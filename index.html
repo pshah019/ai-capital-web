@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The AI Capital Web · June 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  :root{
+    --bg0:#0d1320; --bg1:#070a11; --ink:#eef1f6; --ink-dim:#9aa6bd; --ink-faint:#5e6b85;
+    --line:#1f2a3f; --card:#0f1626; --card-edge:#26344f;
+    --hw:#34d399; --inv:#5b9dff; --svc:#22d3ee; --vc:#e879f9; --cap:#fbbf24;
+    --gold:#e7b24a;
+    --serif:"Fraunces",Georgia,"Times New Roman",serif;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"IBM Plex Sans",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%}
+  body{
+    background:
+      radial-gradient(1200px 700px at 70% -10%, #16223b 0%, rgba(22,34,59,0) 60%),
+      radial-gradient(900px 600px at 10% 110%, #1a1530 0%, rgba(26,21,48,0) 55%),
+      linear-gradient(180deg,var(--bg0),var(--bg1));
+    color:var(--ink); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:26px 20px 60px}
+  header .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  header h1{font-family:var(--serif);font-weight:800;font-size:clamp(30px,6.4vw,56px);line-height:.98;margin:0;letter-spacing:-.01em}
+  header h1 em{font-style:italic;color:var(--gold)}
+  header p.sub{font-size:15px;color:var(--ink-dim);max-width:680px;margin:14px 0 0;line-height:1.55}
+  .rule{height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin:18px 0 22px}
+  .controls{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+  .legend-block .ltitle{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:9px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--card-edge);background:rgba(255,255,255,.02);
+    padding:7px 12px 7px 10px;border-radius:999px;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--ink-dim);
+    transition:.18s;user-select:none}
+  .chip:hover{border-color:#3b4d72;color:var(--ink)}
+  .chip .dot{width:11px;height:11px;border-radius:50%}
+  .chip[data-on="false"]{opacity:.32;text-decoration:line-through;filter:grayscale(.5)}
+  .dot.hw{background:var(--hw)} .dot.inv{background:var(--inv)} .dot.svc{background:var(--svc)} .dot.vc{background:var(--vc)} .dot.cap{background:var(--cap)}
+  .key{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--mono);font-size:10.5px;color:var(--ink-faint)}
+  .key span{display:inline-flex;align-items:center;gap:6px}
+  .key i{width:9px;height:9px;border-radius:50%;border:1.5px solid currentColor;display:inline-block}
+  .btn{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink-dim);background:rgba(255,255,255,.03);
+    border:1px solid var(--card-edge);border-radius:8px;padding:8px 12px;cursor:pointer;transition:.18s}
+  .btn:hover{color:var(--ink);border-color:#3b4d72}
+  .stage{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    background:radial-gradient(700px 460px at 50% 40%, rgba(231,178,74,.05), rgba(0,0,0,0) 70%), rgba(7,10,17,.55);
+    box-shadow:inset 0 0 80px rgba(0,0,0,.5)}
+  svg{display:block;width:100%;height:74vh;min-height:540px;touch-action:none}
+  .hint{position:absolute;left:14px;bottom:12px;font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);pointer-events:none}
+  /* network elements */
+  .link{fill:none;stroke-linecap:round;opacity:.62;transition:opacity .2s}
+  .link.hw{stroke:var(--hw)} .link.inv{stroke:var(--inv)} .link.svc{stroke:var(--svc)} .link.vc{stroke:var(--vc)} .link.cap{stroke:var(--cap)}
+  .node circle.core{fill:#0c1322;stroke-width:2;cursor:pointer;transition:filter .2s}
+  .node text{font-family:var(--mono);fill:var(--ink);paint-order:stroke;stroke:#070a11;stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+  .node text.val{fill:var(--ink-dim);font-size:9.5px}
+  .node:hover circle.core{filter:drop-shadow(0 0 10px rgba(231,178,74,.55))}
+  .faded{opacity:.07 !important}
+  .faded text{opacity:.12}
+  .lit{opacity:1 !important}
+  /* tooltip */
+  .tip{position:fixed;z-index:30;pointer-events:none;max-width:300px;background:rgba(12,18,30,.97);
+    border:1px solid var(--card-edge);border-radius:11px;padding:11px 13px;opacity:0;transform:translateY(4px);
+    transition:opacity .12s;box-shadow:0 18px 40px rgba(0,0,0,.55)}
+  .tip .t-route{font-family:var(--mono);font-size:12px;color:var(--ink);margin-bottom:5px}
+  .tip .t-cat{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    padding:2px 7px;border-radius:5px;margin-bottom:7px}
+  .tip .t-body{font-size:12.5px;color:var(--ink-dim);line-height:1.45;font-family:var(--sans)}
+  /* side panel */
+  .panel{position:fixed;top:0;right:0;height:100%;width:360px;max-width:88vw;z-index:40;
+    background:linear-gradient(180deg,#101727,#0a0f1b);border-left:1px solid var(--card-edge);
+    box-shadow:-24px 0 60px rgba(0,0,0,.5);transform:translateX(102%);transition:transform .32s cubic-bezier(.22,1,.36,1);
+    display:flex;flex-direction:column}
+  .panel.open{transform:translateX(0)}
+  .panel .ph{padding:22px 22px 16px;border-bottom:1px solid var(--line)}
+  .panel .ph .ptype{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+  .panel .ph h2{font-family:var(--serif);font-weight:700;font-size:27px;margin:8px 0 0;letter-spacing:-.01em}
+  .panel .ph .pval{font-family:var(--mono);font-size:12.5px;color:var(--ink-dim);margin-top:7px}
+  .panel .ph .pnote{font-size:13px;color:var(--ink-dim);line-height:1.5;margin-top:12px}
+  .panel .pclose{position:absolute;top:16px;right:16px;cursor:pointer;border:1px solid var(--card-edge);background:rgba(255,255,255,.03);
+    color:var(--ink-dim);border-radius:8px;width:30px;height:30px;font-size:15px;line-height:1;display:grid;place-items:center}
+  .panel .pclose:hover{color:var(--ink)}
+  .pdeals{overflow-y:auto;padding:14px 18px 28px}
+  .pdeals h3{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin:14px 0 8px}
+  .deal{border:1px solid var(--line);border-left-width:3px;border-radius:9px;padding:9px 11px;margin-bottom:8px;background:rgba(255,255,255,.015)}
+  .deal .dr{font-family:var(--mono);font-size:12px;color:var(--ink);margin-bottom:3px}
+  .deal .db{font-size:12px;color:var(--ink-dim);line-height:1.4}
+  .deal.hw{border-left-color:var(--hw)} .deal.inv{border-left-color:var(--inv)} .deal.svc{border-left-color:var(--svc)} .deal.vc{border-left-color:var(--vc)} .deal.cap{border-left-color:var(--cap)}
+  footer{margin-top:22px;font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);line-height:1.7}
+  footer b{color:var(--ink-dim);font-weight:500}
+  @media (max-width:620px){
+    .panel{width:100%;max-width:100%;top:auto;bottom:0;height:74%;border-left:none;border-top:1px solid var(--card-edge);
+      transform:translateY(102%);border-radius:18px 18px 0 0}
+    .panel.open{transform:translateY(0)}
+    svg{height:62vh;min-height:420px}
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Compute · Capital · Silicon — updated June 5, 2026</div>
+    <h1>The AI <em>Capital Web</em></h1>
+    <p class="sub">Who is paying whom across the AI build-out. Each circle is sized by market value (or last private valuation); each line is a deal, colored by type. Tap a circle for its full deal sheet, hover a line for terms, or use the legend to filter. Built from your Bloomberg chart — then re-reported and expanded.</p>
+  </header>
+  <div class="rule"></div>
+  <div class="controls">
+    <div class="legend-block">
+      <div class="ltitle">Deal type — tap to filter</div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="legend-block">
+      <div class="ltitle">Circle ring = role</div>
+      <div class="key" id="typekey"></div>
+      <div style="margin-top:12px"><button class="btn" id="reset">⟲ Reset view</button></div>
+    </div>
+  </div>
+  <div class="stage">
+    <svg id="net"></svg>
+    <div class="hint">Drag to rearrange · scroll / pinch to zoom · tap a circle for details</div>
+  </div>
+  <footer>
+    <div><b>Sizing:</b> public market caps & private valuations are approximate, as of June 2026; private figures are last-round or reported IPO/round targets. <b>Deal values</b> are headline / committed figures and may span multiple years.</div>
+    <div style="margin-top:6px"><b>Sources:</b> company filings (SEC), Bloomberg, CNBC, Reuters, TechCrunch, The Information, DCD &amp; company press releases. Figures simplify complex multi-part agreements — treat as a map, not a balance sheet. Not investment advice.</div>
+  </footer>
+</div>
+<div class="tip" id="tip"></div>
+<aside class="panel" id="panel">
+  <div class="ph">
+    <div class="pclose" id="pclose">×</div>
+    <div class="ptype" id="p-type"></div>
+    <h2 id="p-name"></h2>
+    <div class="pval" id="p-val"></div>
+    <div class="pnote" id="p-note"></div>
+  </div>
+  <div class="pdeals" id="p-deals"></div>
+</aside>
+<script>
+/* ---------- category + role metadata ---------- */
+const CATS = {
+  hw:{label:"Hardware / Software", color:"#34d399"},
+  inv:{label:"Investment / Equity", color:"#5b9dff"},
+  svc:{label:"Services / Compute", color:"#22d3ee"},
+  vc:{label:"Venture Capital", color:"#e879f9"},
+  cap:{label:"Capital Raise / Debt", color:"#fbbf24"},
+};
+const ROLES = {
+  lab:{label:"AI lab", ring:"#f3efe3"},
+  hyper:{label:"Hyperscaler / cloud", ring:"#8fb2ec"},
+  chip:{label:"Chipmaker", ring:"#ffa45c"},
+  neo:{label:"Neocloud / GPU infra", ring:"#c4a7f0"},
+  space:{label:"Space + AI", ring:"#ff6b6b"},
+  fin:{label:"Financier / investor", ring:"#7fd6a3"},
+  startup:{label:"Applied-AI startup", ring:"#c8cdd6"},
+  market:{label:"Public debt & equity", ring:"#fbbf24"},
+};
+/* ---------- nodes (v = approx $B for sizing) ---------- */
+const NODES = [
+  {id:"nvidia",   label:"Nvidia",        role:"chip",  v:5200, val:"~$5.2T mkt cap",
+    note:"The hub of the hub. Sells AI silicon to nearly everyone — and is also an equity investor in OpenAI, Anthropic, SpaceX/xAI, CoreWeave, Intel, Mistral and Figure."},
+  {id:"google",   label:"Alphabet",      role:"hyper", v:4600, val:"~$4.6T mkt cap",
+    note:"2026 capex $180–190B. Raised $84.75B in equity (Jun 2026, incl. Berkshire) plus >$100B of debt. Sells TPUs to Anthropic & Meta — yet also rents Nvidia GPUs from SpaceX."},
+  {id:"microsoft",label:"Microsoft",     role:"hyper", v:3100, val:"~$3.1T mkt cap",
+    note:"Owns ~27% of OpenAI (~$135B) with model rights to 2032. 2026 capex ~$190B and still capacity-constrained. Hedging via Anthropic ($5B) and a 900MW Crusoe lease."},
+  {id:"amazon",   label:"Amazon",        role:"hyper", v:2900, val:"~$2.9T mkt cap",
+    note:"Now backs BOTH frontier labs — $50B into OpenAI and up to $25B into Anthropic. 2026 capex ~$200B. Custom silicon: Trainium / Inferentia."},
+  {id:"meta",     label:"Meta",          role:"hyper", v:1850, val:"~$1.9T mkt cap",
+    note:"2026 capex $125–145B; ~$600B U.S. infrastructure pledged through 2028. Its 5GW Hyperion campus (Louisiana) is financed off-balance-sheet via Blue Owl / PIMCO."},
+  {id:"spacex",   label:"SpaceX · xAI",  role:"space", v:1750, val:"~$1.75T IPO target",
+    note:"Absorbed xAI in Feb 2026 ($1.25T combined merger). IPO targeted ~Jun 12, 2026 at ~$1.75T, raising up to $75B — the largest ever. Now rents out its Colossus GPU clusters to Google & Anthropic, and is pivoting toward orbital data centers. Owns Grok and X."},
+  {id:"broadcom", label:"Broadcom",      role:"chip",  v:1700, val:"~$1.7T mkt cap",
+    note:"The quiet kingmaker of custom AI silicon — co-designs OpenAI's accelerators (~10GW) and Google's TPUs that Anthropic & Meta run on."},
+  {id:"berkshire",label:"Berkshire H.",  role:"fin",   v:1050, val:"~$1.05T mkt cap",
+    note:"Anchored Alphabet's 2026 raise with a $10B private placement — a notable AI-era bet from the post-Buffett Berkshire."},
+  {id:"openai",   label:"OpenAI",        role:"lab",   v:850,  val:"~$850B (private)",
+    note:"Now a Public Benefit Corp. Closed the largest private round ever (~$110–122B) led by Amazon, Nvidia & SoftBank. Anchors a ~17GW U.S. build-out (Stargate). IPO expected 2026–27 above $1T."},
+  {id:"oracle",   label:"Oracle",        role:"hyper", v:750,  val:"~$750B mkt cap",
+    note:"Stargate's cloud anchor — a $300B, ~$60B/yr deal with OpenAI. 2026 capex ~$50B; raised $25B of bonds with orders topping $129B."},
+  {id:"anthropic",label:"Anthropic",     role:"lab",   v:350,  val:"$350B (private)",
+    note:"Revenue run-rate passed $30B (Apr 2026), ahead of OpenAI. Uniquely multi-cloud: Google TPUs, AWS Trainium, Azure+Nvidia, plus SpaceX's Colossus. 2026 IPO expected."},
+  {id:"amd",      label:"AMD",           role:"chip",  v:350,  val:"~$350B mkt cap",
+    note:"Landed OpenAI as a marquee customer for 6GW of Instinct GPUs — and handed OpenAI a warrant for up to ~10% of AMD to seal it."},
+  {id:"intel",    label:"Intel",         role:"chip",  v:180,  val:"~$180B mkt cap",
+    note:"Took a surprise $5B / ~4% investment from Nvidia (Sept 2025) as it fights to stay relevant in AI silicon."},
+  {id:"softbank", label:"SoftBank",      role:"fin",   v:150,  val:"~$150B mkt cap",
+    note:"Co-founder of the $500B Stargate program and a $30B investor in OpenAI's latest round."},
+  {id:"coreweave",label:"CoreWeave",     role:"neo",   v:80,   val:"~$80B mkt cap",
+    note:"Nvidia-backed neocloud; rents GPU capacity to OpenAI and Microsoft at huge scale."},
+  {id:"figure",   label:"Figure AI",     role:"startup",v:39,  val:"~$39B (private)",
+    note:"Humanoid-robot maker; backed by Nvidia, Microsoft and Jeff Bezos."},
+  {id:"blueowl",  label:"Blue Owl · PIMCO",role:"fin", v:33,   val:"private-credit",
+    note:"Own 80% of Meta's Hyperion JV and arranged ~$27B of private credit (PIMCO as anchor lender) — the template for off-balance-sheet AI build-outs."},
+  {id:"nebius",   label:"Nebius",        role:"neo",   v:30,   val:"~$30B mkt cap",
+    note:"European-rooted neocloud; signed a ~$17–19B GPU-capacity deal with Microsoft."},
+  {id:"anysphere",label:"Anysphere",     role:"startup",v:30,  val:"~$30B (private)",
+    note:"Maker of Cursor. OpenAI-backed — and the target of SpaceX's $10B deal with an option to buy it for up to $60B."},
+  {id:"mgx",      label:"MGX",           role:"fin",   v:100,  val:"sovereign fund",
+    note:"Abu Dhabi's AI investment vehicle and a founding partner of the $500B Stargate program."},
+  {id:"crusoe",   label:"Crusoe",        role:"neo",   v:10,   val:"~$10B (private)",
+    note:"Builds the Abilene, TX 'AI factory' campus — OpenAI/Oracle tenants on one tract, and a 900MW Microsoft lease right next door."},
+  {id:"harvey",   label:"Harvey",        role:"startup",v:8,   val:"~$8B (private)",
+    note:"Legal-AI startup; OpenAI-backed."},
+  {id:"mistral",  label:"Mistral",       role:"lab",   v:14,   val:"~$14B (private)",
+    note:"European frontier lab; counts Nvidia among its backers."},
+  {id:"nscale",   label:"Nscale",        role:"neo",   v:3,    val:"private",
+    note:"GPU-cloud build-out partner contracting capacity to hyperscalers."},
+  {id:"ambience", label:"Ambience Health",role:"startup",v:1.5,val:"~$1.5B (private)",
+    note:"Healthcare-documentation AI; OpenAI-backed."},
+  {id:"markets",  label:"Debt & Equity Markets",role:"market",v:600,val:"capital source",
+    note:"Not a company — the bond and equity markets now bankrolling record AI capex. Hyperscalers alone are on track for $700B+ of 2026 capital spending, increasingly funded by debt and stock sales."},
+];
+/* ---------- links ---------- */
+const LINKS = [
+  // OpenAI
+  ["microsoft","openai","inv","27% stake (~$135B); rights to OpenAI models through 2032.",135],
+  ["openai","microsoft","svc","$250B Azure compute commitment.",250],
+  ["nvidia","openai","inv","Up to $100B committed; ~$30B in the latest round; 10GW of Nvidia systems.",100],
+  ["amazon","openai","inv","$50B — led the ~$110B round ($15B now, $35B on conditions).",50],
+  ["openai","amazon","svc","$38B AWS deal + $100B more over 8 yrs; AWS hosts OpenAI 'Frontier'.",138],
+  ["softbank","openai","inv","$30B in the latest round; co-founder of Stargate.",30],
+  ["openai","oracle","svc","$300B cloud deal (Stargate): ~$60B/yr, 2027–31.",300],
+  ["oracle","nvidia","hw","~$40B for ~400K GB200 GPUs for the Abilene Stargate site.",40],
+  ["openai","amd","hw","Deploying 6GW of AMD Instinct GPUs.",30],
+  ["amd","openai","inv","Warrant: OpenAI may buy up to 160M AMD shares (~10%).",20],
+  ["openai","broadcom","hw","Custom OpenAI accelerators, ~10GW.",20],
+  ["openai","coreweave","svc","Multi-year GPU cloud capacity.",22],
+  ["nvidia","coreweave","inv",">5% equity stake; ~$6.3B of cloud purchases.",10],
+  ["microsoft","crusoe","svc","Leases 900MW at the Abilene, TX campus.",9],
+  ["mgx","openai","inv","Stargate JV partner ($500B program).",15],
+  ["openai","anysphere","vc","OpenAI-backed (Cursor).",2],
+  ["openai","harvey","vc","OpenAI-backed (legal AI).",2],
+  ["openai","ambience","vc","OpenAI-backed (healthcare AI).",1.5],
+  // Anthropic
+  ["google","anthropic","inv","Up to $40B; up to 1M TPUs / ~5GW of capacity.",40],
+  ["anthropic","google","svc","Reportedly up to $200B of Google Cloud over 5 yrs (Ironwood TPUs).",200],
+  ["amazon","anthropic","inv","Up to $25B; Project Rainier, ~5GW of Trainium.",25],
+  ["anthropic","amazon","svc","Trainium compute (Project Rainier).",13],
+  ["microsoft","anthropic","inv","Up to $5B.",5],
+  ["anthropic","microsoft","svc","$30B of Azure compute; up to 1GW.",30],
+  ["nvidia","anthropic","inv","Up to $10B; Grace Blackwell + Vera Rubin (≤1GW).",10],
+  ["broadcom","anthropic","hw","Co-designs next-gen TPUs (3.5GW from 2027).",15],
+  ["anthropic","spacex","svc","$1.25B/month for Colossus 1 (Memphis) through 2029.",45],
+  // Alphabet
+  ["berkshire","google","inv","$10B private placement (part of the $84.75B raise).",10],
+  ["google","spacex","svc","$920M/month (~$30B) for ~110K Nvidia GPUs, 2026–29.",30],
+  ["meta","google","svc","~$10B Google Cloud deal + TPU purchases.",10],
+  // Meta
+  ["meta","nvidia","hw","Up to $50B of Nvidia systems (Blackwell/Rubin, Spectrum-X).",50],
+  ["blueowl","meta","cap","~$27B private credit (PIMCO anchor) for Hyperion — Blue Owl owns 80%.",27],
+  ["meta","oracle","svc","~$20B of Oracle cloud (reported, in discussions).",20],
+  // SpaceX / xAI
+  ["spacex","anysphere","vc","$10B deal + option to acquire Cursor for up to $60B.",10],
+  ["spacex","nvidia","hw","Nvidia GPUs powering the Colossus clusters.",30],
+  // chips
+  ["nvidia","intel","inv","$5B for ~4% (Sept 2025).",5],
+  // neoclouds
+  ["microsoft","coreweave","svc","Anchor customer — very large GPU capacity contracts.",14],
+  ["microsoft","nebius","svc","~$17–19B GPU-capacity deal.",18],
+  ["microsoft","nscale","svc","GPU-capacity contract.",6],
+  // labs / robotics
+  ["nvidia","mistral","inv","Backer (Series C, ~€1.7B / $2B round).",2],
+  ["nvidia","figure","inv","Backer (humanoid robots).",1],
+  ["microsoft","figure","inv","Backer.",1],
+  // capital raises
+  ["markets","google","cap","$84.75B of equity (Jun 2026) + >$100B of bonds.",85],
+  ["markets","meta","cap","$30B bond sale (2025) + a new H1'26 offering.",30],
+  ["markets","oracle","cap","$25B of bonds; up to $50B of debt+equity for 2026.",25],
+  ["markets","microsoft","cap","Debt issuance funding ~$190B of 2026 capex.",30],
+  ["markets","amazon","cap","Bond issuance funding ~$200B of 2026 capex.",30],
+  ["markets","spacex","cap","IPO up to ~$75B at ~$1.75T (Jun 2026) — the largest ever.",75],
+].map(d=>({source:d[0],target:d[1],cat:d[2],body:d[3],w:d[4]}));
+/* ---------- build ---------- */
+const idIndex = new Map(NODES.map((n,i)=>[n.id,i]));
+const nameOf  = id=>NODES[idIndex.get(id)].label;
+const rScale  = d3.scaleSqrt().domain([1.5,5200]).range([10,58]).clamp(true);
+const wScale  = d3.scaleSqrt().domain([1.5,300]).range([1.2,6]).clamp(true);
+NODES.forEach(n=>n.r=rScale(n.v));
+const svg = d3.select("#net");
+let W=svg.node().clientWidth, H=svg.node().clientHeight;
+svg.attr("viewBox",[0,0,W,H]);
+// defs: arrow markers per category + glow
+const defs = svg.append("defs");
+Object.entries(CATS).forEach(([k,c])=>{
+  defs.append("marker")
+    .attr("id","arw-"+k).attr("viewBox","0 -5 10 10").attr("refX",9).attr("refY",0)
+    .attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto")
+    .append("path").attr("d","M0,-4L9,0L0,4Z").attr("fill",c.color).attr("opacity",.9);
+});
+const root = svg.append("g");
+svg.call(d3.zoom().scaleExtent([0.35,3.2]).on("zoom",ev=>root.attr("transform",ev.transform)));
+const linkSel = root.append("g").selectAll("path")
+  .data(LINKS).join("path")
+    .attr("class",d=>"link "+d.cat)
+    .attr("stroke-width",d=>wScale(d.w))
+    .attr("marker-end",d=>`url(#arw-${d.cat})`)
+    .on("mousemove",(ev,d)=>showTip(ev, `${nameOf(d.source.id||d.source)} → ${nameOf(d.target.id||d.target)}`, d.cat, d.body))
+    .on("mouseleave",hideTip)
+    .on("click",(ev,d)=>{ev.stopPropagation(); showTip(ev,`${nameOf(d.source.id)} → ${nameOf(d.target.id)}`,d.cat,d.body,true);});
+const nodeSel = root.append("g").selectAll("g")
+  .data(NODES).join("g").attr("class","node")
+    .call(d3.drag()
+      .on("start",(ev,d)=>{if(!ev.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
+      .on("drag",(ev,d)=>{d.fx=ev.x;d.fy=ev.y;})
+      .on("end",(ev,d)=>{if(!ev.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}))
+    .on("click",(ev,d)=>{ev.stopPropagation();focusNode(d);openPanel(d);})
+    .on("mousemove",(ev,d)=>showTip(ev,d.label,null,`${ROLES[d.role].label} · ${d.val}`))
+    .on("mouseleave",hideTip);
+nodeSel.append("circle").attr("class","core")
+  .attr("r",d=>d.r)
+  .attr("stroke",d=>ROLES[d.role].ring)
+  .attr("stroke-dasharray",d=>d.role==="market"?"3 3":null)
+  .attr("fill",d=>d.role==="market"?"rgba(251,191,36,.05)":"#0c1322");
+nodeSel.append("text").attr("class","name").attr("text-anchor","middle")
+  .attr("dy",d=>d.r+13).style("font-size",d=>d.v>800?"13px":d.v>120?"11.5px":"10px")
+  .style("font-weight",d=>d.v>800?"600":"500").text(d=>d.label);
+nodeSel.append("text").attr("class","val").attr("text-anchor","middle")
+  .attr("dy",d=>d.r+25).text(d=>d.v>120?d.val:"");
+/* ---------- simulation ---------- */
+const sim = d3.forceSimulation(NODES)
+  .force("link", d3.forceLink(LINKS).id(d=>d.id).distance(d=>{
+      const r=(d.source.r||14)+(d.target.r||14);
+      return r + (d.source.role==="market"||d.target.role==="market"?150:80);
+  }).strength(.45))
+  .force("charge", d3.forceManyBody().strength(-560))
+  .force("collide", d3.forceCollide().radius(d=>d.r+16).strength(.9))
+  .force("x", d3.forceX(W/2).strength(.045))
+  .force("y", d3.forceY(H/2).strength(.06))
+  .on("tick",ticked);
+// gentle seed so it settles pleasingly
+NODES.forEach((n,i)=>{const a=i/NODES.length*2*Math.PI;n.x=W/2+Math.cos(a)*Math.min(W,H)*0.34;n.y=H/2+Math.sin(a)*Math.min(W,H)*0.34;});
+function curvedPath(d){
+  const s=d.source,t=d.target;
+  let dx=t.x-s.x, dy=t.y-s.y, len=Math.hypot(dx,dy)||1;
+  const sign = idIndex.get(s.id) < idIndex.get(t.id) ? 1 : -1;
+  const off = Math.min(Math.max(len*0.16,18),90)*sign;
+  const nx=-dy/len, ny=dx/len;
+  const cx=(s.x+t.x)/2+nx*off, cy=(s.y+t.y)/2+ny*off;
+  // trim ends to circle edges
+  let es_x=cx-s.x, es_y=cy-s.y, el=Math.hypot(es_x,es_y)||1;
+  const sx=s.x+es_x/el*(s.r+2), sy=s.y+es_y/el*(s.r+2);
+  let et_x=cx-t.x, et_y=cy-t.y, etl=Math.hypot(et_x,et_y)||1;
+  const tx=t.x+et_x/etl*(t.r+7), ty=t.y+et_y/etl*(t.r+7);
+  return `M${sx},${sy}Q${cx},${cy} ${tx},${ty}`;
+}
+function ticked(){
+  linkSel.attr("d",curvedPath);
+  nodeSel.attr("transform",d=>`translate(${d.x},${d.y})`);
+}
+/* ---------- tooltip ---------- */
+const tip=document.getElementById("tip");
+function showTip(ev,route,cat,body,pin){
+  let html=`<div class="t-route">${route}</div>`;
+  if(cat){const c=CATS[cat];html+=`<span class="t-cat" style="color:${c.color};background:${c.color}1f">${c.label}</span>`;}
+  html+=`<div class="t-body">${body}</div>`;
+  tip.innerHTML=html;
+  const pad=14; let x=ev.clientX+16, y=ev.clientY+16;
+  tip.style.opacity=1;
+  const bb=tip.getBoundingClientRect();
+  if(x+bb.width>innerWidth-pad)x=ev.clientX-bb.width-16;
+  if(y+bb.height>innerHeight-pad)y=ev.clientY-bb.height-16;
+  tip.style.left=x+"px"; tip.style.top=y+"px";
+}
+function hideTip(){tip.style.opacity=0;}
+/* ---------- focus / highlight ---------- */
+let active=null;
+function focusNode(d){
+  if(active===d.id){clearFocus();return;}
+  active=d.id;
+  const keep=new Set([d.id]);
+  LINKS.forEach(l=>{if(l.source.id===d.id)keep.add(l.target.id);if(l.target.id===d.id)keep.add(l.source.id);});
+  nodeSel.classed("faded",n=>!keep.has(n.id)).classed("lit",n=>keep.has(n.id));
+  linkSel.classed("faded",l=>!(l.source.id===d.id||l.target.id===d.id))
+         .classed("lit",l=>(l.source.id===d.id||l.target.id===d.id));
+}
+function clearFocus(){active=null;nodeSel.classed("faded",false).classed("lit",false);linkSel.classed("faded",false).classed("lit",false);}
+svg.on("click",()=>{clearFocus();closePanel();hideTip();});
+/* ---------- side panel ---------- */
+const panel=document.getElementById("panel");
+function openPanel(d){
+  document.getElementById("p-type").textContent=ROLES[d.role].label;
+  document.getElementById("p-name").textContent=d.label;
+  document.getElementById("p-val").textContent=d.val;
+  document.getElementById("p-note").textContent=d.note;
+  const outs=LINKS.filter(l=>l.source.id===d.id), ins=LINKS.filter(l=>l.target.id===d.id);
+  const dealHTML=l=>{
+    const other = (l.source.id===d.id)?nameOf(l.target.id):nameOf(l.source.id);
+    const dir = (l.source.id===d.id)?"→ "+other:"← "+other;
+    return `<div class="deal ${l.cat}"><div class="dr">${dir}</div><div class="db">${l.body}</div></div>`;
+  };
+  let html="";
+  if(outs.length){html+=`<h3>Outgoing — pays / invests in</h3>`+outs.map(dealHTML).join("");}
+  if(ins.length){html+=`<h3>Incoming — receives from</h3>`+ins.map(dealHTML).join("");}
+  if(!outs.length&&!ins.length)html=`<div class="db" style="padding:8px">No mapped deals.</div>`;
+  document.getElementById("p-deals").innerHTML=html;
+  panel.classList.add("open");
+}
+function closePanel(){panel.classList.remove("open");}
+document.getElementById("pclose").addEventListener("click",e=>{e.stopPropagation();closePanel();clearFocus();});
+panel.addEventListener("click",e=>e.stopPropagation());
+/* ---------- legend / filters ---------- */
+const chips=document.getElementById("chips"); const onCats=new Set(Object.keys(CATS));
+Object.entries(CATS).forEach(([k,c])=>{
+  const el=document.createElement("div"); el.className="chip"; el.dataset.on="true";
+  el.innerHTML=`<span class="dot ${k}"></span>${c.label}`;
+  el.addEventListener("click",()=>{
+    if(onCats.has(k)){onCats.delete(k);el.dataset.on="false";}else{onCats.add(k);el.dataset.on="true";}
+    linkSel.style("display",l=>onCats.has(l.cat)?null:"none");
+  });
+  chips.appendChild(el);
+});
+const tk=document.getElementById("typekey");
+Object.values(ROLES).forEach(r=>{const s=document.createElement("span");s.style.color=r.ring;s.innerHTML=`<i></i>${r.label}`;tk.appendChild(s);});
+/* ---------- reset / resize ---------- */
+document.getElementById("reset").addEventListener("click",()=>{
+  clearFocus();closePanel();
+  svg.transition().duration(450).call(d3.zoom().transform, d3.zoomIdentity);
+  sim.alpha(.6).restart();
+});
+addEventListener("resize",()=>{
+  W=svg.node().clientWidth;H=svg.node().clientHeight;svg.attr("viewBox",[0,0,W,H]);
+  sim.force("x",d3.forceX(W/2).strength(.045)).force("y",d3.forceY(H/2).strength(.06)).alpha(.3).restart();
+});
+</script>
+</body>
+</html>
