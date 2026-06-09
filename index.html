@@ -103,6 +103,13 @@
     .panel.open{transform:translateY(0)}
     svg{height:62vh;min-height:420px}
   }
+  /* tabs */
+  .tabs{display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap}
+  .tab{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink-dim);
+    background:rgba(255,255,255,.03);border:1px solid var(--card-edge);border-radius:10px;
+    padding:10px 17px;cursor:pointer;transition:.18s}
+  .tab:hover{color:var(--ink);border-color:#3b4d72}
+  .tab.active{color:#0c1322;background:var(--gold);border-color:var(--gold);font-weight:600}
 </style>
 </head>
 <body>
@@ -114,6 +121,11 @@
     <p class="sub">Who is paying whom across the AI build-out. Each circle is sized by market value (or last private valuation); each line is a deal, colored by type. Tap a circle for its full deal sheet, hover a line for terms, or use the legend to filter. Built from your Bloomberg chart — then re-reported and expanded.</p>
   </header>
   <div class="rule"></div>
+  <div class="tabs">
+    <button class="tab active" data-view="capital">◆ The Capital Web</button>
+    <button class="tab" data-view="nvidia">▲ Nvidia Web</button>
+  </div>
+  <div id="view-capital">
   <div class="controls">
     <div class="legend-block">
       <div class="ltitle">Deal type — tap to filter</div>
@@ -133,6 +145,30 @@
     <div><b>Sizing:</b> public market caps & private valuations are approximate, as of June 2026; private figures are last-round or reported IPO/round targets. <b>Deal values</b> are headline / committed figures and may span multiple years.</div>
     <div style="margin-top:6px"><b>Sources:</b> company filings (SEC), Bloomberg, CNBC, Reuters, TechCrunch, The Information, DCD &amp; company press releases. Figures simplify complex multi-part agreements — treat as a map, not a balance sheet. Not investment advice.</div>
   </footer>
+  </div><!-- /view-capital -->
+
+  <div id="view-nvidia" style="display:none">
+    <p class="sub" style="margin:0 0 16px">Nvidia's live global web — its current inbound and outbound investments and partnerships, centred on the company itself. Arrows pointing <b>into</b> Nvidia are inbound (compute customers + supply chain); arrows pointing <b>out</b> are Nvidia's reach (equity stakes, partnerships, sovereign-AI buildouts). Tap a circle for its full sheet.</p>
+    <div class="controls">
+      <div class="legend-block">
+        <div class="ltitle">Relationship type — tap to filter</div>
+        <div class="chips" id="chips-nv"></div>
+      </div>
+      <div class="legend-block">
+        <div class="ltitle">Circle ring = sector</div>
+        <div class="key" id="typekey-nv"></div>
+        <div style="margin-top:12px"><button class="btn" id="reset-nv">⟲ Reset view</button></div>
+      </div>
+    </div>
+    <div class="stage">
+      <svg id="net-nv"></svg>
+      <div class="hint">Drag to rearrange · scroll / pinch to zoom · tap a circle for details</div>
+    </div>
+    <footer>
+      <div><b>Inbound vs outbound:</b> inbound = money / compute flowing to Nvidia (customers, suppliers); outbound = Nvidia's capital &amp; partnerships flowing out. Circles sized by market cap or last private valuation, approximate as of June 2026.</div>
+      <div style="margin-top:6px"><b>Sources:</b> Nvidia, OpenAI, Nokia, Intel, Marvell, Eli Lilly, Reliance &amp; partner press releases; CNBC, Reuters, TechCrunch, Tom's Hardware, DCD. A map, not a balance sheet. Not investment advice.</div>
+    </footer>
+  </div>
 </div>
 <div class="tip" id="tip"></div>
 <aside class="panel" id="panel">
@@ -438,6 +474,247 @@ addEventListener("resize",()=>{
   W=svg.node().clientWidth;H=svg.node().clientHeight;svg.attr("viewBox",[0,0,W,H]);
   sim.force("x",d3.forceX(W/2).strength(.045)).force("y",d3.forceY(H/2).strength(.06)).alpha(.3).restart();
 });
+</script>
+<script>
+/* ===== Tab switching (isolated; does not touch the capital web) ===== */
+(function(){
+  let nvInit=false;
+  function showView(v){
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.view===v));
+    const cap=document.getElementById('view-capital'), nv=document.getElementById('view-nvidia');
+    const panel=document.getElementById('panel'); if(panel) panel.classList.remove('open');
+    const tip=document.getElementById('tip'); if(tip) tip.style.opacity=0;
+    if(v==='nvidia'){
+      nv.style.display=''; cap.style.display='none';
+      if(!nvInit){ nvInit=true; initNvidiaWeb(); } else if(window.nvResize){ window.nvResize(); }
+    } else {
+      cap.style.display=''; nv.style.display='none';
+      window.dispatchEvent(new Event('resize'));
+    }
+  }
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showView(t.dataset.view)));
+})();
+
+/* ===== Nvidia Web — self-contained, lazily initialised on first open ===== */
+function initNvidiaWeb(){
+  /* category keys reuse the capital web's CSS colours (inv/hw/cap/vc/svc) with Nvidia-specific labels */
+  const CATS={
+    inv:{label:"Nvidia equity investment (out)", color:"#5b9dff"},
+    hw:{label:"Compute customer (in $)", color:"#34d399"},
+    cap:{label:"Supply chain (in)", color:"#fbbf24"},
+    vc:{label:"Strategic partnership", color:"#e879f9"},
+    svc:{label:"Sovereign / national AI", color:"#22d3ee"},
+  };
+  const ROLES={
+    chip:{label:"Chipmaker", ring:"#ffa45c"},
+    lab:{label:"AI lab", ring:"#f3efe3"},
+    cloud:{label:"Hyperscaler / cloud", ring:"#8fb2ec"},
+    neo:{label:"Neocloud / GPU infra", ring:"#c4a7f0"},
+    supplier:{label:"Supply chain", ring:"#7fd6a3"},
+    startup:{label:"AI startup", ring:"#c8cdd6"},
+    auto:{label:"Auto / robotaxi", ring:"#ff8f6b"},
+    health:{label:"Healthcare / pharma", ring:"#6ee7b7"},
+    enterprise:{label:"Enterprise software", ring:"#d6bcfa"},
+    telecom:{label:"Telecom", ring:"#93c5fd"},
+    sov:{label:"Sovereign / nation", ring:"#fbbf24"},
+  };
+  const NODES=[
+    {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"The center of the AI economy: designs the GPUs nearly everyone buys, then recycles the profits into equity stakes, partnerships and sovereign buildouts spanning labs, clouds, chips, autos, telecom, pharma and nations."},
+    {id:"openai",label:"OpenAI",role:"lab",v:850,val:"~$850B (private)",note:"Nvidia signed an LOI to invest up to $100B (~$30B deployed); now stalling — Huang says $100B is 'not in the cards.'"},
+    {id:"anthropic",label:"Anthropic",role:"lab",v:600,val:"~$380B→~$1T",note:"Up to $10B from Nvidia (Nov 2025); runs Grace Blackwell + Vera Rubin alongside TPUs and Trainium."},
+    {id:"xai",label:"xAI",role:"lab",v:250,val:"~$250B (in SpaceX)",note:"Nvidia put $2B into xAI's $20B round (Jan 2026); xAI is now inside SpaceX."},
+    {id:"mistral",label:"Mistral",role:"lab",v:14,val:"~$14B (private)",note:"European frontier lab; Nvidia is a backer."},
+    {id:"coreweave",label:"CoreWeave",role:"neo",v:80,val:"~$80B mkt cap",note:"Nvidia holds >5% and backstops $6.3B of unsold capacity through 2032 — then rents it back for its own R&D."},
+    {id:"lambda",label:"Lambda",role:"neo",v:4,val:"~$4B (private)",note:"GPU cloud; Nvidia-backed, with capacity leased back."},
+    {id:"nscale",label:"Nscale",role:"neo",v:3,val:"private",note:"Nvidia-backed sovereign-AI neocloud (Stargate Norway)."},
+    {id:"intel",label:"Intel",role:"chip",v:180,val:"~$180B mkt cap",note:"$5B for ~4% ($23.28/sh, Sept 2025); co-developing custom x86 CPUs + RTX chiplets over NVLink."},
+    {id:"marvell",label:"Marvell",role:"chip",v:90,val:"~$90B mkt cap",note:"$2B (Mar 2026) + NVLink Fusion — binds Marvell's custom XPUs to Nvidia's fabric so Nvidia keeps a cut even in non-Nvidia racks."},
+    {id:"nokia",label:"Nokia",role:"telecom",v:30,val:"~$30B mkt cap",note:"$1B for 2.9% ($6.01/sh, Oct 2025) + a 6G / AI-RAN partnership (with T-Mobile)."},
+    {id:"cursor",label:"Cursor",role:"startup",v:29,val:"~$29B (private)",note:"Maker of Cursor (Anysphere); Nvidia joined the $2.3B Series D (Nov 2025)."},
+    {id:"figure",label:"Figure AI",role:"startup",v:39,val:"~$39B (private)",note:"Humanoid robots; Nvidia is a backer."},
+    {id:"synthesia",label:"Synthesia",role:"startup",v:4,val:"~$4B (private)",note:"UK AI-video startup; Nvidia joined its $200M Series E (2026)."},
+    {id:"microsoft",label:"Microsoft",role:"cloud",v:3100,val:"~$3.1T mkt cap",note:"Nvidia's largest customer — vast Blackwell/Rubin fleets across Azure."},
+    {id:"amazon",label:"Amazon",role:"cloud",v:2900,val:"~$2.9T mkt cap",note:"Buys Nvidia for AWS even while pushing its own Trainium."},
+    {id:"google",label:"Alphabet",role:"cloud",v:4600,val:"~$4.6T mkt cap",note:"Buys Nvidia GPUs despite designing its own TPUs."},
+    {id:"meta",label:"Meta",role:"cloud",v:1850,val:"~$1.9T mkt cap",note:"Committed up to $50B of Nvidia systems (Blackwell/Rubin, Spectrum-X)."},
+    {id:"oracle",label:"Oracle",role:"cloud",v:750,val:"~$750B mkt cap",note:"~$40B for ~400K GB200 GPUs for the Abilene Stargate site."},
+    {id:"tesla",label:"Tesla",role:"auto",v:1300,val:"~$1.3T mkt cap",note:"Returned to buying Nvidia after shelving its in-house Dojo supercomputer."},
+    {id:"tsmc",label:"TSMC",role:"supplier",v:1100,val:"~$1.1T mkt cap",note:"Sole-source foundry for every Nvidia GPU; its CoWoS advanced packaging is the industry's tightest chokepoint."},
+    {id:"skhynix",label:"SK Hynix",role:"supplier",v:150,val:"~$150B mkt cap",note:"Lead HBM4 memory supplier for Vera Rubin; 2026 output sold out."},
+    {id:"samsung",label:"Samsung",role:"supplier",v:350,val:"~$350B mkt cap",note:"Shipping HBM4 and in next-gen foundry talks with Nvidia."},
+    {id:"micron",label:"Micron",role:"supplier",v:250,val:"~$250B mkt cap",note:"HBM memory supplier; 2026 production sold out."},
+    {id:"foxconn",label:"Foxconn",role:"supplier",v:90,val:"~$90B mkt cap",note:"Builds Nvidia's AI servers and rack-scale systems (incl. US plants)."},
+    {id:"elililly",label:"Eli Lilly",role:"health",v:700,val:"~$700B mkt cap",note:"$1B, 5-year co-innovation lab in San Francisco for AI drug discovery, trials and manufacturing."},
+    {id:"palantir",label:"Palantir",role:"enterprise",v:400,val:"~$400B mkt cap",note:"Joint operational- and sovereign-AI stack — Nvidia Nemotron models inside Palantir's platform."},
+    {id:"uber",label:"Uber",role:"auto",v:200,val:"~$200B mkt cap",note:"Robotaxi partnership scaling to 28 cities on Nvidia DRIVE."},
+    {id:"mercedes",label:"Mercedes-Benz",role:"auto",v:70,val:"~$70B mkt cap",note:"DRIVE AV software powers the all-new Mercedes CLA."},
+    {id:"toyota",label:"Toyota",role:"auto",v:300,val:"~$300B mkt cap",note:"Part of the DRIVE Hyperion robotaxi initiative."},
+    {id:"hyundai",label:"Hyundai",role:"auto",v:50,val:"~$50B mkt cap",note:"DRIVE Hyperion + Level-4 robotaxi via the Motional JV."},
+    {id:"humain",label:"HUMAIN (Saudi)",role:"sov",v:100,val:"Saudi PIF · $100B+",note:"Saudi sovereign-AI champion building 11 data centers (2.2GW) on several hundred thousand Nvidia GPUs."},
+    {id:"g42",label:"G42 (UAE)",role:"sov",v:80,val:"UAE sovereign AI",note:"Anchor of Stargate UAE — a 5GW Abu Dhabi cluster with OpenAI, Oracle, SoftBank & Cisco."},
+    {id:"skorea",label:"South Korea",role:"sov",v:60,val:"260k+ GPUs",note:"National buildout with Samsung, Hyundai, SK Group and Naver Cloud — over a quarter-million Nvidia GPUs."},
+    {id:"reliance",label:"Reliance (India)",role:"sov",v:240,val:"~$240B (Reliance)",note:"2,000MW of AI data centers in India, led by Jio, on Nvidia silicon."},
+  ];
+  const LINKS=[
+    ["nvidia","openai","inv","Up to $100B LOI (~$30B in) — now stalling; Huang: $100B 'not in the cards.'",30],
+    ["nvidia","anthropic","inv","Up to $10B (Nov 2025); Grace Blackwell + Vera Rubin.",10],
+    ["nvidia","xai","inv","$2B in xAI's $20B round (Jan 2026).",2],
+    ["nvidia","mistral","inv","Backer of the European frontier lab.",2],
+    ["nvidia","coreweave","inv",">5% stake + a $6.3B take-or-pay backstop through 2032.",10],
+    ["nvidia","lambda","inv","Backer; leases capacity back.",1],
+    ["nvidia","nscale","inv","Backer; sovereign-AI neocloud.",1],
+    ["nvidia","intel","inv","$5B for ~4% (Sept 2025) + custom x86/RTX co-design over NVLink.",5],
+    ["nvidia","marvell","inv","$2B (Mar 2026) + NVLink Fusion for custom XPUs.",2],
+    ["nvidia","nokia","inv","$1B for 2.9% (Oct 2025) + 6G / AI-RAN partnership.",1],
+    ["nvidia","cursor","inv","$2.3B Series D (Nov 2025) at ~$29B.",2],
+    ["nvidia","figure","inv","Backer (humanoid robots).",1],
+    ["nvidia","synthesia","inv","Joined the $200M Series E (2026).",1],
+    ["microsoft","nvidia","hw","Largest GPU buyer — Azure fleets at scale.",50],
+    ["amazon","nvidia","hw","Buys Nvidia for AWS alongside its own Trainium.",40],
+    ["google","nvidia","hw","Buys Nvidia despite its own TPUs.",30],
+    ["meta","nvidia","hw","Up to $50B of Nvidia systems.",50],
+    ["oracle","nvidia","hw","~$40B for ~400K GB200 GPUs (Stargate).",40],
+    ["tesla","nvidia","hw","Buys Nvidia after shelving Dojo.",10],
+    ["tsmc","nvidia","cap","Fabricates every Nvidia GPU; CoWoS is the chokepoint.",60],
+    ["skhynix","nvidia","cap","Lead HBM4 supplier for Vera Rubin.",30],
+    ["samsung","nvidia","cap","HBM4 + next-gen foundry talks.",25],
+    ["micron","nvidia","cap","HBM memory (2026 sold out).",20],
+    ["foxconn","nvidia","cap","Builds Nvidia's AI servers & racks.",20],
+    ["nvidia","elililly","vc","$1B 5-yr AI drug-discovery lab.",6],
+    ["nvidia","palantir","vc","Operational & sovereign-AI software stack.",4],
+    ["nvidia","uber","vc","Robotaxi platform — 28 cities via DRIVE.",4],
+    ["nvidia","mercedes","vc","DRIVE AV powers the new CLA.",2],
+    ["nvidia","toyota","vc","DRIVE Hyperion robotaxi initiative.",2],
+    ["nvidia","hyundai","vc","DRIVE Hyperion + L4 robotaxi (Motional).",2],
+    ["nvidia","humain","svc","Saudi AI factories — several hundred thousand GPUs (2.2GW).",30],
+    ["nvidia","g42","svc","Stargate UAE — 5GW Abu Dhabi cluster.",20],
+    ["nvidia","skorea","svc","260k+ GPUs across Samsung, Hyundai, SK & Naver.",15],
+    ["nvidia","reliance","svc","2,000MW of AI data centers in India (Jio-led).",15],
+  ].map(d=>({source:d[0],target:d[1],cat:d[2],body:d[3],w:d[4]}));
+
+  const idIndex=new Map(NODES.map((n,i)=>[n.id,i]));
+  const nameOf=id=>NODES[idIndex.get(id)].label;
+  const rScale=d3.scaleSqrt().domain([3,5200]).range([9,56]).clamp(true);
+  const wScale=d3.scaleSqrt().domain([1,60]).range([1.2,6]).clamp(true);
+  NODES.forEach(n=>n.r=rScale(n.v));
+  const svg=d3.select("#net-nv");
+  let W=svg.node().clientWidth||960, H=svg.node().clientHeight||560;
+  svg.attr("viewBox",[0,0,W,H]);
+  const defs=svg.append("defs");
+  Object.entries(CATS).forEach(([k,c])=>{
+    defs.append("marker").attr("id","arwnv-"+k).attr("viewBox","0 -5 10 10").attr("refX",9).attr("refY",0)
+      .attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto")
+      .append("path").attr("d","M0,-4L9,0L0,4Z").attr("fill",c.color).attr("opacity",.9);
+  });
+  const root=svg.append("g");
+  svg.call(d3.zoom().scaleExtent([0.35,3.2]).on("zoom",ev=>root.attr("transform",ev.transform)));
+  const tip=document.getElementById("tip");
+  function showTip(ev,route,cat,body){
+    let html=`<div class="t-route">${route}</div>`;
+    if(cat){const c=CATS[cat];html+=`<span class="t-cat" style="color:${c.color};background:${c.color}1f">${c.label}</span>`;}
+    html+=`<div class="t-body">${body}</div>`;
+    tip.innerHTML=html; tip.style.opacity=1;
+    const pad=14; let x=ev.clientX+16,y=ev.clientY+16; const bb=tip.getBoundingClientRect();
+    if(x+bb.width>innerWidth-pad)x=ev.clientX-bb.width-16;
+    if(y+bb.height>innerHeight-pad)y=ev.clientY-bb.height-16;
+    tip.style.left=x+"px"; tip.style.top=y+"px";
+  }
+  function hideTip(){tip.style.opacity=0;}
+  const linkSel=root.append("g").selectAll("path").data(LINKS).join("path")
+    .attr("class",d=>"link "+d.cat)
+    .attr("stroke-width",d=>wScale(d.w))
+    .attr("marker-end",d=>`url(#arwnv-${d.cat})`)
+    .on("mousemove",(ev,d)=>showTip(ev,`${nameOf(d.source.id||d.source)} → ${nameOf(d.target.id||d.target)}`,d.cat,d.body))
+    .on("mouseleave",hideTip);
+  const nodeSel=root.append("g").selectAll("g").data(NODES).join("g").attr("class","node")
+    .call(d3.drag()
+      .on("start",(ev,d)=>{if(!ev.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
+      .on("drag",(ev,d)=>{d.fx=ev.x;d.fy=ev.y;})
+      .on("end",(ev,d)=>{if(!ev.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}))
+    .on("click",(ev,d)=>{ev.stopPropagation();focusNode(d);openPanel(d);})
+    .on("mousemove",(ev,d)=>showTip(ev,d.label,null,`${ROLES[d.role].label} · ${d.val}`))
+    .on("mouseleave",hideTip);
+  nodeSel.append("circle").attr("class","core").attr("r",d=>d.r)
+    .attr("stroke",d=>ROLES[d.role].ring)
+    .attr("stroke-dasharray",d=>d.role==="sov"?"3 3":null)
+    .attr("fill",d=>d.id==="nvidia"?"#10241f":"#0c1322");
+  nodeSel.append("text").attr("class","name").attr("text-anchor","middle")
+    .attr("dy",d=>d.r+13).style("font-size",d=>d.v>800?"13px":d.v>120?"11.5px":"10px")
+    .style("font-weight",d=>d.v>800?"600":"500").text(d=>d.label);
+  nodeSel.append("text").attr("class","val").attr("text-anchor","middle")
+    .attr("dy",d=>d.r+25).text(d=>d.val);
+  const sim=d3.forceSimulation(NODES)
+    .force("link",d3.forceLink(LINKS).id(d=>d.id).distance(d=>{const r=(d.source.r||14)+(d.target.r||14);return r+72;}).strength(.4))
+    .force("charge",d3.forceManyBody().strength(-640))
+    .force("collide",d3.forceCollide().radius(d=>d.r+16).strength(.9))
+    .force("x",d3.forceX(W/2).strength(.05))
+    .force("y",d3.forceY(H/2).strength(.07))
+    .on("tick",ticked);
+  NODES[0].x=W/2; NODES[0].y=H/2;
+  NODES.forEach((n,i)=>{ if(i===0)return; const a=(i-1)/(NODES.length-1)*2*Math.PI; n.x=W/2+Math.cos(a)*Math.min(W,H)*0.37; n.y=H/2+Math.sin(a)*Math.min(W,H)*0.37; });
+  function curvedPath(d){
+    const s=d.source,t=d.target; let dx=t.x-s.x,dy=t.y-s.y,len=Math.hypot(dx,dy)||1;
+    const sign=idIndex.get(s.id)<idIndex.get(t.id)?1:-1;
+    const off=Math.min(Math.max(len*0.14,16),80)*sign; const nx=-dy/len,ny=dx/len;
+    const cx=(s.x+t.x)/2+nx*off, cy=(s.y+t.y)/2+ny*off;
+    let es_x=cx-s.x,es_y=cy-s.y,el=Math.hypot(es_x,es_y)||1;
+    const sx=s.x+es_x/el*(s.r+2), sy=s.y+es_y/el*(s.r+2);
+    let et_x=cx-t.x,et_y=cy-t.y,etl=Math.hypot(et_x,et_y)||1;
+    const tx=t.x+et_x/etl*(t.r+7), ty=t.y+et_y/etl*(t.r+7);
+    return `M${sx},${sy}Q${cx},${cy} ${tx},${ty}`;
+  }
+  function ticked(){ linkSel.attr("d",curvedPath); nodeSel.attr("transform",d=>`translate(${d.x},${d.y})`); }
+  let active=null;
+  function focusNode(d){
+    if(active===d.id){clearFocus();return;}
+    active=d.id; const keep=new Set([d.id]);
+    LINKS.forEach(l=>{if(l.source.id===d.id)keep.add(l.target.id);if(l.target.id===d.id)keep.add(l.source.id);});
+    nodeSel.classed("faded",n=>!keep.has(n.id)).classed("lit",n=>keep.has(n.id));
+    linkSel.classed("faded",l=>!(l.source.id===d.id||l.target.id===d.id)).classed("lit",l=>(l.source.id===d.id||l.target.id===d.id));
+  }
+  function clearFocus(){active=null;nodeSel.classed("faded",false).classed("lit",false);linkSel.classed("faded",false).classed("lit",false);}
+  svg.on("click",()=>{clearFocus();closePanel();hideTip();});
+  const panel=document.getElementById("panel");
+  function openPanel(d){
+    document.getElementById("p-type").textContent=ROLES[d.role].label;
+    document.getElementById("p-name").textContent=d.label;
+    document.getElementById("p-val").textContent=d.val;
+    document.getElementById("p-note").textContent=d.note;
+    const outs=LINKS.filter(l=>l.source.id===d.id), ins=LINKS.filter(l=>l.target.id===d.id);
+    const dealHTML=l=>{const other=(l.source.id===d.id)?nameOf(l.target.id):nameOf(l.source.id);
+      const dir=(l.source.id===d.id)?"→ "+other:"← "+other;
+      return `<div class="deal ${l.cat}"><div class="dr">${dir}</div><div class="db">${l.body}</div></div>`;};
+    let html="";
+    if(outs.length){html+=`<h3>Outbound — Nvidia invests / partners</h3>`+outs.map(dealHTML).join("");}
+    if(ins.length){html+=`<h3>Inbound — flows to Nvidia</h3>`+ins.map(dealHTML).join("");}
+    if(!outs.length&&!ins.length)html=`<div class="db" style="padding:8px">No mapped links.</div>`;
+    document.getElementById("p-deals").innerHTML=html;
+    panel.classList.add("open");
+  }
+  function closePanel(){panel.classList.remove("open");}
+  const chips=document.getElementById("chips-nv"); const onCats=new Set(Object.keys(CATS));
+  Object.entries(CATS).forEach(([k,c])=>{
+    const el=document.createElement("div"); el.className="chip"; el.dataset.on="true";
+    el.innerHTML=`<span class="dot ${k}"></span>${c.label}`;
+    el.addEventListener("click",()=>{
+      if(onCats.has(k)){onCats.delete(k);el.dataset.on="false";}else{onCats.add(k);el.dataset.on="true";}
+      linkSel.style("display",l=>onCats.has(l.cat)?null:"none");
+    });
+    chips.appendChild(el);
+  });
+  const tk=document.getElementById("typekey-nv");
+  Object.values(ROLES).forEach(r=>{const s=document.createElement("span");s.style.color=r.ring;s.innerHTML=`<i></i>${r.label}`;tk.appendChild(s);});
+  document.getElementById("reset-nv").addEventListener("click",()=>{
+    clearFocus();closePanel();
+    svg.transition().duration(450).call(d3.zoom().transform,d3.zoomIdentity);
+    sim.alpha(.6).restart();
+  });
+  window.nvResize=function(){
+    W=svg.node().clientWidth||W; H=svg.node().clientHeight||H; svg.attr("viewBox",[0,0,W,H]);
+    sim.force("x",d3.forceX(W/2).strength(.05)).force("y",d3.forceY(H/2).strength(.07)).alpha(.3).restart();
+  };
+  addEventListener("resize",()=>{ const nv=document.getElementById("view-nvidia"); if(nv && nv.style.display!=='none') window.nvResize(); });
+}
 </script>
 </body>
 </html>
