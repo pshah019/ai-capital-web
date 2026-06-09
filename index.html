@@ -130,8 +130,14 @@
   <div class="tabs">
     <button class="tab active" data-view="capital">◆ The Capital Web</button>
     <button class="tab" data-view="nvidia">▲ Nvidia Web</button>
+    <button class="tab" data-view="apple">▲ Apple Web</button>
+    <button class="tab" data-view="microsoft">▲ Microsoft Web</button>
+    <button class="tab" data-view="alphabet">▲ Alphabet Web</button>
+    <button class="tab" data-view="amazon">▲ Amazon Web</button>
+    <button class="tab" data-view="meta">▲ Meta Web</button>
+    <button class="tab" data-view="tesla">▲ Tesla Web</button>
   </div>
-  <div id="view-capital">
+  <div id="view-capital" class="webview">
   <div class="controls">
     <div class="legend-block">
       <div class="ltitle">Deal type — tap to filter</div>
@@ -153,7 +159,7 @@
   </footer>
   </div><!-- /view-capital -->
 
-  <div id="view-nvidia" style="display:none">
+  <div id="view-nvidia" class="webview" style="display:none">
     <p class="sub" style="margin:0 0 16px">Nvidia's live global web — its current inbound and outbound investments and partnerships, centred on the company itself. Arrows pointing <b>into</b> Nvidia are inbound (compute customers + supply chain); arrows pointing <b>out</b> are Nvidia's reach (equity stakes, partnerships, sovereign-AI buildouts). Tap a circle for its full sheet.</p>
     <div class="controls">
       <div class="legend-block">
@@ -174,6 +180,66 @@
       <div><b>Inbound vs outbound:</b> inbound = money / compute flowing to Nvidia (customers, suppliers); outbound = Nvidia's capital &amp; partnerships flowing out. Circles sized by market cap or last private valuation, approximate as of June 2026.</div>
       <div style="margin-top:6px"><b>Sources:</b> Nvidia, OpenAI, Nokia, Intel, Marvell, Eli Lilly, Reliance &amp; partner press releases; CNBC, Reuters, TechCrunch, Tom's Hardware, DCD. A map, not a balance sheet. Not investment advice.</div>
     </footer>
+  </div>
+
+  <div id="view-apple" class="webview" style="display:none">
+    <p class="sub" style="margin:0 0 16px">Apple's live web — the AI-era minimalist. Rather than building megaclusters, Apple <b>licenses</b> others' frontier models (Gemini, ChatGPT, Claude) and runs the tightest hardware supply chain in tech. Arrows out = what Apple pays / partners for; arrows in = what flows to Apple.</p>
+    <div class="controls">
+      <div class="legend-block"><div class="ltitle">Relationship type — tap to filter</div><div class="chips" id="chips-apple"></div></div>
+      <div class="legend-block"><div class="ltitle">Circle ring = sector — tap to highlight</div><div class="key" id="typekey-apple"></div><div style="margin-top:12px"><button class="btn" id="reset-apple">⟲ Reset view</button></div></div>
+    </div>
+    <div class="stage"><svg id="net-apple"></svg><div class="hint">Drag to rearrange · scroll / pinch to zoom · tap a circle for details</div></div>
+    <footer><div><b>Sizing</b> by market cap / last valuation, approx June 2026. <b>Sources:</b> Apple, Google, Anthropic, TSMC &amp; partner releases; TechCrunch, CNBC, Fortune. A map, not a balance sheet. Not investment advice.</div></footer>
+  </div>
+
+  <div id="view-microsoft" class="webview" style="display:none">
+    <p class="sub" style="margin:0 0 16px">Microsoft's live web — owner of ~27% of OpenAI, backer of Anthropic, Mistral &amp; Hugging Face, and the biggest single buyer of GPUs and neocloud capacity, all while building its own Maia silicon. Arrows out = Microsoft's spend / stakes; arrows in = compute revenue &amp; capital flowing to it.</p>
+    <div class="controls">
+      <div class="legend-block"><div class="ltitle">Relationship type — tap to filter</div><div class="chips" id="chips-microsoft"></div></div>
+      <div class="legend-block"><div class="ltitle">Circle ring = sector — tap to highlight</div><div class="key" id="typekey-microsoft"></div><div style="margin-top:12px"><button class="btn" id="reset-microsoft">⟲ Reset view</button></div></div>
+    </div>
+    <div class="stage"><svg id="net-microsoft"></svg><div class="hint">Drag to rearrange · scroll / pinch to zoom · tap a circle for details</div></div>
+    <footer><div><b>Sizing</b> by market cap / last valuation, approx June 2026. <b>Sources:</b> Microsoft, OpenAI, Anthropic &amp; partner releases; CNBC, Reuters, DCD. A map, not a balance sheet. Not investment advice.</div></footer>
+  </div>
+
+  <div id="view-alphabet" class="webview" style="display:none">
+    <p class="sub" style="margin:0 0 16px">Alphabet's live web — backer of Anthropic (up to $40B), designer of TPUs with Broadcom, supplier of cloud to OpenAI &amp; Meta, and the model behind Apple's Siri — funding it all with an $80B equity raise plus &gt;$100B of debt. Arrows out = Alphabet's spend / stakes; arrows in = revenue &amp; capital flowing to it.</p>
+    <div class="controls">
+      <div class="legend-block"><div class="ltitle">Relationship type — tap to filter</div><div class="chips" id="chips-alphabet"></div></div>
+      <div class="legend-block"><div class="ltitle">Circle ring = sector — tap to highlight</div><div class="key" id="typekey-alphabet"></div><div style="margin-top:12px"><button class="btn" id="reset-alphabet">⟲ Reset view</button></div></div>
+    </div>
+    <div class="stage"><svg id="net-alphabet"></svg><div class="hint">Drag to rearrange · scroll / pinch to zoom · tap a circle for details</div></div>
+    <footer><div><b>Sizing</b> by market cap / last valuation, approx June 2026. <b>Sources:</b> Alphabet, Anthropic, Broadcom &amp; partner releases; CNBC, Reuters, SEC filings. A map, not a balance sheet. Not investment advice.</div></footer>
+  </div>
+
+  <div id="view-amazon" class="webview" style="display:none">
+    <p class="sub" style="margin:0 0 16px">Amazon's live web — the only player backing <b>both</b> frontier labs ($25B Anthropic + $50B OpenAI) while pushing its own Trainium silicon as a Nvidia alternative. Arrows out = Amazon's stakes / spend; arrows in = the $100B+ of cloud revenue flowing back to AWS.</p>
+    <div class="controls">
+      <div class="legend-block"><div class="ltitle">Relationship type — tap to filter</div><div class="chips" id="chips-amazon"></div></div>
+      <div class="legend-block"><div class="ltitle">Circle ring = sector — tap to highlight</div><div class="key" id="typekey-amazon"></div><div style="margin-top:12px"><button class="btn" id="reset-amazon">⟲ Reset view</button></div></div>
+    </div>
+    <div class="stage"><svg id="net-amazon"></svg><div class="hint">Drag to rearrange · scroll / pinch to zoom · tap a circle for details</div></div>
+    <footer><div><b>Sizing</b> by market cap / last valuation, approx June 2026. <b>Sources:</b> Amazon, Anthropic, OpenAI &amp; partner releases; TechCrunch, CNBC, Tom's Hardware. A map, not a balance sheet. Not investment advice.</div></footer>
+  </div>
+
+  <div id="view-meta" class="webview" style="display:none">
+    <p class="sub" style="margin:0 0 16px">Meta's live web — bought 49% of Scale AI, committed $48B to neoclouds and up to $50B to Nvidia, co-designs its own MTIA chips, lines up gigawatts of nuclear power, and finances its data centers off-balance-sheet via Blue Owl. Arrows out = Meta's spend / stakes; arrows in = the private credit funding its build-out.</p>
+    <div class="controls">
+      <div class="legend-block"><div class="ltitle">Relationship type — tap to filter</div><div class="chips" id="chips-meta"></div></div>
+      <div class="legend-block"><div class="ltitle">Circle ring = sector — tap to highlight</div><div class="key" id="typekey-meta"></div><div style="margin-top:12px"><button class="btn" id="reset-meta">⟲ Reset view</button></div></div>
+    </div>
+    <div class="stage"><svg id="net-meta"></svg><div class="hint">Drag to rearrange · scroll / pinch to zoom · tap a circle for details</div></div>
+    <footer><div><b>Sizing</b> by market cap / last valuation, approx June 2026. <b>Sources:</b> Meta, Scale AI, CoreWeave, Blue Owl &amp; partner releases; CNBC, Reuters, Utility Dive. A map, not a balance sheet. Not investment advice.</div></footer>
+  </div>
+
+  <div id="view-tesla" class="webview" style="display:none">
+    <p class="sub" style="margin:0 0 16px">Tesla's live web — shelved its in-house Dojo supercomputer, now leans on Samsung ($16.5B) and TSMC to fab its AI chips, buys Nvidia/AMD for training, and runs Musk's xAI Grok in its cars. Arrows out = Tesla's spend / partnerships; sized by market cap.</p>
+    <div class="controls">
+      <div class="legend-block"><div class="ltitle">Relationship type — tap to filter</div><div class="chips" id="chips-tesla"></div></div>
+      <div class="legend-block"><div class="ltitle">Circle ring = sector — tap to highlight</div><div class="key" id="typekey-tesla"></div><div style="margin-top:12px"><button class="btn" id="reset-tesla">⟲ Reset view</button></div></div>
+    </div>
+    <div class="stage"><svg id="net-tesla"></svg><div class="hint">Drag to rearrange · scroll / pinch to zoom · tap a circle for details</div></div>
+    <footer><div><b>Sizing</b> by market cap / last valuation, approx June 2026. <b>Sources:</b> Tesla, Samsung, TSMC, xAI &amp; partner releases; TechCrunch, CNBC, Tom's Hardware. A map, not a balance sheet. Not investment advice.</div></footer>
   </div>
 </div>
 <div class="tip" id="tip"></div>
@@ -484,19 +550,14 @@ addEventListener("resize",()=>{
 <script>
 /* ===== Tab switching (isolated; does not touch the capital web) ===== */
 (function(){
-  let nvInit=false;
   function showView(v){
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.view===v));
-    const cap=document.getElementById('view-capital'), nv=document.getElementById('view-nvidia');
-    const panel=document.getElementById('panel'); if(panel) panel.classList.remove('open');
-    const tip=document.getElementById('tip'); if(tip) tip.style.opacity=0;
-    if(v==='nvidia'){
-      nv.style.display=''; cap.style.display='none';
-      if(!nvInit){ nvInit=true; initNvidiaWeb(); } else if(window.nvResize){ window.nvResize(); }
-    } else {
-      cap.style.display=''; nv.style.display='none';
-      window.dispatchEvent(new Event('resize'));
-    }
+    document.querySelectorAll('.webview').forEach(el=>el.style.display='none');
+    const t=document.getElementById('view-'+v); if(t) t.style.display='';
+    const p=document.getElementById('panel'); if(p) p.classList.remove('open');
+    const tp=document.getElementById('tip'); if(tp) tp.style.opacity=0;
+    if(v==='capital'){ window.dispatchEvent(new Event('resize')); }
+    else if(window.__showWeb){ window.__showWeb(v); }
   }
   document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showView(t.dataset.view)));
 })();
@@ -759,6 +820,335 @@ function initNvidiaWeb(){
   };
   addEventListener("resize",()=>{ const nv=document.getElementById("view-nvidia"); if(nv && nv.style.display!=='none') window.nvResize(); });
 }
+</script>
+<script>
+/* ===== Shared web renderer for the Mag-7 company tabs ===== */
+const CATS_CO={
+  inv:{label:"Equity stake / investment", color:"#5b9dff"},
+  svc:{label:"Cloud / compute deal", color:"#22d3ee"},
+  hw:{label:"Chips / hardware", color:"#34d399"},
+  vc:{label:"Strategic partnership", color:"#e879f9"},
+  cap:{label:"Supply chain / capital", color:"#fbbf24"},
+};
+const ROLE_PAL={
+  cloud:{label:"Hyperscaler / cloud", ring:"#8fb2ec"},
+  lab:{label:"AI lab", ring:"#f3efe3"},
+  chip:{label:"Chipmaker / silicon", ring:"#ffa45c"},
+  neo:{label:"Neocloud / GPU infra", ring:"#c4a7f0"},
+  supplier:{label:"Supply chain", ring:"#7fd6a3"},
+  startup:{label:"AI startup", ring:"#c8cdd6"},
+  auto:{label:"Automotive", ring:"#ff8f6b"},
+  energy:{label:"Energy / nuclear", ring:"#fca5a5"},
+  fin:{label:"Financier / investor", ring:"#a7f3d0"},
+  consumer:{label:"Consumer / devices", ring:"#f0abfc"},
+  space:{label:"Space + AI", ring:"#ff6b6b"},
+  market:{label:"Debt & equity markets", ring:"#fbbf24"},
+  sov:{label:"Sovereign / nation", ring:"#22d3ee"},
+};
+function buildWeb(cfg){
+  const CATS=cfg.CATS, ROLES=cfg.ROLES, NODES=cfg.NODES, LINKS=cfg.LINKS;
+  const idIndex=new Map(NODES.map((n,i)=>[n.id,i]));
+  const nameOf=id=>NODES[idIndex.get(id)].label;
+  const vs=NODES.map(n=>n.v);
+  const rScale=d3.scaleSqrt().domain([Math.max(1,Math.min(...vs)),Math.max(...vs)]).range([10,54]).clamp(true);
+  const wScale=d3.scaleSqrt().domain([1,60]).range([0.7,2.2]).clamp(true);
+  NODES.forEach(n=>n.r=rScale(n.v));
+  const svg=d3.select("#"+cfg.svgId);
+  let W=svg.node().clientWidth||960, H=svg.node().clientHeight||560;
+  svg.attr("viewBox",[0,0,W,H]);
+  const defs=svg.append("defs"); const mp="m-"+cfg.svgId+"-";
+  Object.entries(CATS).forEach(([k,c])=>{
+    defs.append("marker").attr("id",mp+k).attr("viewBox","0 -5 10 10").attr("refX",9).attr("refY",0)
+      .attr("markerWidth",8).attr("markerHeight",8).attr("markerUnits","userSpaceOnUse").attr("orient","auto")
+      .append("path").attr("d","M0,-4L9,0L0,4Z").attr("fill",c.color).attr("opacity",.9);
+  });
+  const root=svg.append("g");
+  svg.call(d3.zoom().scaleExtent([0.35,3.2]).on("zoom",ev=>root.attr("transform",ev.transform)));
+  const tip=document.getElementById("tip");
+  function showTip(ev,route,cat,body){
+    let html=`<div class="t-route">${route}</div>`;
+    if(cat){const c=CATS[cat];html+=`<span class="t-cat" style="color:${c.color};background:${c.color}1f">${c.label}</span>`;}
+    html+=`<div class="t-body">${body}</div>`; tip.innerHTML=html; tip.style.opacity=1;
+    const pad=14; let x=ev.clientX+16,y=ev.clientY+16; const bb=tip.getBoundingClientRect();
+    if(x+bb.width>innerWidth-pad)x=ev.clientX-bb.width-16;
+    if(y+bb.height>innerHeight-pad)y=ev.clientY-bb.height-16;
+    tip.style.left=x+"px"; tip.style.top=y+"px";
+  }
+  function hideTip(){tip.style.opacity=0;}
+  const linkSel=root.append("g").selectAll("path").data(LINKS).join("path")
+    .attr("class",d=>"link "+d.cat).attr("stroke-width",d=>wScale(d.w)).attr("marker-end",d=>`url(#${mp}${d.cat})`)
+    .on("mousemove",(ev,d)=>showTip(ev,`${nameOf(d.source.id||d.source)} → ${nameOf(d.target.id||d.target)}`,d.cat,d.body))
+    .on("mouseleave",hideTip);
+  const nodeSel=root.append("g").selectAll("g").data(NODES).join("g").attr("class","node")
+    .call(d3.drag()
+      .on("start",(ev,d)=>{if(!ev.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
+      .on("drag",(ev,d)=>{d.fx=ev.x;d.fy=ev.y;})
+      .on("end",(ev,d)=>{if(!ev.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}))
+    .on("click",(ev,d)=>{ev.stopPropagation();focusNode(d);openPanel(d);})
+    .on("mousemove",(ev,d)=>showTip(ev,d.label,null,`${ROLES[d.role].label} · ${d.val}`))
+    .on("mouseleave",hideTip);
+  nodeSel.append("circle").attr("class","core").attr("r",d=>d.r)
+    .attr("stroke",d=>ROLES[d.role].ring)
+    .attr("stroke-dasharray",d=>(d.role==="market"||d.role==="sov")?"3 3":null)
+    .attr("fill",d=>d.id===cfg.centerId?"#10241f":"#0c1322");
+  nodeSel.append("text").attr("class","name").attr("text-anchor","middle")
+    .attr("dy",d=>d.r+13).style("font-size",d=>d.v>800?"13px":d.v>120?"11.5px":"10px")
+    .style("font-weight",d=>d.v>800?"600":"500").text(d=>d.label);
+  nodeSel.append("text").attr("class","val").attr("text-anchor","middle").attr("dy",d=>d.r+25).text(d=>d.val);
+  const sim=d3.forceSimulation(NODES)
+    .force("link",d3.forceLink(LINKS).id(d=>d.id).distance(d=>{const r=(d.source.r||14)+(d.target.r||14);return r+72;}).strength(.4))
+    .force("charge",d3.forceManyBody().strength(-660))
+    .force("collide",d3.forceCollide().radius(d=>d.r+16).strength(.9))
+    .force("x",d3.forceX(W/2).strength(.05)).force("y",d3.forceY(H/2).strength(.07))
+    .on("tick",ticked);
+  const ci=idIndex.get(cfg.centerId);
+  if(ci!=null){NODES[ci].x=W/2;NODES[ci].y=H/2;}
+  NODES.forEach((n,i)=>{ if(i===ci)return; const a=i/NODES.length*2*Math.PI; n.x=W/2+Math.cos(a)*Math.min(W,H)*0.37; n.y=H/2+Math.sin(a)*Math.min(W,H)*0.37; });
+  function curvedPath(d){
+    const s=d.source,t=d.target; let dx=t.x-s.x,dy=t.y-s.y,len=Math.hypot(dx,dy)||1;
+    const sign=idIndex.get(s.id)<idIndex.get(t.id)?1:-1;
+    const off=Math.min(Math.max(len*0.14,16),80)*sign; const nx=-dy/len,ny=dx/len;
+    const cx=(s.x+t.x)/2+nx*off, cy=(s.y+t.y)/2+ny*off;
+    let es_x=cx-s.x,es_y=cy-s.y,el=Math.hypot(es_x,es_y)||1;
+    const sx=s.x+es_x/el*(s.r+2), sy=s.y+es_y/el*(s.r+2);
+    let et_x=cx-t.x,et_y=cy-t.y,etl=Math.hypot(et_x,et_y)||1;
+    const tx=t.x+et_x/etl*(t.r+7), ty=t.y+et_y/etl*(t.r+7);
+    return `M${sx},${sy}Q${cx},${cy} ${tx},${ty}`;
+  }
+  function ticked(){ linkSel.attr("d",curvedPath); nodeSel.attr("transform",d=>`translate(${d.x},${d.y})`); }
+  let active=null;
+  function focusNode(d){
+    clearRoleSel();
+    if(active===d.id){clearFocus();return;}
+    active=d.id; const keep=new Set([d.id]);
+    LINKS.forEach(l=>{if(l.source.id===d.id)keep.add(l.target.id);if(l.target.id===d.id)keep.add(l.source.id);});
+    nodeSel.classed("faded",n=>!keep.has(n.id)).classed("lit",n=>keep.has(n.id));
+    linkSel.classed("faded",l=>!(l.source.id===d.id||l.target.id===d.id)).classed("lit",l=>(l.source.id===d.id||l.target.id===d.id));
+  }
+  function clearFocus(){active=null;nodeSel.classed("faded",false).classed("lit",false);linkSel.classed("faded",false).classed("lit",false);clearRoleSel();}
+  svg.on("click",()=>{clearFocus();closePanel();hideTip();});
+  const panel=document.getElementById("panel");
+  function openPanel(d){
+    document.getElementById("p-type").textContent=ROLES[d.role].label;
+    document.getElementById("p-name").textContent=d.label;
+    document.getElementById("p-val").textContent=d.val;
+    document.getElementById("p-note").textContent=d.note;
+    const outs=LINKS.filter(l=>l.source.id===d.id), ins=LINKS.filter(l=>l.target.id===d.id);
+    const dealHTML=l=>{const other=(l.source.id===d.id)?nameOf(l.target.id):nameOf(l.source.id);
+      const dir=(l.source.id===d.id)?"→ "+other:"← "+other;
+      return `<div class="deal ${l.cat}"><div class="dr">${dir}</div><div class="db">${l.body}</div></div>`;};
+    let html="";
+    if(outs.length){html+=`<h3>${cfg.outLabel}</h3>`+outs.map(dealHTML).join("");}
+    if(ins.length){html+=`<h3>${cfg.inLabel}</h3>`+ins.map(dealHTML).join("");}
+    if(!outs.length&&!ins.length)html=`<div class="db" style="padding:8px">No mapped links.</div>`;
+    document.getElementById("p-deals").innerHTML=html; panel.classList.add("open");
+  }
+  function closePanel(){panel.classList.remove("open");}
+  const chips=document.getElementById(cfg.chipsId); const onCats=new Set(Object.keys(CATS));
+  Object.entries(CATS).forEach(([k,c])=>{
+    const el=document.createElement("div"); el.className="chip"; el.dataset.on="true";
+    el.innerHTML=`<span class="dot ${k}"></span>${c.label}`;
+    el.addEventListener("click",()=>{ if(onCats.has(k)){onCats.delete(k);el.dataset.on="false";}else{onCats.add(k);el.dataset.on="true";} linkSel.style("display",l=>onCats.has(l.cat)?null:"none"); });
+    chips.appendChild(el);
+  });
+  const tk=document.getElementById(cfg.typekeyId); const used=new Set(NODES.map(n=>n.role)); const selRoles=new Set();
+  function applyRoles(){
+    if(selRoles.size===0){ tk.classList.remove('has-sel'); nodeSel.classed("faded",false).classed("lit",false); linkSel.classed("faded",false).classed("lit",false); return; }
+    active=null; tk.classList.add('has-sel');
+    const onN=n=>selRoles.has(n.role)||n.id===cfg.centerId;
+    nodeSel.classed("lit",onN).classed("faded",n=>!onN(n));
+    const onL=l=>selRoles.has(l.source.role)||selRoles.has(l.target.role);
+    linkSel.classed("lit",onL).classed("faded",l=>!onL(l));
+  }
+  function clearRoleSel(){ if(!selRoles.size)return; selRoles.clear(); tk.querySelectorAll('span.sec-on').forEach(s=>s.classList.remove('sec-on')); tk.classList.remove('has-sel'); nodeSel.classed("faded",false).classed("lit",false); linkSel.classed("faded",false).classed("lit",false); }
+  Object.entries(ROLES).forEach(([k,r])=>{ if(!used.has(k))return;
+    const s=document.createElement("span"); s.style.color=r.ring; s.dataset.role=k; s.innerHTML=`<i></i>${r.label}`;
+    s.addEventListener("click",(e)=>{ e.stopPropagation(); if(selRoles.has(k)){selRoles.delete(k);s.classList.remove('sec-on');}else{selRoles.add(k);s.classList.add('sec-on');} closePanel(); applyRoles(); });
+    tk.appendChild(s);
+  });
+  document.getElementById(cfg.resetId).addEventListener("click",()=>{ clearFocus();closePanel(); svg.transition().duration(450).call(d3.zoom().transform,d3.zoomIdentity); sim.alpha(.6).restart(); });
+  function doResize(){ W=svg.node().clientWidth||W; H=svg.node().clientHeight||H; svg.attr("viewBox",[0,0,W,H]); sim.force("x",d3.forceX(W/2).strength(.05)).force("y",d3.forceY(H/2).strength(.07)).alpha(.3).restart(); }
+  addEventListener("resize",()=>{ const vw=document.getElementById(cfg.viewId); if(vw && vw.style.display!=='none') doResize(); });
+  return {resize:doResize};
+}
+/* ===== datasets ===== */
+function L(a){return a.map(d=>({source:d[0],target:d[1],cat:d[2],body:d[3],w:d[4]}));}
+const CFGS={
+  apple:{svgId:"net-apple",chipsId:"chips-apple",typekeyId:"typekey-apple",resetId:"reset-apple",viewId:"view-apple",centerId:"apple",CATS:CATS_CO,ROLES:ROLE_PAL,outLabel:"Outbound — Apple pays / partners",inLabel:"Inbound — flows to Apple",
+   NODES:[
+    {id:"apple",label:"Apple",role:"consumer",v:4000,val:"~$4T mkt cap",note:"The AI-era minimalist: licenses others' frontier models (Gemini, ChatGPT, Claude) instead of building megaclusters, and runs the tightest hardware supply chain in tech."},
+    {id:"google",label:"Alphabet",role:"cloud",v:4600,val:"~$4.6T mkt cap",note:"Apple pays ~$1B/yr for a custom 1.2T-parameter Gemini to power Siri — and Google pays Apple ~$20B/yr to be Safari's default search."},
+    {id:"openai",label:"OpenAI",role:"lab",v:850,val:"~$850B (private)",note:"ChatGPT is integrated into Apple Intelligence."},
+    {id:"anthropic",label:"Anthropic",role:"lab",v:600,val:"~$380B→$1T",note:"Claude powers AI coding inside Xcode."},
+    {id:"tsmc",label:"TSMC",role:"supplier",v:1100,val:"~$1.1T mkt cap",note:"Fabricates all Apple Silicon — Apple is its lead customer on the N2 node."},
+    {id:"foxconn",label:"Foxconn",role:"supplier",v:90,val:"~$90B mkt cap",note:"Assembles iPhones and most Apple devices."},
+    {id:"broadcom",label:"Broadcom",role:"chip",v:1700,val:"~$1.7T mkt cap",note:"Wireless components + custom silicon; a $10B+ multi-year US componentry deal."},
+    {id:"qualcomm",label:"Qualcomm",role:"chip",v:180,val:"~$180B mkt cap",note:"5G modems — Apple is phasing toward its in-house C1 modem."},
+    {id:"samsung",label:"Samsung",role:"supplier",v:350,val:"~$350B mkt cap",note:"OLED displays and memory."},
+    {id:"sony",label:"Sony",role:"supplier",v:20,val:"~$20B mkt cap",note:"Camera image sensors."},
+    {id:"corning",label:"Corning",role:"supplier",v:40,val:"~$40B mkt cap",note:"Cover glass — backed by a $2.5B Apple US commitment."},
+    {id:"amazon",label:"Amazon",role:"cloud",v:2900,val:"~$2.9T mkt cap",note:"Apple runs services on AWS and uses its Trainium chips."},
+   ],
+   LINKS:L([
+    ["apple","google","vc","~$1B/yr for a custom 1.2T-param Gemini to power Siri.",1],
+    ["google","apple","cap","Google pays Apple ~$20B/yr to be Safari's default search engine.",20],
+    ["apple","openai","vc","ChatGPT integrated into Apple Intelligence.",1],
+    ["apple","anthropic","vc","Claude powers AI coding in Xcode.",1],
+    ["apple","tsmc","cap","Fabricates all Apple Silicon (lead N2 customer).",20],
+    ["apple","foxconn","cap","Assembles iPhones & most devices.",15],
+    ["apple","broadcom","hw","Wireless + custom silicon ($10B+ US deal).",10],
+    ["apple","qualcomm","hw","5G modems (phasing toward in-house C1).",5],
+    ["apple","samsung","cap","OLED displays + memory.",10],
+    ["apple","sony","cap","Camera image sensors.",3],
+    ["apple","corning","cap","Cover glass ($2.5B US commitment).",2.5],
+    ["apple","amazon","svc","Runs services on AWS + uses Trainium.",5],
+   ])},
+  microsoft:{svgId:"net-microsoft",chipsId:"chips-microsoft",typekeyId:"typekey-microsoft",resetId:"reset-microsoft",viewId:"view-microsoft",centerId:"microsoft",CATS:CATS_CO,ROLES:ROLE_PAL,outLabel:"Outbound — Microsoft invests / pays / partners",inLabel:"Inbound — flows to Microsoft",
+   NODES:[
+    {id:"microsoft",label:"Microsoft",role:"cloud",v:3100,val:"~$3.1T mkt cap",note:"Owns ~27% of OpenAI; backs Anthropic, Mistral & Hugging Face; the biggest single buyer of GPUs & neocloud capacity, all while building its own Maia silicon."},
+    {id:"openai",label:"OpenAI",role:"lab",v:850,val:"~$850B (private)",note:"~27% stake (~$135B). Microsoft's revenue-share is now capped through 2030 as OpenAI multi-clouds across AWS, Google & neoclouds."},
+    {id:"anthropic",label:"Anthropic",role:"lab",v:600,val:"~$380B→$1T",note:"Up to $5B invested; $30B of Azure compute; in talks to run Microsoft's Maia chips."},
+    {id:"mistral",label:"Mistral",role:"lab",v:14,val:"~$14B (private)",note:"Investor + Azure model partner."},
+    {id:"huggingface",label:"Hugging Face",role:"startup",v:4.5,val:"~$4.5B (private)",note:"Investor + model-hub partner."},
+    {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Microsoft is Nvidia's single largest GPU customer."},
+    {id:"amd",label:"AMD",role:"chip",v:350,val:"~$350B mkt cap",note:"Deploys AMD Instinct GPUs across Azure."},
+    {id:"coreweave",label:"CoreWeave",role:"neo",v:80,val:"~$80B mkt cap",note:"Anchor customer — very large GPU-capacity contracts."},
+    {id:"nebius",label:"Nebius",role:"neo",v:30,val:"~$30B mkt cap",note:"~$17–19B GPU-capacity deal."},
+    {id:"nscale",label:"Nscale",role:"neo",v:3,val:"private",note:"GPU-capacity contract."},
+    {id:"lambda",label:"Lambda",role:"neo",v:4,val:"~$4B (private)",note:"Multi-billion GPU-capacity deal."},
+    {id:"crusoe",label:"Crusoe",role:"neo",v:10,val:"~$10B (private)",note:"Leases 900MW at the Abilene, TX campus."},
+    {id:"g42",label:"G42 (UAE)",role:"sov",v:80,val:"UAE sovereign AI",note:"$1.5B strategic investment + UAE AI partnership."},
+    {id:"markets",label:"Debt Markets",role:"market",v:300,val:"capital source",note:"Debt issuance helping fund ~$190B of 2026 capex."},
+   ],
+   LINKS:L([
+    ["microsoft","openai","inv","~27% stake (~$135B); rev-share capped through 2030.",135],
+    ["openai","microsoft","svc","OpenAI's ~$250B Azure compute commitment.",250],
+    ["microsoft","anthropic","inv","Up to $5B.",5],
+    ["anthropic","microsoft","svc","$30B of Azure compute; Maia-chip talks.",30],
+    ["microsoft","mistral","inv","Investor + Azure model partner.",2],
+    ["microsoft","huggingface","inv","Investor + partner.",1],
+    ["microsoft","nvidia","hw","Largest buyer of Nvidia GPUs.",50],
+    ["microsoft","amd","hw","Deploys AMD Instinct GPUs.",14],
+    ["microsoft","coreweave","svc","Anchor customer — huge GPU contracts.",14],
+    ["microsoft","nebius","svc","~$17–19B GPU-capacity deal.",18],
+    ["microsoft","nscale","svc","GPU-capacity contract.",6],
+    ["microsoft","lambda","svc","Multi-$B GPU-capacity deal.",8],
+    ["microsoft","crusoe","svc","Leases 900MW at Abilene, TX.",9],
+    ["microsoft","g42","inv","$1.5B strategic investment (UAE).",1.5],
+    ["markets","microsoft","cap","Debt funding ~$190B of 2026 capex.",30],
+   ])},
+  alphabet:{svgId:"net-alphabet",chipsId:"chips-alphabet",typekeyId:"typekey-alphabet",resetId:"reset-alphabet",viewId:"view-alphabet",centerId:"google",CATS:CATS_CO,ROLES:ROLE_PAL,outLabel:"Outbound — Alphabet invests / pays / partners",inLabel:"Inbound — flows to Alphabet",
+   NODES:[
+    {id:"google",label:"Alphabet",role:"cloud",v:4600,val:"~$4.6T mkt cap",note:"Backs Anthropic (up to $40B), designs TPUs with Broadcom, sells cloud to OpenAI & Meta, and powers Apple's Siri — funded by an $80B equity raise plus >$100B of debt."},
+    {id:"anthropic",label:"Anthropic",role:"lab",v:600,val:"~$380B→$1T",note:"Up to $40B from Google; runs up to 1M TPUs / ~5GW of capacity."},
+    {id:"broadcom",label:"Broadcom",role:"chip",v:1700,val:"~$1.7T mkt cap",note:"Co-designs Google's TPUs (Ironwood)."},
+    {id:"tsmc",label:"TSMC",role:"supplier",v:1100,val:"~$1.1T mkt cap",note:"Fabricates Google's TPUs."},
+    {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Google Cloud also buys Nvidia GPUs."},
+    {id:"apple",label:"Apple",role:"consumer",v:4000,val:"~$4T mkt cap",note:"Pays ~$1B/yr — custom Gemini powers Siri; Google in turn pays Apple for default search."},
+    {id:"meta",label:"Meta",role:"cloud",v:1850,val:"~$1.9T mkt cap",note:"$10B+ Google Cloud deal + TPU purchases."},
+    {id:"openai",label:"OpenAI",role:"lab",v:850,val:"~$850B (private)",note:"Google Cloud customer — part of a $460B performance-obligation backlog."},
+    {id:"spacex",label:"SpaceX",role:"space",v:1750,val:"~$1.75T",note:"Google rents ~110K Nvidia GPUs from SpaceX's Colossus (~$30B)."},
+    {id:"berkshire",label:"Berkshire H.",role:"fin",v:1050,val:"~$1.05T mkt cap",note:"$10B private placement (June 2026)."},
+    {id:"markets",label:"Debt & Equity Markets",role:"market",v:300,val:"capital source",note:"$80B equity raise (Jun '26) + >$100B of bonds."},
+   ],
+   LINKS:L([
+    ["google","anthropic","inv","Up to $40B; up to 1M TPUs / ~5GW.",40],
+    ["anthropic","google","svc","Up to ~$200B of Google Cloud over 5 yrs (Ironwood TPUs).",200],
+    ["google","broadcom","hw","Co-designs TPUs (Ironwood, 3.5GW from 2027).",15],
+    ["google","tsmc","cap","Fabricates its TPUs.",20],
+    ["google","nvidia","hw","Also buys Nvidia GPUs for Cloud.",20],
+    ["apple","google","svc","~$1B/yr — custom Gemini powers Siri.",1],
+    ["google","apple","cap","Google pays Apple ~$20B/yr to be Safari's default search.",20],
+    ["meta","google","svc","$10B+ Google Cloud + TPU purchases.",10],
+    ["openai","google","svc","Google Cloud customer (part of a $460B backlog).",10],
+    ["google","spacex","svc","$920M/mo (~$30B) for ~110K Nvidia GPUs, 2026–29.",30],
+    ["berkshire","google","inv","$10B private placement.",10],
+    ["markets","google","cap","$80B equity (Jun '26) + >$100B of bonds.",100],
+   ])},
+  amazon:{svgId:"net-amazon",chipsId:"chips-amazon",typekeyId:"typekey-amazon",resetId:"reset-amazon",viewId:"view-amazon",centerId:"amazon",CATS:CATS_CO,ROLES:ROLE_PAL,outLabel:"Outbound — Amazon invests / pays / partners",inLabel:"Inbound — flows to Amazon",
+   NODES:[
+    {id:"amazon",label:"Amazon",role:"cloud",v:2900,val:"~$2.9T mkt cap",note:"The only player backing BOTH frontier labs — $25B into Anthropic and $50B into OpenAI — while pushing its own Trainium silicon as a Nvidia alternative."},
+    {id:"anthropic",label:"Anthropic",role:"lab",v:600,val:"~$380B→$1T",note:"Up to $25B; Project Rainier ~5GW of Trainium. Anthropic commits >$100B to AWS over 10 yrs."},
+    {id:"openai",label:"OpenAI",role:"lab",v:850,val:"~$850B (private)",note:"$50B investment; 2GW of Trainium for GPT-5.4; AWS is exclusive cloud for OpenAI 'Frontier'."},
+    {id:"trainium",label:"Trainium",role:"chip",v:60,val:"in-house silicon",note:"Amazon's Trainium2/3 (Annapurna Labs) — now winning Anthropic, OpenAI, even Apple as a Nvidia alternative."},
+    {id:"marvell",label:"Marvell",role:"chip",v:90,val:"~$90B mkt cap",note:"Co-designs Trainium's networking silicon."},
+    {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"AWS still buys Nvidia GPUs at scale."},
+    {id:"databricks",label:"Databricks",role:"startup",v:130,val:"~$130B (private)",note:"Strategic AWS partner; Amazon is an investor."},
+    {id:"apple",label:"Apple",role:"consumer",v:4000,val:"~$4T mkt cap",note:"Uses AWS Trainium for its own AI."},
+    {id:"markets",label:"Debt Markets",role:"market",v:300,val:"capital source",note:"Bond issuance funding ~$200B of 2026 capex."},
+   ],
+   LINKS:L([
+    ["amazon","anthropic","inv","Up to $25B; ~5GW Trainium (Project Rainier).",25],
+    ["anthropic","amazon","svc",">$100B of AWS over 10 yrs (Trainium).",100],
+    ["amazon","openai","inv","$50B; 2GW Trainium for GPT-5.4.",50],
+    ["openai","amazon","svc","AWS = exclusive cloud distributor for OpenAI 'Frontier'.",38],
+    ["amazon","trainium","hw","In-house Trainium2/3 silicon (Annapurna Labs).",20],
+    ["amazon","marvell","hw","Co-designs Trainium networking.",5],
+    ["amazon","nvidia","hw","Buys Nvidia GPUs for AWS.",40],
+    ["amazon","databricks","inv","Investor + deep AWS partnership.",2],
+    ["apple","amazon","svc","Uses AWS Trainium for its AI.",5],
+    ["markets","amazon","cap","Bonds funding ~$200B of 2026 capex.",30],
+   ])},
+  meta:{svgId:"net-meta",chipsId:"chips-meta",typekeyId:"typekey-meta",resetId:"reset-meta",viewId:"view-meta",centerId:"meta",CATS:CATS_CO,ROLES:ROLE_PAL,outLabel:"Outbound — Meta invests / pays / partners",inLabel:"Inbound — flows to Meta",
+   NODES:[
+    {id:"meta",label:"Meta",role:"cloud",v:1850,val:"~$1.9T mkt cap",note:"Bought 49% of Scale AI, committed $48B to neoclouds and up to $50B to Nvidia, co-designs its own MTIA chips, lines up gigawatts of nuclear, and finances data centers off-balance-sheet via Blue Owl."},
+    {id:"scale",label:"Scale AI",role:"startup",v:29,val:"~$29B (Scale AI)",note:"$14.3B for 49%; founder Alexandr Wang now leads Meta's superintelligence team."},
+    {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Up to $50B of Nvidia systems (Blackwell/Rubin, Spectrum-X)."},
+    {id:"broadcom",label:"Broadcom",role:"chip",v:1700,val:"~$1.7T mkt cap",note:"Co-designs Meta's MTIA in-house accelerators."},
+    {id:"coreweave",label:"CoreWeave",role:"neo",v:80,val:"~$80B mkt cap",note:"$21B AI-cloud deal through 2032 (early Vera Rubin deployments)."},
+    {id:"nebius",label:"Nebius",role:"neo",v:30,val:"~$30B mkt cap",note:"Up to $27B of GPU capacity."},
+    {id:"google",label:"Alphabet",role:"cloud",v:4600,val:"~$4.6T mkt cap",note:"$10B+ Google Cloud deal + TPU purchases."},
+    {id:"oracle",label:"Oracle",role:"cloud",v:750,val:"~$750B mkt cap",note:"~$20B of Oracle cloud (reported)."},
+    {id:"amazon",label:"Amazon",role:"cloud",v:2900,val:"~$2.9T mkt cap",note:"Adopting hundreds of thousands of AWS Graviton chips."},
+    {id:"blueowl",label:"Blue Owl · PIMCO",role:"fin",v:33,val:"private-credit",note:"$27–30B of private credit for the Hyperion data center (Blue Owl owns 80%)."},
+    {id:"oklo",label:"Oklo",role:"energy",v:10,val:"nuclear (SMR)",note:"Altman-backed small modular reactors — part of up to 6.6GW of nuclear Meta has lined up."},
+    {id:"constellation",label:"Constellation",role:"energy",v:100,val:"~$100B mkt cap",note:"20-year nuclear PPA (Clinton Clean Energy Center)."},
+    {id:"markets",label:"Debt Markets",role:"market",v:300,val:"capital source",note:"$25B bond (May '26) funding ~$125–145B of capex."},
+   ],
+   LINKS:L([
+    ["meta","scale","inv","$14.3B for 49%; Wang now leads Meta superintelligence.",14.3],
+    ["meta","nvidia","hw","Up to $50B of Nvidia systems.",50],
+    ["meta","broadcom","hw","Co-designs MTIA accelerators.",15],
+    ["meta","coreweave","svc","$21B AI cloud through 2032 (Vera Rubin).",21],
+    ["meta","nebius","svc","Up to $27B of GPU capacity.",27],
+    ["meta","google","svc","$10B+ Google Cloud + TPU purchases.",10],
+    ["meta","oracle","svc","~$20B of Oracle cloud (reported).",20],
+    ["meta","amazon","hw","Hundreds of thousands of AWS Graviton chips.",5],
+    ["blueowl","meta","cap","$27–30B private credit for Hyperion (owns 80%).",30],
+    ["meta","oklo","svc","Part of up to 6.6GW of nuclear (Oklo SMRs).",5],
+    ["meta","constellation","svc","20-yr nuclear PPA (Clinton).",5],
+    ["markets","meta","cap","$25B bond (May '26).",25],
+   ])},
+  tesla:{svgId:"net-tesla",chipsId:"chips-tesla",typekeyId:"typekey-tesla",resetId:"reset-tesla",viewId:"view-tesla",centerId:"tesla",CATS:CATS_CO,ROLES:ROLE_PAL,outLabel:"Outbound — Tesla pays / partners",inLabel:"Inbound — flows to Tesla",
+   NODES:[
+    {id:"tesla",label:"Tesla",role:"auto",v:1300,val:"~$1.3T mkt cap",note:"Shelved its in-house Dojo supercomputer, leans on Samsung & TSMC to fab AI chips, buys Nvidia/AMD for training, and runs Musk's xAI Grok in its cars."},
+    {id:"samsung",label:"Samsung",role:"supplier",v:350,val:"~$350B mkt cap",note:"$16.5B deal to fabricate Tesla's next-gen AI6 chip (Taylor, TX)."},
+    {id:"tsmc",label:"TSMC",role:"supplier",v:1100,val:"~$1.1T mkt cap",note:"Fabricates the AI5 chip (Taiwan, then Arizona)."},
+    {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Buys Nvidia GPUs for AI training after shelving Dojo."},
+    {id:"amd",label:"AMD",role:"chip",v:350,val:"~$350B mkt cap",note:"AMD Ryzen runs in-car Grok; also a GPU supplier."},
+    {id:"xai",label:"xAI",role:"lab",v:250,val:"~$250B (in SpaceX)",note:"Musk's xAI — Grok is the 'brain' directing Tesla's hardware; joint 'Digital Optimus' project."},
+    {id:"aisilicon",label:"AI5 / AI6",role:"chip",v:40,val:"in-house silicon",note:"Tesla's own chip program — Dojo shelved Aug '25; AI6 fabbed by Samsung, AI5 by TSMC."},
+    {id:"panasonic",label:"Panasonic",role:"supplier",v:30,val:"~$30B mkt cap",note:"Battery cell supplier."},
+    {id:"catl",label:"CATL",role:"supplier",v:130,val:"~$130B mkt cap",note:"LFP battery cells."},
+    {id:"lg",label:"LG Energy",role:"supplier",v:60,val:"~$60B mkt cap",note:"Battery cells."},
+   ],
+   LINKS:L([
+    ["tesla","samsung","cap","$16.5B to fabricate the AI6 chip (Taylor, TX).",16.5],
+    ["tesla","tsmc","cap","Fabricates the AI5 chip (Taiwan → Arizona).",10],
+    ["tesla","nvidia","hw","Buys Nvidia GPUs for training (post-Dojo).",10],
+    ["tesla","amd","hw","AMD Ryzen runs in-car Grok; GPU buyer.",5],
+    ["tesla","xai","vc","Grok is the 'brain'; joint 'Digital Optimus' project.",5],
+    ["tesla","aisilicon","hw","In-house AI5/AI6 program (Dojo shelved).",10],
+    ["tesla","panasonic","cap","Battery cell supply.",3],
+    ["tesla","catl","cap","LFP battery cells.",4],
+    ["tesla","lg","cap","Battery cells.",3],
+   ])},
+};
+const __built={}; let __nvDone=false;
+window.__showWeb=function(v){
+  if(v==='nvidia'){ if(!__nvDone){__nvDone=true; initNvidiaWeb();} else if(window.nvResize){window.nvResize();} return; }
+  if(CFGS[v]){ if(!__built[v]){ __built[v]=buildWeb(CFGS[v]); } else { __built[v].resize(); } }
+};
 </script>
 </body>
 </html>
