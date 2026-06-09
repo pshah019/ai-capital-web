@@ -110,12 +110,12 @@
     padding:10px 17px;cursor:pointer;transition:.18s}
   .tab:hover{color:var(--ink);border-color:#3b4d72}
   .tab.active{color:#0c1322;background:var(--gold);border-color:var(--gold);font-weight:600}
-  /* clickable sector legend (Nvidia tab only) */
-  #typekey-nv span{cursor:pointer;transition:.15s;padding:3px 6px;border-radius:6px}
-  #typekey-nv span:hover{background:rgba(255,255,255,.07)}
-  #typekey-nv span.sec-on i{background:currentColor}
-  #typekey-nv span.sec-on{background:rgba(255,255,255,.06)}
-  #typekey-nv.has-sel span:not(.sec-on){opacity:.34}
+  /* clickable sector / role legends (all tabs) */
+  .key span{cursor:pointer;transition:.15s;padding:3px 6px;border-radius:6px}
+  .key span:hover{background:rgba(255,255,255,.07)}
+  .key span.sec-on i{background:currentColor}
+  .key span.sec-on{background:rgba(255,255,255,.06)}
+  .key.has-sel span:not(.sec-on){opacity:.34}
 </style>
 </head>
 <body>
@@ -144,7 +144,7 @@
       <div class="chips" id="chips"></div>
     </div>
     <div class="legend-block">
-      <div class="ltitle">Circle ring = role</div>
+      <div class="ltitle">Circle ring = role — tap to highlight</div>
       <div class="key" id="typekey"></div>
       <div style="margin-top:12px"><button class="btn" id="reset">⟲ Reset view</button></div>
     </div>
@@ -490,6 +490,7 @@ function hideTip(){tip.style.opacity=0;}
 /* ---------- focus / highlight ---------- */
 let active=null;
 function focusNode(d){
+  clearRoleSel();
   if(active===d.id){clearFocus();return;}
   active=d.id;
   const keep=new Set([d.id]);
@@ -498,7 +499,7 @@ function focusNode(d){
   linkSel.classed("faded",l=>!(l.source.id===d.id||l.target.id===d.id))
          .classed("lit",l=>(l.source.id===d.id||l.target.id===d.id));
 }
-function clearFocus(){active=null;nodeSel.classed("faded",false).classed("lit",false);linkSel.classed("faded",false).classed("lit",false);}
+function clearFocus(){active=null;nodeSel.classed("faded",false).classed("lit",false);linkSel.classed("faded",false).classed("lit",false);clearRoleSel();}
 svg.on("click",()=>{clearFocus();closePanel();hideTip();});
 /* ---------- side panel ---------- */
 const panel=document.getElementById("panel");
@@ -535,7 +536,17 @@ Object.entries(CATS).forEach(([k,c])=>{
   chips.appendChild(el);
 });
 const tk=document.getElementById("typekey");
-Object.values(ROLES).forEach(r=>{const s=document.createElement("span");s.style.color=r.ring;s.innerHTML=`<i></i>${r.label}`;tk.appendChild(s);});
+const selRoles=new Set();
+function applyRoles(){
+  if(selRoles.size===0){ tk.classList.remove('has-sel'); nodeSel.classed("faded",false).classed("lit",false); linkSel.classed("faded",false).classed("lit",false); return; }
+  active=null; tk.classList.add('has-sel');
+  nodeSel.classed("lit",n=>selRoles.has(n.role)).classed("faded",n=>!selRoles.has(n.role));
+  linkSel.classed("lit",l=>selRoles.has(l.source.role)||selRoles.has(l.target.role)).classed("faded",l=>!(selRoles.has(l.source.role)||selRoles.has(l.target.role)));
+}
+function clearRoleSel(){ if(!selRoles.size)return; selRoles.clear(); tk.querySelectorAll('span.sec-on').forEach(s=>s.classList.remove('sec-on')); tk.classList.remove('has-sel'); nodeSel.classed("faded",false).classed("lit",false); linkSel.classed("faded",false).classed("lit",false); }
+Object.entries(ROLES).forEach(([k,r])=>{const s=document.createElement("span");s.style.color=r.ring;s.dataset.role=k;s.innerHTML=`<i></i>${r.label}`;
+  s.addEventListener("click",(e)=>{e.stopPropagation(); if(selRoles.has(k)){selRoles.delete(k);s.classList.remove('sec-on');}else{selRoles.add(k);s.classList.add('sec-on');} closePanel(); applyRoles();});
+  tk.appendChild(s);});
 /* ---------- reset / resize ---------- */
 document.getElementById("reset").addEventListener("click",()=>{
   clearFocus();closePanel();
