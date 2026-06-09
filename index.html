@@ -333,7 +333,7 @@ const LINKS = [
 const idIndex = new Map(NODES.map((n,i)=>[n.id,i]));
 const nameOf  = id=>NODES[idIndex.get(id)].label;
 const rScale  = d3.scaleSqrt().domain([1.5,5200]).range([10,58]).clamp(true);
-const wScale  = d3.scaleSqrt().domain([1.5,300]).range([1.2,6]).clamp(true);
+const wScale  = d3.scaleSqrt().domain([1.5,300]).range([0.7,2.2]).clamp(true);
 NODES.forEach(n=>n.r=rScale(n.v));
 const svg = d3.select("#net");
 let W=svg.node().clientWidth, H=svg.node().clientHeight;
@@ -343,7 +343,7 @@ const defs = svg.append("defs");
 Object.entries(CATS).forEach(([k,c])=>{
   defs.append("marker")
     .attr("id","arw-"+k).attr("viewBox","0 -5 10 10").attr("refX",9).attr("refY",0)
-    .attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto")
+    .attr("markerWidth",8).attr("markerHeight",8).attr("markerUnits","userSpaceOnUse").attr("orient","auto")
     .append("path").attr("d","M0,-4L9,0L0,4Z").attr("fill",c.color).attr("opacity",.9);
 });
 const root = svg.append("g");
@@ -621,7 +621,7 @@ function initNvidiaWeb(){
   const idIndex=new Map(NODES.map((n,i)=>[n.id,i]));
   const nameOf=id=>NODES[idIndex.get(id)].label;
   const rScale=d3.scaleSqrt().domain([3,5200]).range([9,56]).clamp(true);
-  const wScale=d3.scaleSqrt().domain([1,60]).range([1.2,6]).clamp(true);
+  const wScale=d3.scaleSqrt().domain([1,60]).range([0.7,2.2]).clamp(true);
   NODES.forEach(n=>n.r=rScale(n.v));
   const svg=d3.select("#net-nv");
   let W=svg.node().clientWidth||960, H=svg.node().clientHeight||560;
@@ -629,7 +629,7 @@ function initNvidiaWeb(){
   const defs=svg.append("defs");
   Object.entries(CATS).forEach(([k,c])=>{
     defs.append("marker").attr("id","arwnv-"+k).attr("viewBox","0 -5 10 10").attr("refX",9).attr("refY",0)
-      .attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto")
+      .attr("markerWidth",8).attr("markerHeight",8).attr("markerUnits","userSpaceOnUse").attr("orient","auto")
       .append("path").attr("d","M0,-4L9,0L0,4Z").attr("fill",c.color).attr("opacity",.9);
   });
   const root=svg.append("g");
