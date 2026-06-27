@@ -122,7 +122,7 @@
 <div class="grain"></div>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Compute · Capital · Silicon — updated June 22, 2026</div>
+    <div class="eyebrow">Compute · Capital · Silicon — updated June 27, 2026</div>
     <h1>The AI <em>Capital Web</em></h1>
     <p class="sub">Who is paying whom across the AI build-out. Each circle is sized by market value (or last private valuation); each line is a deal, colored by type. Tap a circle for its full deal sheet, hover a line for terms, or use the legend to filter. Built from your Bloomberg chart — then re-reported and expanded.</p>
   </header>
@@ -286,7 +286,7 @@ const NODES = [
   {id:"meta",     label:"Meta",          role:"hyper", v:1850, val:"~$1.9T mkt cap",
     note:"2026 capex $125–145B; ~$600B U.S. infrastructure pledged through 2028. Its 5GW Hyperion campus (Louisiana) is financed off-balance-sheet via Blue Owl / PIMCO."},
   {id:"spacex",   label:"SpaceX · xAI",  role:"space", v:1750, val:"~$1.75T IPO target",
-    note:"Absorbed xAI in Feb 2026 ($1.25T combined merger). IPO priced in Jun 2026 at ~$1.75T, raising a record ~$75B (~$100.8B cash on hand), followed by a first-ever $20B bond to repay the xAI-merger bridge loan. Now rents out its Colossus GPU clusters to Google & Anthropic, and is pivoting toward orbital data centers. Owns Grok and X."},
+    note:"Absorbed xAI in Feb 2026 ($1.25T combined merger). IPO priced in Jun 2026 at ~$1.75T, raising a record ~$75B (~$100.8B cash on hand), followed by a first-ever $25B bond (priced Jun 23 on ~$90B of orders) to repay the xAI-merger bridge loan. Now rents out its Colossus GPU clusters to Google & Anthropic, and is pivoting toward orbital data centers. Owns Grok and X."},
   {id:"broadcom", label:"Broadcom",      role:"chip",  v:1700, val:"~$1.7T mkt cap",
     note:"The quiet kingmaker of custom AI silicon — co-designs OpenAI's accelerators (~10GW) and Google's TPUs that Anthropic & Meta run on."},
   {id:"berkshire",label:"Berkshire H.",  role:"fin",   v:1050, val:"~$1.05T mkt cap",
@@ -315,8 +315,8 @@ const NODES = [
     note:"European-rooted neocloud; signed a ~$17–19B GPU-capacity deal with Microsoft."},
   {id:"anysphere",label:"Anysphere",     role:"startup",v:30,  val:"~$30B (private)",
     note:"Maker of Cursor. OpenAI-backed — and the target of SpaceX's $10B deal with an option to buy it for up to $60B."},
-  {id:"mgx",      label:"MGX",           role:"fin",   v:100,  val:"sovereign fund",
-    note:"Abu Dhabi's AI investment vehicle and a founding partner of the $500B Stargate program."},
+  {id:"mgx",      label:"MGX",           role:"fin",   v:120,  val:"~$50B fund (Jun '26)",
+    note:"Abu Dhabi's AI investment vehicle and a founding Stargate partner; raised ~$50B for its 'MGX 1' fund (Jun '26) from sovereign and global LPs (>$500M minimum) to accelerate AI-infra deals."},
   {id:"crusoe",   label:"Crusoe",        role:"neo",   v:10,   val:"~$10B (private)",
     note:"Builds the Abilene, TX 'AI factory' campus — OpenAI/Oracle tenants on one tract, and a 900MW Microsoft lease right next door."},
   {id:"harvey",   label:"Harvey",        role:"startup",v:8,   val:"~$8B (private)",
@@ -328,7 +328,7 @@ const NODES = [
   {id:"ambience", label:"Ambience Health",role:"startup",v:1.5,val:"~$1.5B (private)",
     note:"Healthcare-documentation AI; OpenAI-backed."},
   {id:"markets",  label:"Debt & Equity Markets",role:"market",v:600,val:"capital source",
-    note:"Not a company — the bond and equity markets now bankrolling record AI capex. June 2026 alone brought a wave of issuance: Nvidia ($25B), SpaceX ($20B), Oracle (~$18B bonds + ~$38B loans), CoreWeave ($1.25B + €2B) and SMCI ($7B). Morgan Stanley sees hyperscalers borrowing ~$400B in 2026, pushing US high-grade issuance toward a record $2.25T."},
+    note:"Not a company — the bond and equity markets now bankrolling record AI capex. June 2026 alone brought a wave of issuance: Nvidia ($25B), SpaceX ($25B), Oracle (~$18B bonds + ~$38B loans), CoreWeave ($1.25B + €2B) and SMCI ($7B). Morgan Stanley sees hyperscalers borrowing ~$400B in 2026, pushing US high-grade issuance toward a record $2.25T."},
 ];
 /* ---------- links ---------- */
 const LINKS = [
@@ -1060,7 +1060,7 @@ const CFGS={
    NODES:[
     {id:"google",label:"Alphabet",role:"cloud",v:4600,val:"~$4.6T mkt cap",note:"Backs Anthropic (up to $40B), designs TPUs with Broadcom, sells cloud to OpenAI & Meta, and powers Apple's Siri — funded by an $80B equity raise plus >$100B of debt."},
     {id:"anthropic",label:"Anthropic",role:"lab",v:900,val:"~$965B (Series H)",note:"Up to $40B from Google; runs up to 1M TPUs / ~5GW of capacity."},
-    {id:"broadcom",label:"Broadcom",role:"chip",v:1700,val:"~$1.7T mkt cap",note:"Co-designs Google's TPUs (Ironwood)."},
+    {id:"broadcom",label:"Broadcom",role:"chip",v:1700,val:"~$1.7T mkt cap",note:"Co-designs Google's TPUs (Ironwood); also unveiled OpenAI's first custom inference chip, 'Jalapeño,' on Jun 24 '26 (deploying late 2026)."},
     {id:"tsmc",label:"TSMC",role:"supplier",v:1100,val:"~$1.1T mkt cap",note:"Fabricates Google's TPUs."},
     {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Google Cloud also buys Nvidia GPUs."},
     {id:"apple",label:"Apple",role:"consumer",v:4000,val:"~$4T mkt cap",note:"Pays ~$1B/yr — custom Gemini powers Siri; Google in turn pays Apple for default search."},
