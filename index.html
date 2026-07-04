@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The AI Capital Web · June 2026</title>
+<title>The AI Capital Web · July 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -126,7 +126,7 @@
 <div class="grain"></div>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Compute · Capital · Silicon — updated June 27, 2026</div>
+    <div class="eyebrow">Compute · Capital · Silicon — updated July 4, 2026</div>
     <h1>The AI <em>Capital Web</em></h1>
     <p class="sub">Who is paying whom across the AI build-out. Each circle is sized by market value (or last private valuation); each line is a deal, colored by type. Tap a circle for its full deal sheet, hover a line for terms, or use the legend to filter. Built from your Bloomberg chart — then re-reported and expanded.</p>
   </header>
@@ -288,11 +288,11 @@ const NODES = [
   {id:"amazon",   label:"Amazon",        role:"hyper", v:2900, val:"~$2.9T mkt cap",
     note:"Now backs BOTH frontier labs — $50B into OpenAI and up to $25B into Anthropic. 2026 capex ~$200B. Custom silicon: Trainium / Inferentia."},
   {id:"meta",     label:"Meta",          role:"hyper", v:1850, val:"~$1.9T mkt cap",
-    note:"2026 capex $125–145B; ~$600B U.S. infrastructure pledged through 2028. Its 5GW Hyperion campus (Louisiana) is financed off-balance-sheet via Blue Owl / PIMCO."},
+    note:"2026 capex $125–145B; ~$600B U.S. infrastructure pledged through 2028. Its 5GW Hyperion campus (Louisiana) is financed off-balance-sheet via Blue Owl / PIMCO. In Jul 2026, Bloomberg reported a planned Meta Compute service renting out its own GPU capacity — neocloud stocks fell ~15% on the news."},
   {id:"spacex",   label:"SpaceX · xAI",  role:"space", v:1750, val:"~$1.75T IPO target",
-    note:"Absorbed xAI in Feb 2026 ($1.25T combined merger). IPO priced in Jun 2026 at ~$1.75T, raising a record ~$75B (~$100.8B cash on hand), followed by a first-ever $25B bond (priced Jun 23 on ~$90B of orders) to repay the xAI-merger bridge loan. Now rents out its Colossus GPU clusters to Google & Anthropic, and is pivoting toward orbital data centers. Owns Grok and X."},
+    note:"Absorbed xAI in Feb 2026 ($1.25T combined merger). IPO priced in Jun 2026 at ~$1.75T, raising a record ~$75B (~$100.8B cash on hand), followed by a first-ever $25B bond (priced Jun 23 on ~$90B of orders) to repay the xAI-merger bridge loan. Now rents out its Colossus GPU clusters to Google, Anthropic & Reflection AI, and is pivoting toward orbital data centers. Owns Grok and X."},
   {id:"broadcom", label:"Broadcom",      role:"chip",  v:1700, val:"~$1.7T mkt cap",
-    note:"The quiet kingmaker of custom AI silicon — co-designs OpenAI's accelerators (~10GW) and Google's TPUs that Anthropic & Meta run on."},
+    note:"The quiet kingmaker of custom AI silicon — co-designs OpenAI's accelerators (~10GW) and Google's TPUs that Anthropic & Meta run on. Its first OpenAI custom chip, Jalapeño, was unveiled Jun 24, 2026."},
   {id:"berkshire",label:"Berkshire H.",  role:"fin",   v:1050, val:"~$1.05T mkt cap",
     note:"Anchored Alphabet's 2026 raise with a $10B private placement — a notable AI-era bet from the post-Buffett Berkshire."},
   {id:"openai",   label:"OpenAI",        role:"lab",   v:850,  val:"~$850B (private)",
@@ -300,11 +300,13 @@ const NODES = [
   {id:"oracle",   label:"Oracle",        role:"hyper", v:750,  val:"~$750B mkt cap",
     note:"Stargate's cloud anchor — a $300B, ~$60B/yr deal with OpenAI. 2026 capex ~$50B; raised $25B of bonds with orders topping $129B."},
   {id:"anthropic",label:"Anthropic",     role:"lab",   v:900,  val:"~$965B (Series H)",
-    note:"Closed a $65B Series H in Jun 2026 at a ~$965B post-money valuation — briefly the most valuable startup, ahead of OpenAI — and confidentially filed for an IPO (Jun 1). Strategic chip partners Micron, Samsung & SK hynix joined the round. Uniquely multi-cloud: Google TPUs, AWS Trainium, Azure+Nvidia, plus SpaceX's Colossus."},
+    note:"Closed a $65B Series H in Jun 2026 at a ~$965B post-money valuation — briefly the most valuable startup, ahead of OpenAI — and confidentially filed for an IPO (Jun 1). Strategic chip partners Micron, Samsung & SK hynix joined the round. Uniquely multi-cloud: Google TPUs, AWS Trainium, Azure+Nvidia, plus SpaceX's Colossus. Revenue run-rate reportedly passed $30B in 2026."},
   {id:"amd",      label:"AMD",           role:"chip",  v:350,  val:"~$350B mkt cap",
     note:"Landed OpenAI as a marquee customer for 6GW of Instinct GPUs — and handed OpenAI a warrant for up to ~10% of AMD to seal it."},
   {id:"intel",    label:"Intel",         role:"chip",  v:180,  val:"~$180B mkt cap",
     note:"Took a surprise $5B / ~4% investment from Nvidia (Sept 2025) as it fights to stay relevant in AI silicon."},
+  {id:"cerebras", label:"Cerebras",      role:"chip",  v:8,    val:"~$8B (private)",
+    note:"Wafer-scale inference challenger and IPO candidate. Disclosed a $20B+, multi-year OpenAI contract for up to 750MW of inference compute; GPT-5.6 Sol launches on Cerebras hardware in Jul 2026 at ~750 tokens/sec — roughly 15x typical GPU serving speed."},
   {id:"softbank", label:"SoftBank",      role:"fin",   v:150,  val:"~$150B mkt cap",
     note:"Co-founder of the $500B Stargate program and a $30B investor in OpenAI's latest round. Sold its ENTIRE $5.83B Nvidia stake (Nov 2025) — plus margin-loaned Arm and trimmed T-Mobile — to help fund the OpenAI cheque."},
   {id:"stargate", label:"Stargate",      role:"jv",    v:500,  val:"$500B program",
@@ -325,6 +327,8 @@ const NODES = [
     note:"Builds the Abilene, TX 'AI factory' campus — OpenAI/Oracle tenants on one tract, and a 900MW Microsoft lease right next door."},
   {id:"harvey",   label:"Harvey",        role:"startup",v:8,   val:"~$8B (private)",
     note:"Legal-AI startup; OpenAI-backed."},
+  {id:"reflection",label:"Reflection AI", role:"lab",   v:8,   val:"~$8B (private)",
+    note:"Open foundation-model lab, Nvidia-backed. Became the third anchor tenant of SpaceX Colossus (Jun 2026): a $6.3B compute deal — ~$150M/month from Jul 1 — for immediate GB300 capacity."},
   {id:"mistral",  label:"Mistral",       role:"lab",   v:14,   val:"~$14B (private)",
     note:"European frontier lab; counts Nvidia among its backers."},
   {id:"nscale",   label:"Nscale",        role:"neo",   v:3,    val:"private",
@@ -352,7 +356,7 @@ const LINKS = [
   ["oracle","nvidia","hw","~$40B for ~400K GB200 GPUs for the Abilene Stargate site.",40],
   ["openai","amd","hw","Deploying 6GW of AMD Instinct GPUs.",30],
   ["amd","openai","inv","Warrant: OpenAI may buy up to 160M AMD shares (~10%).",20],
-  ["openai","broadcom","hw","~10GW of custom accelerators — but the deal hit a snag (Jun '26): Broadcom will fund phase 1 (~1.3GW, ~$18B) only if Microsoft buys ~40% of output, which it hasn't signed.",18],
+  ["openai","broadcom","hw","~10GW of custom accelerators. First chip, Jalapeño, unveiled Jun 24, 2026 — a reticle-sized inference ASIC taped out in 9 months; initial deployment by end-2026, incl. GW-scale sites with Microsoft.",18],
   ["openai","coreweave","svc","Multi-year GPU cloud capacity.",22],
   ["nvidia","coreweave","inv",">5% equity stake + a $6.3B take-or-pay backstop — Nvidia buys CoreWeave's UNSOLD capacity through 2032 (textbook vendor financing).",10],
   ["microsoft","crusoe","svc","Leases 900MW at the Abilene, TX campus.",9],
@@ -381,8 +385,10 @@ const LINKS = [
   // SpaceX / xAI
   ["spacex","anysphere","vc","Agreed to ACQUIRE Cursor for $60B (Jun '26) — halting a ~$2B round Nvidia was set to join.",60],
   ["spacex","nvidia","hw","Nvidia GPUs powering the Colossus clusters.",30],
+  ["reflection","spacex","svc","$6.3B for Colossus GB300 capacity — ~$150M/month starting Jul 1, 2026.",6.3],
   // chips
   ["nvidia","intel","inv","$5B for ~4% (Sept 2025).",5],
+  ["openai","cerebras","svc","$20B+ multi-year inference contract — up to 750MW of wafer-scale compute; GPT-5.6 Sol serves at ~750 tok/s (Jul 2026).",20],
   // neoclouds
   ["microsoft","coreweave","svc","Anchor customer — very large GPU capacity contracts.",14],
   ["microsoft","nebius","svc","~$17–19B GPU-capacity deal.",18],
@@ -397,7 +403,7 @@ const LINKS = [
   ["markets","oracle","cap","$25B bonds (Feb '26) + $20B equity ATM, plus a new ~$38B loan + ~$18B bond package (Jun '26) for its Stargate / New-Mexico build-out.",56],
   ["markets","microsoft","cap","Levering up to help fund ~$190B of 2026 capex; most cash-funded of the group.",30],
   ["markets","amazon","cap","Bond issuance helping fund ~$200B of 2026 capex.",30],
-  ["markets","spacex","cap","Record ~$75B IPO (Jun '26) + a first-ever $20B bond to repay the xAI-merger bridge.",75],
+  ["markets","spacex","cap","Record ~$75B IPO (Jun '26) + a first-ever $25B bond (upsized from $20B) to repay the xAI-merger bridge.",75],
   ["markets","nvidia","cap","$25B of bonds (Jun '26) — Nvidia's largest ever and first since 2021.",25],
   ["markets","coreweave","cap","$1.25B + €2B of senior notes (Jun '26).",10],
 ].map(d=>({source:d[0],target:d[1],cat:d[2],body:d[3],w:d[4]}));
@@ -622,7 +628,7 @@ function initNvidiaWeb(){
     {id:"nebius",label:"Nebius",role:"neo",v:30,val:"~$30B mkt cap",note:"$2B (Mar 2026) + a full-stack AI-cloud partnership; European-rooted neocloud."},
     {id:"cohere",label:"Cohere",role:"lab",v:7,val:"~$7B (private)",note:"Enterprise LLM builder; Nvidia is a backer."},
     {id:"thinkingmachines",label:"Thinking Machines",role:"lab",v:12,val:"~$12B (private)",note:"Mira Murati's frontier lab; Nvidia is a backer."},
-    {id:"reflection",label:"Reflection AI",role:"lab",v:8,val:"~$8B (private)",note:"Open foundation-model startup; Nvidia is a backer."},
+    {id:"reflection",label:"Reflection AI",role:"lab",v:8,val:"~$8B (private)",note:"Open foundation-model startup; Nvidia is a backer. Signed a $6.3B Colossus compute deal with SpaceX (~$150M/month from Jul 2026)."},
     {id:"wayve",label:"Wayve",role:"auto",v:5,val:"~$5B (private)",note:"UK end-to-end autonomous-driving startup; Nvidia-backed."},
     {id:"weride",label:"WeRide",role:"auto",v:5,val:"~$5B mkt cap",note:"Listed robotaxi maker; Nvidia holds an equity stake (per its 13F)."},
     {id:"recursion",label:"Recursion",role:"health",v:3,val:"~$3B mkt cap",note:"AI drug-discovery company; Nvidia holds an equity stake (per its 13F)."},
@@ -1029,7 +1035,7 @@ const CFGS={
     {id:"microsoft",label:"Microsoft",role:"cloud",v:3100,val:"~$3.1T mkt cap",note:"Owns ~27% of OpenAI; backs Anthropic, Mistral & Hugging Face; the biggest single buyer of GPUs & neocloud capacity. In Jun '26 it launched its own MAI models to cut reliance on OpenAI/Anthropic, alongside its Maia silicon."},
     {id:"chevron",label:"Chevron",role:"energy",v:300,val:"~$300B mkt cap",note:"Signed a Jun '26 deal to build & supply dedicated power to Microsoft's 2.7GW 'Project Kilby' data-center campus in Reeves County, TX (power from ~2028)."},
     {id:"openai",label:"OpenAI",role:"lab",v:850,val:"~$850B (private)",note:"~27% stake (~$135B). Microsoft's revenue-share is now capped through 2030 as OpenAI multi-clouds across AWS, Google & neoclouds."},
-    {id:"anthropic",label:"Anthropic",role:"lab",v:900,val:"~$965B (Series H)",note:"Up to $5B invested; $30B of Azure compute; in talks to run Microsoft's Maia chips."},
+    {id:"anthropic",label:"Anthropic",role:"lab",v:900,val:"~$965B (Series H)",note:"Up to $5B invested; $30B of Azure compute; in talks to run Microsoft's Maia chips. Claude went GA on Azure Foundry (Jun 29, 2026) on Nvidia GB300 Blackwell Ultra."},
     {id:"mistral",label:"Mistral",role:"lab",v:14,val:"~$14B (private)",note:"Investor + Azure model partner."},
     {id:"huggingface",label:"Hugging Face",role:"startup",v:4.5,val:"~$4.5B (private)",note:"Investor + model-hub partner."},
     {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Microsoft is Nvidia's single largest GPU customer."},
@@ -1072,6 +1078,7 @@ const CFGS={
     {id:"openai",label:"OpenAI",role:"lab",v:850,val:"~$850B (private)",note:"Google Cloud customer — part of a $460B performance-obligation backlog."},
     {id:"spacex",label:"SpaceX",role:"space",v:1750,val:"~$1.75T",note:"Google rents ~110K Nvidia GPUs from SpaceX's Colossus (~$30B)."},
     {id:"berkshire",label:"Berkshire H.",role:"fin",v:1050,val:"~$1.05T mkt cap",note:"$10B private placement (June 2026)."},
+    {id:"blackstone",label:"Blackstone",role:"fin",v:200,val:"~$200B mkt cap",note:"Committed $5B to a Google-backed AI-infrastructure venture (Jun 16, 2026) targeting ~500MW online by 2027."},
     {id:"markets",label:"Debt & Equity Markets",role:"market",v:300,val:"capital source",note:"$80B equity raise (Jun '26) + >$100B of bonds."},
    ],
    LINKS:L([
@@ -1086,6 +1093,7 @@ const CFGS={
     ["openai","google","svc","Google Cloud customer (part of a $460B backlog).",10],
     ["google","spacex","svc","$920M/mo (~$30B) for ~110K Nvidia GPUs, 2026–29.",30],
     ["berkshire","google","inv","$10B private placement.",10],
+    ["blackstone","google","inv","$5B into a joint AI-infrastructure venture — ~500MW by 2027.",5],
     ["markets","google","cap","$80B equity (Jun '26) + >$100B of bonds.",100],
    ])},
   amazon:{svgId:"net-amazon",chipsId:"chips-amazon",typekeyId:"typekey-amazon",resetId:"reset-amazon",viewId:"view-amazon",centerId:"amazon",CATS:CATS_CO,ROLES:ROLE_PAL,outLabel:"Outbound — Amazon invests / pays / partners",inLabel:"Inbound — flows to Amazon",
@@ -1114,7 +1122,7 @@ const CFGS={
    ])},
   meta:{svgId:"net-meta",chipsId:"chips-meta",typekeyId:"typekey-meta",resetId:"reset-meta",viewId:"view-meta",centerId:"meta",CATS:CATS_CO,ROLES:ROLE_PAL,outLabel:"Outbound — Meta invests / pays / partners",inLabel:"Inbound — flows to Meta",
    NODES:[
-    {id:"meta",label:"Meta",role:"cloud",v:1850,val:"~$1.9T mkt cap",note:"Bought 49% of Scale AI, committed $48B to neoclouds and up to $50B to Nvidia, co-designs its own MTIA chips, lines up gigawatts of nuclear, and finances data centers off-balance-sheet via Blue Owl."},
+    {id:"meta",label:"Meta",role:"cloud",v:1850,val:"~$1.9T mkt cap",note:"Bought 49% of Scale AI, committed $48B to neoclouds and up to $50B to Nvidia, co-designs its own MTIA chips, lines up gigawatts of nuclear, and finances data centers off-balance-sheet via Blue Owl. Jul 2026: reportedly prepping Meta Compute — selling GPU capacity to third parties, neocloud-style."},
     {id:"scale",label:"Scale AI",role:"startup",v:29,val:"~$29B (Scale AI)",note:"$14.3B for 49%; founder Alexandr Wang now leads Meta's superintelligence team."},
     {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Up to $50B of Nvidia systems (Blackwell/Rubin, Spectrum-X)."},
     {id:"broadcom",label:"Broadcom",role:"chip",v:1700,val:"~$1.7T mkt cap",note:"Co-designs Meta's MTIA in-house accelerators."},
