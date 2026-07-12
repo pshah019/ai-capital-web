@@ -1162,4 +1162,30 @@ const CFGS={
     {id:"samsung",label:"Samsung",role:"supplier",v:350,val:"~$350B mkt cap",note:"$16.5B deal to fabricate Tesla's next-gen AI6 chip (Taylor, TX)."},
     {id:"tsmc",label:"TSMC",role:"supplier",v:1100,val:"~$1.1T mkt cap",note:"Fabricates the AI5 chip (Taiwan, then Arizona)."},
     {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Buys Nvidia GPUs for AI training after shelving Dojo."},
-    {id:"amd",label:"AMD",role:"chip",v:350,val:"~$350B mkt cap",note:"AMD Ryzen r
+    {id:"amd",label:"AMD",role:"chip",v:350,val:"~$350B mkt cap",note:"AMD Ryzen runs in-car Grok; also a GPU supplier."},
+    {id:"xai",label:"xAI",role:"lab",v:250,val:"~$250B (in SpaceX)",note:"Musk's xAI — Grok is the 'brain' directing Tesla's hardware; joint 'Digital Optimus' project."},
+    {id:"aisilicon",label:"AI5 / AI6",role:"chip",v:40,val:"in-house silicon",note:"Tesla's own chip program — Dojo shelved Aug '25; AI6 fabbed by Samsung, AI5 by TSMC."},
+    {id:"panasonic",label:"Panasonic",role:"supplier",v:30,val:"~$30B mkt cap",note:"Battery cell supplier."},
+    {id:"catl",label:"CATL",role:"supplier",v:130,val:"~$130B mkt cap",note:"LFP battery cells."},
+    {id:"lg",label:"LG Energy",role:"supplier",v:60,val:"~$60B mkt cap",note:"Battery cells."},
+   ],
+   LINKS:L([
+    ["tesla","samsung","cap","$16.5B to fabricate the AI6 chip (Taylor, TX).",16.5],
+    ["tesla","tsmc","cap","Fabricates the AI5 chip (Taiwan → Arizona).",10],
+    ["tesla","nvidia","hw","Buys Nvidia GPUs for training (post-Dojo).",10],
+    ["tesla","amd","hw","AMD Ryzen runs in-car Grok; GPU buyer.",5],
+    ["tesla","xai","vc","Grok is the 'brain'; joint 'Digital Optimus' project.",5],
+    ["tesla","aisilicon","hw","In-house AI5/AI6 program (Dojo shelved).",10],
+    ["tesla","panasonic","cap","Battery cell supply.",3],
+    ["tesla","catl","cap","LFP battery cells.",4],
+    ["tesla","lg","cap","Battery cells.",3],
+   ])},
+};
+const __built={}; let __nvDone=false;
+window.__showWeb=function(v){
+  if(v==='nvidia'){ if(!__nvDone){__nvDone=true; initNvidiaWeb();} else if(window.nvResize){window.nvResize();} return; }
+  if(CFGS[v]){ if(!__built[v]){ __built[v]=buildWeb(CFGS[v]); } else { __built[v].resize(); } }
+};
+</script>
+</body>
+</html>
