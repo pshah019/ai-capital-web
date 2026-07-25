@@ -126,7 +126,7 @@
 <div class="grain"></div>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Compute · Capital · Silicon — updated July 17, 2026</div>
+    <div class="eyebrow">Compute · Capital · Silicon — updated July 25, 2026</div>
     <h1>The AI <em>Capital Web</em></h1>
     <p class="sub">Who is paying whom across the AI build-out. Each circle is sized by market value (or last private valuation); each line is a deal, colored by type. Tap a circle for its full deal sheet, hover a line for terms, or use the legend to filter. Built from your Bloomberg chart — then re-reported and expanded.</p>
   </header>
@@ -302,7 +302,7 @@ const NODES = [
   {id:"anthropic",label:"Anthropic",     role:"lab",   v:900,  val:"~$965B (Series H)",
     note:"Closed a $65B Series H in Jun 2026 at a ~$965B post-money valuation — briefly the most valuable startup, ahead of OpenAI — and confidentially filed for an IPO (Jun 1). Strategic chip partners Micron, Samsung & SK hynix joined the round. Uniquely multi-cloud: Google TPUs, AWS Trainium, Azure+Nvidia, plus SpaceX's Colossus. Revenue run-rate reportedly passed $30B in 2026. Bankers are now lining up IPO investor meetings — listing as soon as Oct '26 (Jul 15) — and it's in early talks to lease up to ~$10B of Meta compute (Jul 17)."},
   {id:"amd",      label:"AMD",           role:"chip",  v:350,  val:"~$350B mkt cap",
-    note:"Landed OpenAI as a marquee customer for 6GW of Instinct GPUs — and handed OpenAI a warrant for up to ~10% of AMD to seal it."},
+    note:"Landed OpenAI as a marquee customer for 6GW of Instinct GPUs — and handed OpenAI a warrant for up to ~10% of AMD to seal it. Advancing AI (Jul 23 '26): Helios/MI450 racks in mass production, ~14GW of customer compute booked — and up to a $5B investment in Anthropic."},
   {id:"intel",    label:"Intel",         role:"chip",  v:180,  val:"~$180B mkt cap",
     note:"Took a surprise $5B / ~4% investment from Nvidia (Sept 2025) as it fights to stay relevant in AI silicon."},
   {id:"cerebras", label:"Cerebras",      role:"chip",  v:8,    val:"~$8B (private)",
@@ -319,8 +319,8 @@ const NODES = [
     note:"Own 80% of Meta's Hyperion JV and arranged ~$27B of private credit (PIMCO as anchor lender) — the template for off-balance-sheet AI build-outs."},
   {id:"helix", label:"Helix (KKR)", role:"fin", v:10, val:"$10B+ committed",
     note:"KKR-led AI-infrastructure financing company launched Jun 10 '26 with Kuwait's KIA, Nvidia & Vistra; run by ex-AWS chief Adam Selipsky — one-stop capital for data centers, power & connectivity."},
-  {id:"nebius",   label:"Nebius",        role:"neo",   v:30,   val:"~$30B mkt cap",
-    note:"European-rooted neocloud; signed a ~$17–19B GPU-capacity deal with Microsoft."},
+  {id:"nebius",   label:"Nebius",        role:"neo",   v:49,   val:"~$49B mkt cap",
+    note:"European-rooted neocloud; signed a ~$17–19B GPU-capacity deal with Microsoft. A Jul 21 '26 SEC filing revealed Nvidia beneficially owns 9.3% (shares + warrant from its $2B investment)."},
   {id:"anysphere",label:"Anysphere",     role:"startup",v:30,  val:"~$30B (private)",
     note:"Maker of Cursor. OpenAI-backed — and the target of SpaceX's $10B deal with an option to buy it for up to $60B."},
   {id:"mgx",      label:"MGX",           role:"fin",   v:120,  val:"$49B fund (closed Jul '26)",
@@ -340,7 +340,7 @@ const NODES = [
   {id:"terawulf", label:"TeraWulf", role:"neo", v:5, val:"$19B, 20-yr lease",
     note:"Bitcoin-miner-turned-AI-landlord. Jul 6 '26: signed a 20-year, ~$19B lease with Anthropic for a 401MW campus in Hawesville, KY (first capacity 2H27) — and sold its 50.1% of the Abernathy, TX JV to Fluidstack (~$530M)."},
   {id:"markets",  label:"Debt & Equity Markets",role:"market",v:600,val:"capital source",
-    note:"Not a company — the bond and equity markets now bankrolling record AI capex. June 2026 alone brought a wave of issuance: Nvidia ($25B), SpaceX ($25B), Oracle (~$18B bonds + ~$38B loans), CoreWeave ($1.25B + €2B) and SMCI ($7B); July added Amazon ($25B) and pushed high-yield AI issuance to $31.9B YTD (Jul 8). Morgan Stanley sees hyperscalers borrowing ~$400B in 2026, pushing US high-grade issuance toward a record $2.25T."},
+    note:"Not a company — the bond and equity markets now bankrolling record AI capex. June 2026 alone brought a wave of issuance: Nvidia ($25B), SpaceX ($25B), Oracle (~$18B bonds + ~$38B loans), CoreWeave ($1.25B + €2B) and SMCI ($7B); July added Amazon ($25B) and pushed high-yield AI issuance to $31.9B YTD (Jul 8). Morgan Stanley sees hyperscalers borrowing ~$400B in 2026, pushing US high-grade issuance toward a record $2.25T. Jul '26: 2026 AI-linked bond issuance is tracking toward ~$570B — and bond investors are starting to push back on terms."},
 ];
 /* ---------- links ---------- */
 const LINKS = [
@@ -353,6 +353,7 @@ const LINKS = [
   ["softbank","openai","inv","$30B in OpenAI's latest round.",30],
   ["softbank","stargate","inv","~40% owner & chair; committed ~$19B and lead-finances the $500B program.",30],
   ["mgx","stargate","inv","~$7B founding equity partner.",15],
+  ["amd","anthropic","inv","Up to $5B equity investment paired with 2GW of MI450/Helios compute (Jul 22 '26).",20],
   ["openai","stargate","inv","~40% owner & operational lead; committed ~$19B; also anchor tenant for ~17GW.",60],
   ["oracle","stargate","svc","~$7B equity funder + primary cloud & data-center builder (Abilene).",60],
   ["nvidia","stargate","hw","Named technology partner. Its up-to-$100B OpenAI deal funds ~10GW of Stargate capacity — which is spent right back on Nvidia systems (the canonical circular loop).",40],
@@ -618,7 +619,7 @@ function initNvidiaWeb(){
   const NODES=[
     {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"The center of the AI economy: designs the GPUs nearly everyone buys, then recycles the profits into equity stakes, partnerships and sovereign buildouts spanning labs, clouds, chips, autos, telecom, pharma and nations. Jul '26: unveiled a financing platform + revenue-sharing program for AI clouds, anchoring KKR's $10B+ Helix vehicle."},
     {id:"openai",label:"OpenAI",role:"lab",v:850,val:"~$850B (private)",note:"Nvidia signed an LOI to invest up to $100B (~$30B deployed); now stalling — Huang says $100B is 'not in the cards.'"},
-    {id:"anthropic",label:"Anthropic",role:"lab",v:900,val:"~$965B (Series H)",note:"Up to $10B from Nvidia (Nov 2025); runs Grace Blackwell + Vera Rubin alongside TPUs and Trainium. Closed a $65B Series H at ~$965B (Jun '26) and filed for an IPO — investor meetings queued for a listing as soon as Oct '26; chip partners Micron, Samsung & SK hynix joined."},
+    {id:"anthropic",label:"Anthropic",role:"lab",v:900,val:"~$965B (Series H)",note:"Up to $10B from Nvidia (Nov 2025); runs Grace Blackwell + Vera Rubin alongside TPUs and Trainium — and, from 2027, up to 2GW of AMD MI450s (AMD investing up to $5B, Jul '26). Closed a $65B Series H at ~$965B (Jun '26) and filed for an IPO — investor meetings queued for a listing as soon as Oct '26; chip partners Micron, Samsung & SK hynix joined."},
     {id:"xai",label:"xAI",role:"lab",v:250,val:"~$250B (in SpaceX)",note:"Nvidia put $2B into xAI's $20B round (Jan 2026); xAI is now inside SpaceX."},
     {id:"mistral",label:"Mistral",role:"lab",v:14,val:"~$14B (private)",note:"European frontier lab; Nvidia is a backer."},
     {id:"coreweave",label:"CoreWeave",role:"neo",v:80,val:"~$80B mkt cap",note:"Nvidia holds >5% and backstops $6.3B of unsold capacity through 2032 — then rents it back for its own R&D."},
@@ -632,7 +633,8 @@ function initNvidiaWeb(){
     {id:"synthesia",label:"Synthesia",role:"startup",v:4,val:"~$4B (private)",note:"UK AI-video startup; Nvidia joined its $200M Series E (2026)."},
     {id:"lumentum",label:"Lumentum",role:"supplier",v:15,val:"~$15B mkt cap",note:"$2B preferred-stock investment (Mar 2026) + a silicon-photonics partnership and multi-billion purchase commitment for gigawatt-scale AI-factory optics."},
     {id:"coherent",label:"Coherent",role:"supplier",v:25,val:"~$25B mkt cap",note:"$2B (Mar 2026) — the other half of Nvidia's ~$4B photonics bet alongside Lumentum; lasers & optical interconnects."},
-    {id:"nebius",label:"Nebius",role:"neo",v:30,val:"~$30B mkt cap",note:"$2B (Mar 2026) + a full-stack AI-cloud partnership; European-rooted neocloud."},
+    {id:"nebius",label:"Nebius",role:"neo",v:49,val:"~$49B mkt cap",note:"$2B (Mar 2026) + a full-stack AI-cloud partnership; a Jul 21 '26 SEC filing revealed Nvidia beneficially owns 9.3%."},
+    {id:"iren",label:"IREN",role:"neo",v:15,val:"up to 5GW",note:"Strategic partner (May 7 '26): up to 5GW of DSX-aligned AI infrastructure across IREN's global data-center pipeline."},
     {id:"cohere",label:"Cohere",role:"lab",v:7,val:"~$7B (private)",note:"Enterprise LLM builder; Nvidia is a backer."},
     {id:"thinkingmachines",label:"Thinking Machines",role:"lab",v:12,val:"~$12B (private)",note:"Mira Murati's frontier lab; Nvidia is a backer."},
     {id:"reflection",label:"Reflection AI",role:"lab",v:8,val:"~$8B (private)",note:"Open foundation-model startup; Nvidia is a backer. Signed a $6.3B Colossus compute deal with SpaceX (~$150M/month from Jul 2026)."},
@@ -649,9 +651,10 @@ function initNvidiaWeb(){
     {id:"oracle",label:"Oracle",role:"cloud",v:750,val:"~$750B mkt cap",note:"~$40B for ~400K GB200 GPUs for the Abilene Stargate site."},
     {id:"tesla",label:"Tesla",role:"auto",v:1300,val:"~$1.3T mkt cap",note:"Returned to buying Nvidia after shelving its in-house Dojo supercomputer."},
     {id:"tsmc",label:"TSMC",role:"supplier",v:1100,val:"~$1.1T mkt cap",note:"Sole-source foundry for every Nvidia GPU; its CoWoS advanced packaging is the industry's tightest chokepoint. Q2 '26 (Jul 16): record $40.2B revenue (+36%), 67.7% gross margin — HPC is now 66% of sales; raised its full-year AI outlook and earmarked another ~$100B for US fabs."},
-    {id:"skhynix",label:"SK Hynix",role:"supplier",v:150,val:"~$150B mkt cap",note:"Lead HBM4 memory supplier for Vera Rubin; 2026 output sold out."},
+    {id:"skhynix",label:"SK Hynix",role:"supplier",v:150,val:"~$150B mkt cap",note:"Lead HBM4 memory supplier for Vera Rubin; 2026 output sold out. Next-gen HBM4 co-development under the expanded SK Group–Nvidia pact (Jul 25 '26)."},
     {id:"samsung",label:"Samsung",role:"supplier",v:350,val:"~$350B mkt cap",note:"Shipping HBM4 and in next-gen foundry talks with Nvidia."},
     {id:"micron",label:"Micron",role:"supplier",v:250,val:"~$250B mkt cap",note:"HBM memory supplier; 2026 production sold out."},
+    {id:"amkor",label:"Amkor",role:"supplier",v:12,val:"$1.5B pact",note:"Multi-year $1.5B advanced packaging & test partnership (Jul '26); a Nvidia capacity agreement anchors Amkor's Arizona expansion."},
     {id:"foxconn",label:"Foxconn",role:"supplier",v:90,val:"~$90B mkt cap",note:"Builds Nvidia's AI servers and rack-scale systems (incl. US plants)."},
     {id:"elililly",label:"Eli Lilly",role:"health",v:700,val:"~$700B mkt cap",note:"$1B, 5-year co-innovation lab in San Francisco for AI drug discovery, trials and manufacturing."},
     {id:"palantir",label:"Palantir",role:"enterprise",v:400,val:"~$400B mkt cap",note:"Joint operational- and sovereign-AI stack — Nvidia Nemotron models inside Palantir's platform."},
@@ -661,7 +664,7 @@ function initNvidiaWeb(){
     {id:"hyundai",label:"Hyundai",role:"auto",v:50,val:"~$50B mkt cap",note:"DRIVE Hyperion + Level-4 robotaxi via the Motional JV."},
     {id:"humain",label:"HUMAIN (Saudi)",role:"sov",v:100,val:"Saudi PIF · $100B+",note:"Saudi sovereign-AI champion building 11 data centers (2.2GW) on several hundred thousand Nvidia GPUs; Saudi PIF added a ~$1.2B financing framework (Jun '26)."},
     {id:"g42",label:"G42 (UAE)",role:"sov",v:80,val:"UAE sovereign AI",note:"Anchor of Stargate UAE — a 5GW Abu Dhabi cluster with OpenAI, Oracle, SoftBank & Cisco."},
-    {id:"skorea",label:"South Korea",role:"sov",v:60,val:"260k+ GPUs",note:"National buildout with Samsung, Hyundai, SK Group and Naver Cloud — over a quarter-million Nvidia GPUs."},
+    {id:"skorea",label:"South Korea",role:"sov",v:60,val:"260k+ GPUs",note:"National buildout with Samsung, Hyundai, SK Group and Naver Cloud — over a quarter-million Nvidia GPUs. Jul 25 '26: the Nvidia–SK Group pact expanded to a reported >$500B scope — SK Telecom to build a 2GW AI factory on DSX/Vera Rubin, plus an Nvidia investment in Naver."},
     {id:"japan",label:"Japan",role:"sov",v:60,val:"national AI infra",note:"World's first national AI infrastructure for physical AI (Jul 16 '26) — a METI-backed program of Vera Rubin 'AI factories', incl. Noetra Corp's 140MW build with 27,500 Rubin GPUs; Nemotron models spreading across Japanese industry."},
     {id:"reliance",label:"Reliance (India)",role:"sov",v:240,val:"~$240B (Reliance)",note:"2,000MW of AI data centers in India, led by Jio, on Nvidia silicon."},
   ];
@@ -682,6 +685,7 @@ function initNvidiaWeb(){
     ["nvidia","lumentum","inv","$2B preferred (Mar 2026) + silicon-photonics partnership & a multi-billion purchase commitment.",2],
     ["nvidia","coherent","inv","$2B (Mar 2026) — the other half of Nvidia's ~$4B photonics bet.",2],
     ["nvidia","nebius","inv","$2B (Mar 2026) + full-stack AI-cloud partnership.",2],
+    ["nvidia","iren","vc","Up to 5GW of DSX-aligned AI infrastructure across IREN's pipeline (May '26).",10],
     ["nvidia","cohere","inv","Backer of the enterprise LLM builder.",1],
     ["nvidia","thinkingmachines","inv","Backer of Mira Murati's Thinking Machines Lab.",1],
     ["nvidia","reflection","inv","Backer of foundation-model startup Reflection AI.",1],
@@ -699,6 +703,7 @@ function initNvidiaWeb(){
     ["tesla","nvidia","hw","Buys Nvidia after shelving Dojo.",10],
     ["tsmc","nvidia","cap","Fabricates every Nvidia GPU; CoWoS is the chokepoint.",60],
     ["skhynix","nvidia","cap","Lead HBM4 supplier for Vera Rubin.",30],
+    ["amkor","nvidia","cap","$1.5B multi-year advanced packaging & test partnership; US turnkey capacity in Arizona (Jul '26).",8],
     ["samsung","nvidia","cap","HBM4 + next-gen foundry talks.",25],
     ["micron","nvidia","cap","HBM memory (2026 sold out).",20],
     ["foxconn","nvidia","cap","Builds Nvidia's AI servers & racks.",20],
@@ -1048,9 +1053,9 @@ const CFGS={
     {id:"mistral",label:"Mistral",role:"lab",v:14,val:"~$14B (private)",note:"Investor + Azure model partner."},
     {id:"huggingface",label:"Hugging Face",role:"startup",v:4.5,val:"~$4.5B (private)",note:"Investor + model-hub partner."},
     {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Microsoft is Nvidia's single largest GPU customer."},
-    {id:"amd",label:"AMD",role:"chip",v:350,val:"~$350B mkt cap",note:"Deploys AMD Instinct GPUs across Azure."},
+    {id:"amd",label:"AMD",role:"chip",v:350,val:"~$350B mkt cap",note:"Deploys AMD Instinct GPUs across Azure; committed to run Helios/MI450 racks at scale on Azure (Jul '26)."},
     {id:"coreweave",label:"CoreWeave",role:"neo",v:80,val:"~$80B mkt cap",note:"Anchor customer — very large GPU-capacity contracts."},
-    {id:"nebius",label:"Nebius",role:"neo",v:30,val:"~$30B mkt cap",note:"~$17–19B GPU-capacity deal."},
+    {id:"nebius",label:"Nebius",role:"neo",v:49,val:"~$49B mkt cap",note:"~$17–19B GPU-capacity deal."},
     {id:"nscale",label:"Nscale",role:"neo",v:3,val:"private",note:"GPU-capacity contract."},
     {id:"lambda",label:"Lambda",role:"neo",v:4,val:"~$4B (private)",note:"Multi-billion GPU-capacity deal."},
     {id:"crusoe",label:"Crusoe",role:"neo",v:10,val:"~$10B (private)",note:"Leases 900MW at the Abilene, TX campus."},
@@ -1137,7 +1142,7 @@ const CFGS={
     {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Up to $50B of Nvidia systems (Blackwell/Rubin, Spectrum-X)."},
     {id:"broadcom",label:"Broadcom",role:"chip",v:1700,val:"~$1.7T mkt cap",note:"Co-designs Meta's MTIA in-house accelerators."},
     {id:"coreweave",label:"CoreWeave",role:"neo",v:80,val:"~$80B mkt cap",note:"$21B AI-cloud deal through 2032 (early Vera Rubin deployments)."},
-    {id:"nebius",label:"Nebius",role:"neo",v:30,val:"~$30B mkt cap",note:"Up to $27B of GPU capacity."},
+    {id:"nebius",label:"Nebius",role:"neo",v:49,val:"~$49B mkt cap",note:"Up to $27B of GPU capacity."},
     {id:"google",label:"Alphabet",role:"cloud",v:4600,val:"~$4.6T mkt cap",note:"$10B+ Google Cloud deal + TPU purchases."},
     {id:"oracle",label:"Oracle",role:"cloud",v:750,val:"~$750B mkt cap",note:"~$20B of Oracle cloud (reported)."},
     {id:"amazon",label:"Amazon",role:"cloud",v:2900,val:"~$2.9T mkt cap",note:"Adopting hundreds of thousands of AWS Graviton chips."},
