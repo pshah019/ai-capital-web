@@ -293,7 +293,7 @@ const NODES = [
   {id:"amazon",   label:"Amazon",        role:"hyper", v:2900, val:"~$2.9T mkt cap",
     note:"Now backs BOTH frontier labs — $50B into OpenAI and up to $25B into Anthropic. 2026 capex raised to ~$220B (Jul 30, from $200B — memory prices); Jassy: AWS 'booming', AI and custom-chip lines each >$25B run-rate, and even $220B won't meet 2026 demand. Custom silicon: Trainium / Inferentia."},
   {id:"meta",     label:"Meta",          role:"hyper", v:1850, val:"~$1.9T mkt cap",
-    note:"2026 capex raised to $130–145B (Jul 29); Q2 capex $31.1B and FCF collapsed to ~$0.8B — the stock sold off on guidance. ~$600B U.S. infrastructure pledged through 2028. Its 5GW Hyperion campus (Louisiana) is financed off-balance-sheet via Blue Owl / PIMCO. In Jul 2026, Bloomberg reported a planned Meta Compute service renting out its own GPU capacity — neocloud stocks fell ~15% on the news. Jul 17: reportedly in early talks to lease Anthropic up to ~$10B of compute over two years — Meta Compute's first marquee customer."},
+    note:"2026 capex raised to $130–145B (Jul 29); Q2 capex $31.1B and FCF collapsed to ~$0.8B — the stock sold off on guidance. ~$600B U.S. infrastructure pledged through 2028. Its 5GW Hyperion campus (Louisiana) is financed off-balance-sheet via Blue Owl / PIMCO. In Jul 2026, Bloomberg reported a planned Meta Compute service renting out its own GPU capacity — neocloud stocks fell ~15% on the news. Jul 17: reportedly in early talks to lease Anthropic up to ~$10B of compute over two years — Meta Compute's first marquee customer. Jul 28: sold 80% of its $14B, 1GW El Paso campus to BlackRock-managed funds and leased the whole site back — the Hyperion playbook, again."},
   {id:"spacex",   label:"SpaceX · xAI",  role:"space", v:1750, val:"~$1.75T IPO target",
     note:"Absorbed xAI in Feb 2026 ($1.25T combined merger). IPO priced in Jun 2026 at ~$1.75T, raising a record ~$75B (~$100.8B cash on hand), followed by a first-ever $25B bond (priced Jun 23 on ~$90B of orders) to repay the xAI-merger bridge loan. Now rents out its Colossus GPU clusters to Google, Anthropic & Reflection AI, and is pivoting toward orbital data centers. Owns Grok and X; xAI rebranded to SpaceXAI (Jul 6 '26). Jul '26: reportedly in talks to supply the Pentagon with billions of dollars of AI compute; its three cloud deals (Google, Anthropic, Reflection) run ~$27B/yr at full rates. Aug 5 '26: first earnings as a public company — Q2 revenue $7.8B (+92%) — and confirmed Nvidia Rubin GPUs + Vera CPUs will fly on the Starmind AI1 orbital data-center satellite (prototype targeted early 2027)."},
   {id:"broadcom", label:"Broadcom",      role:"chip",  v:1700, val:"~$1.7T mkt cap",
@@ -322,6 +322,8 @@ const NODES = [
     note:"Humanoid-robot maker; backed by Nvidia, Microsoft and Jeff Bezos."},
   {id:"blueowl",  label:"Blue Owl · PIMCO",role:"fin", v:33,   val:"private-credit",
     note:"Own 80% of Meta's Hyperion JV and arranged ~$27B of private credit (PIMCO as anchor lender) — the template for off-balance-sheet AI build-outs."},
+  {id:"wallst", label:"Wall St Platforms", role:"fin", v:60, val:">$500B target",
+    note:"Apollo, BlackRock, Blackstone, Brookfield, Goldman Sachs & KKR — recruited by Nvidia (Aug 10 '26) to run independent compute-financing platforms mobilizing >$500B of third-party capital for the AI build-out; Nvidia holds an option to backstop up to $125B (25%). BlackRock is separately Meta's newest landlord — its funds own 80% of the $14B, 1GW El Paso campus JV (Jul 28 '26)."},
   {id:"helix", label:"Helix (KKR)", role:"fin", v:10, val:"$10B+ committed",
     note:"KKR-led AI-infrastructure financing company launched Jun 10 '26 with Kuwait's KIA, Nvidia & Vistra; run by ex-AWS chief Adam Selipsky — one-stop capital for data centers, power & connectivity."},
   {id:"nebius",   label:"Nebius",        role:"neo",   v:49,   val:"~$49B mkt cap",
@@ -404,6 +406,8 @@ const LINKS = [
   // chips
   ["nvidia","intel","inv","$5B for ~4% (Sept 2025).",5],
   ["nvidia","helix","inv","Strategic partner in KKR's $10B+ Helix AI-infra financing vehicle (Jun '26, with KIA & Vistra).",5],
+  ["nvidia","wallst","vc","Aug 10 '26: partnership to stand up >$500B of independent compute-financing platforms; Nvidia backstop option up to $125B (25%).",50],
+  ["wallst","meta","cap","BlackRock funds own 80% of Meta's $14B, 1GW El Paso campus JV (Jul 28 '26) — Meta leases back 100%.",14],
   ["openai","cerebras","svc","$20B+ multi-year inference contract — up to 750MW of wafer-scale compute; GPT-5.6 Sol serves at ~750 tok/s (Jul 2026).",20],
   // neoclouds
   ["microsoft","coreweave","svc","Anchor customer — very large GPU capacity contracts.",14],
@@ -657,6 +661,7 @@ function initNvidiaWeb(){
     telecom:{label:"Telecom", ring:"#93c5fd"},
     sov:{label:"Sovereign / nation", ring:"#fbbf24"},
     energy:{label:"Energy / power", ring:"#fca5a5"},
+    fin:{label:"Financier / investor", ring:"#a7f3d0"},
   };
   const NODES=[
     {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"The center of the AI economy: designs the GPUs nearly everyone buys, then recycles the profits into equity stakes, partnerships and sovereign buildouts spanning labs, clouds, chips, autos, telecom, pharma and nations. Jul '26: unveiled a financing platform + revenue-sharing program for AI clouds, anchoring KKR's $10B+ Helix vehicle. Aug 10 '26: scaled it up — Apollo, BlackRock, Blackstone, Brookfield, Goldman & KKR to run independent compute-financing platforms mobilizing >$500B of third-party capital (Nvidia can backstop up to $125B)."},
@@ -710,6 +715,7 @@ function initNvidiaWeb(){
     {id:"japan",label:"Japan",role:"sov",v:60,val:"national AI infra",note:"World's first national AI infrastructure for physical AI (Jul 16 '26) — a METI-backed program of Vera Rubin 'AI factories', incl. Noetra Corp's 140MW build with 27,500 Rubin GPUs; Nemotron models spreading across Japanese industry."},
     {id:"reliance",label:"Reliance (India)",role:"sov",v:240,val:"~$240B (Reliance)",note:"2,000MW of AI data centers in India, led by Jio, on Nvidia silicon."},
     {id:"sbenergy",label:"SB Energy",role:"energy",v:10,val:"$1.5B Nvidia stake",note:"SoftBank-founded power & data-center developer. Aug 17 '26: Nvidia invested $1.5B (joining SoftBank & OpenAI) and became exclusive AI-compute provider at SB Energy's PORTS-Pike Technology Campus in Pike County, Ohio — phases online from 2028."},
+    {id:"wallst",label:"Wall St Platforms",role:"fin",v:60,val:">$500B target",note:"Apollo, BlackRock, Blackstone, Brookfield, Goldman Sachs & KKR — independent compute-financing platforms (Aug 10 '26) mobilizing >$500B of third-party capital to fund AI-infrastructure buildouts on Nvidia systems; Nvidia holds an option to backstop up to $125B (25%). Institutionalized vendor financing: Wall Street lends against demand for Nvidia's own chips."},
   ];
   const LINKS=[
     ["nvidia","openai","inv","Up to $100B LOI (~$30B in) — now stalling; Huang: $100B 'not in the cards.'",30],
@@ -762,6 +768,7 @@ function initNvidiaWeb(){
     ["nvidia","japan","svc","National physical-AI infrastructure (Jul 16 '26) — METI-backed Vera Rubin AI factories; first site: 27,500 Rubin GPUs / 140MW with Noetra.",12],
     ["nvidia","reliance","svc","2,000MW of AI data centers in India (Jio-led).",15],
     ["nvidia","sbenergy","inv","$1.5B investment (Aug 17 '26) + exclusive compute provider at the PORTS-Pike campus, Ohio.",5],
+    ["nvidia","wallst","vc",">$500B of independent compute-financing platforms (Aug 10 '26); Nvidia backstop option up to $125B (25%).",40],
   ].map(d=>({source:d[0],target:d[1],cat:d[2],body:d[3],w:d[4]}));
 
   const idIndex=new Map(NODES.map((n,i)=>[n.id,i]));
@@ -1182,7 +1189,7 @@ const CFGS={
    ])},
   meta:{svgId:"net-meta",chipsId:"chips-meta",typekeyId:"typekey-meta",resetId:"reset-meta",viewId:"view-meta",centerId:"meta",CATS:CATS_CO,ROLES:ROLE_PAL,outLabel:"Outbound — Meta invests / pays / partners",inLabel:"Inbound — flows to Meta",
    NODES:[
-    {id:"meta",label:"Meta",role:"cloud",v:1850,val:"~$1.9T mkt cap",note:"Bought 49% of Scale AI, committed $48B to neoclouds and up to $50B to Nvidia, co-designs its own MTIA chips, lines up gigawatts of nuclear, and finances data centers off-balance-sheet via Blue Owl. Jul 2026: reportedly prepping Meta Compute — selling GPU capacity to third parties, neocloud-style. First mooted tenant: Anthropic (~$10B over 2 yrs, in talks Jul 17)."},
+    {id:"meta",label:"Meta",role:"cloud",v:1850,val:"~$1.9T mkt cap",note:"Bought 49% of Scale AI, committed $48B to neoclouds and up to $50B to Nvidia, co-designs its own MTIA chips, lines up gigawatts of nuclear, and finances data centers off-balance-sheet via Blue Owl. Jul 2026: reportedly prepping Meta Compute — selling GPU capacity to third parties, neocloud-style. First mooted tenant: Anthropic (~$10B over 2 yrs, in talks Jul 17). Jul 28: sold 80% of its $14B, 1GW El Paso campus to BlackRock funds and leased it all back."},
     {id:"scale",label:"Scale AI",role:"startup",v:29,val:"~$29B (Scale AI)",note:"$14.3B for 49%; founder Alexandr Wang now leads Meta's superintelligence team."},
     {id:"anthropic",label:"Anthropic",role:"lab",v:900,val:"~$965B (Series H)",note:"In early talks (Jul 17 '26) to lease up to ~$10B of Meta's AI compute over two years — potentially Meta Compute's first marquee customer."},
     {id:"nvidia",label:"Nvidia",role:"chip",v:5200,val:"~$5.2T mkt cap",note:"Up to $50B of Nvidia systems (Blackwell/Rubin, Spectrum-X)."},
@@ -1193,6 +1200,7 @@ const CFGS={
     {id:"oracle",label:"Oracle",role:"cloud",v:750,val:"~$750B mkt cap",note:"~$20B of Oracle cloud (reported)."},
     {id:"amazon",label:"Amazon",role:"cloud",v:2900,val:"~$2.9T mkt cap",note:"Adopting hundreds of thousands of AWS Graviton chips."},
     {id:"blueowl",label:"Blue Owl · PIMCO",role:"fin",v:33,val:"private-credit",note:"$27–30B of private credit for the Hyperion data center (Blue Owl owns 80%)."},
+    {id:"blackrock",label:"BlackRock",role:"fin",v:60,val:"80% of El Paso JV",note:"Jul 28 '26: BlackRock-managed funds took 80% of Meta's $14B, 1GW El Paso, TX campus. Meta transferred ~$2.3B of land & partially built assets, keeps 20%, receives a ~$1B distribution, and leases back the entire site (4-yr initial term + options to ~20 yrs; sole occupant from 2028). BlackRock adds ~$4.9B of cash, with $12.5B of debt financing the build — the Hyperion/Blue Owl playbook at bigger scale."},
     {id:"oklo",label:"Oklo",role:"energy",v:10,val:"nuclear (SMR)",note:"Altman-backed small modular reactors — part of up to 6.6GW of nuclear Meta has lined up."},
     {id:"constellation",label:"Constellation",role:"energy",v:100,val:"~$100B mkt cap",note:"20-year nuclear PPA (Clinton Clean Energy Center)."},
     {id:"markets",label:"Debt Markets",role:"market",v:300,val:"capital source",note:"$25B bond (May '26) funding capex raised to $130–145B (Jul 29 '26); Q2 FCF fell to ~$0.8B and the stock sold off on guidance."},
@@ -1208,6 +1216,7 @@ const CFGS={
     ["meta","oracle","svc","~$20B of Oracle cloud (reported).",20],
     ["meta","amazon","hw","Hundreds of thousands of AWS Graviton chips.",5],
     ["blueowl","meta","cap","$27–30B private credit for Hyperion (owns 80%).",30],
+    ["blackrock","meta","cap","80% of the $14B El Paso JV — ~$4.9B cash + $12.5B debt; Meta keeps 20% and leases back 100% (Jul 28 '26).",14],
     ["meta","oklo","svc","Part of up to 6.6GW of nuclear (Oklo SMRs).",5],
     ["meta","constellation","svc","20-yr nuclear PPA (Clinton).",5],
     ["markets","meta","cap","$25B bond (May '26).",25],
