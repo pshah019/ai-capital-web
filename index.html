@@ -67,6 +67,11 @@
   .faded{opacity:.07 !important}
   .faded text{opacity:.12}
   .lit{opacity:1 !important}
+  .netsearch{position:absolute;top:12px;left:14px;z-index:5}
+  .netsearch input{background:rgba(10,16,28,.85);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+    font-family:var(--mono);font-size:12px;padding:7px 12px;width:190px;outline:none}
+  .netsearch input:focus{border-color:#5b9dff;box-shadow:0 0 0 2px rgba(91,157,255,.18)}
+  .netsearch input::placeholder{color:var(--ink-faint)}
   /* tooltip */
   .tip{position:fixed;z-index:30;pointer-events:none;max-width:300px;background:rgba(12,18,30,.97);
     border:1px solid var(--card-edge);border-radius:11px;padding:11px 13px;opacity:0;transform:translateY(4px);
@@ -570,6 +575,39 @@ function clearRoleSel(){ if(!selRoles.size)return; selRoles.clear(); tk.querySel
 Object.entries(ROLES).forEach(([k,r])=>{const s=document.createElement("span");s.style.color=r.ring;s.dataset.role=k;s.innerHTML=`<i></i>${r.label}`;
   s.addEventListener("click",(e)=>{e.stopPropagation(); if(selRoles.has(k)){selRoles.delete(k);s.classList.remove('sec-on');}else{selRoles.add(k);s.classList.add('sec-on');} closePanel(); applyRoles();});
   tk.appendChild(s);});
+/* ---------- company search (shared helper, used by all webs) ---------- */
+window.attachWebSearch=function(svgNode,nodeSel,linkSel,opts){
+  const stage=svgNode.parentElement; if(!stage||stage.querySelector(".netsearch")) return;
+  const wrap=document.createElement("div"); wrap.className="netsearch";
+  const inp=document.createElement("input");
+  inp.type="search"; inp.placeholder="Search company…"; inp.setAttribute("aria-label","Search company");
+  wrap.appendChild(inp); stage.appendChild(wrap);
+  const matcher=q=>d=>d&&((d.label||"")+" "+(d.id||"")).toLowerCase().includes(q);
+  const apply=()=>{
+    const q=inp.value.trim().toLowerCase();
+    opts.clear();
+    if(!q) return;
+    const m=matcher(q);
+    nodeSel.classed("lit",m).classed("faded",d=>!m(d));
+    linkSel.classed("lit",l=>m(l.source)||m(l.target)).classed("faded",l=>!(m(l.source)||m(l.target)));
+  };
+  inp.addEventListener("input",apply);
+  inp.addEventListener("keydown",e=>{
+    e.stopPropagation();
+    if(e.key==="Escape"){ inp.value=""; apply(); inp.blur(); }
+    if(e.key==="Enter"){
+      const q=inp.value.trim().toLowerCase(); if(!q) return;
+      const m=matcher(q), hits=[];
+      nodeSel.each(d=>{ if(m(d)) hits.push(d); });
+      if(hits.length) opts.pick(hits[0]);
+    }
+  });
+  wrap.addEventListener("click",e=>e.stopPropagation());
+};
+attachWebSearch(svg.node(),nodeSel,linkSel,{
+  clear:()=>{clearFocus();},
+  pick:d=>{clearFocus();focusNode(d);openPanel(d);}
+});
 /* ---------- reset / resize ---------- */
 document.getElementById("reset").addEventListener("click",()=>{
   clearFocus();closePanel();
@@ -861,6 +899,7 @@ function initNvidiaWeb(){
     svg.transition().duration(450).call(d3.zoom().transform,d3.zoomIdentity);
     sim.alpha(.6).restart();
   });
+  attachWebSearch(svg.node(),nodeSel,linkSel,{clear:()=>{clearFocus();},pick:d=>{clearFocus();focusNode(d);openPanel(d);}});
   window.nvResize=function(){
     W=svg.node().clientWidth||W; H=svg.node().clientHeight||H; svg.attr("viewBox",[0,0,W,H]);
     sim.force("x",d3.forceX(W/2).strength(.05)).force("y",d3.forceY(H/2).strength(.07)).alpha(.3).restart();
@@ -1014,6 +1053,7 @@ function buildWeb(cfg){
     tk.appendChild(s);
   });
   document.getElementById(cfg.resetId).addEventListener("click",()=>{ clearFocus();closePanel(); svg.transition().duration(450).call(d3.zoom().transform,d3.zoomIdentity); sim.alpha(.6).restart(); });
+  attachWebSearch(svg.node(),nodeSel,linkSel,{clear:()=>{clearFocus();},pick:d=>{clearFocus();focusNode(d);openPanel(d);}});
   function doResize(){ W=svg.node().clientWidth||W; H=svg.node().clientHeight||H; svg.attr("viewBox",[0,0,W,H]); sim.force("x",d3.forceX(W/2).strength(.05)).force("y",d3.forceY(H/2).strength(.07)).alpha(.3).restart(); }
   addEventListener("resize",()=>{ const vw=document.getElementById(cfg.viewId); if(vw && vw.style.display!=='none') doResize(); });
   return {resize:doResize};
