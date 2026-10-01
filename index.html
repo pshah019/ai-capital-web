@@ -252,10 +252,10 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <footer><div><b>Sizing</b> by market cap / last valuation, approx June 2026. <b>Sources:</b> Tesla, Samsung, TSMC, xAI &amp; partner releases; TechCrunch, CNBC, Tom's Hardware. A map, not a balance sheet. Not investment advice.</div></footer>
 </div>
 <div id="view-energy" class="webview" style="display:none">
-<p class="sub" style="margin:0 0 16px">The power layer of the AI buildout — 24 publicly traded generators, utilities, nuclear developers and grid builders mapped to the states where they operate, contract and build. Click a state to see who has what there; pick a company to light up its footprint, dollar commitments, financing structure and counterparties. Arrows of money: hyperscaler PPAs, DOE loans, rate-base capex.</p>
+<p class="sub" style="margin:0 0 16px">The power layer of the AI buildout — 25 publicly traded generators, utilities, nuclear developers and grid builders mapped to the states where they operate, contract and build. Click a state to see who has what there; pick a company to light up its footprint, dollar commitments, financing structure and counterparties. Arrows of money: hyperscaler PPAs, DOE loans, rate-base capex.</p>
 <div class="controls">
 <div class="legend-block"><div class="ltitle">Presence type — tap to filter</div><div class="chips" id="chips-energy"></div></div>
-<div class="legend-block"><div class="ltitle">TTM revenue share — top 5 of the 24 tracked</div><div id="eshare"></div></div>
+<div class="legend-block"><div class="ltitle">TTM revenue share — top 5 of the 25 tracked</div><div id="eshare"></div></div>
 <div class="legend-block"><div class="ltitle">State shading = tracked companies present</div>
 <div class="key" id="ekey"><span><i style="background:#1a2336;border-color:#26344f"></i> none</span><span><i style="background:#4a4430;border-color:#6b5c33"></i> few</span><span><i style="background:#e7b24a;border-color:#e7b24a"></i> most</span></div>
 <div style="margin-top:12px"><button class="btn" id="reset-energy">⟲ Reset view</button></div></div>
@@ -267,7 +267,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <div class="hint">Tap a state for its energy web · tap a company to light its footprint</div>
 </div>
 <div id="epanel" class="panel"><button class="pclose" id="epclose">×</button><div class="ph" id="eph"></div><div class="pdeals" id="epdeals"></div></div>
-<footer><div><b>Curated snapshot, approx Sept 2026.</b> Operating footprints from company fleet disclosures (EIA-860 lineage); deals, dollar values &amp; financing structures from company IR, DOE, state PSC filings, Utility Dive, Data Center Dynamics, POWER, AJC &amp; trade press. TTM revenue per latest earnings summaries (stockanalysis.com, Q2 '26); revenue share is of the 24-company tracked cohort, not any total market. Dollar values shown only where disclosed at state or project level — program-level totals are labeled as such, never split by guesswork. A map, not a balance sheet. Not investment advice.</div></footer>
+<footer><div><b>Curated snapshot, approx Sept 2026.</b> Operating footprints from company fleet disclosures (EIA-860 lineage); deals, dollar values &amp; financing structures from company IR, DOE, state PSC filings, Utility Dive, Data Center Dynamics, POWER, AJC &amp; trade press. TTM revenue per latest earnings summaries (stockanalysis.com, Q2 '26); revenue share is of the 25-company tracked cohort, not any total market. Dollar values shown only where disclosed at state or project level — program-level totals are labeled as such, never split by guesswork. A map, not a balance sheet. Not investment advice.</div></footer>
 </div>
 </div>
 <div class="tip" id="tip"></div>
@@ -1379,6 +1379,30 @@ states:[
 {title:"PSEG Long Island",detail:"Operates LIPA's T&D system under services contract — utility operations, not generation.",value:"not disclosed",partners:["Long Island Power Authority"],financing:"Management services contract",src:"company disclosures, 2025"}]}]},
 
 /* ---- Regulated utilities ---- */
+{ticker:"NEE",name:"NextEra Energy",grp:"Regulated Utilities",sector:"Regulated utility (FPL) + largest US renewables developer",mktCap:"~$158B",rev:28700,hq:"Juno Beach, FL",
+note:"America's largest regulated utility (FPL) plus its largest renewables+storage developer (~35 GW backlog), pivoting hard into AI load: the Google partnership spans the Duane Arnold nuclear restart, a '15 GW by 2035' data-center program, and ~$33B of new gas in TX/PA. Florida's rate-base cash machine funds the AI-power land grab everywhere else.",
+states:[
+{st:"FL",status:"operating",items:[
+{title:"Florida Power & Light regulated base",detail:"Largest US electric utility (~6M accounts); four-year ~$6.9B rate settlement approved Nov '25 at 10.95% ROE; ~$12–13B of 2026 capex on solar, storage and grid.",value:"~$6.9B settlement / ~$12-13B '26 capex",partners:["FPL ratepayers"],financing:"Rate base",src:"Florida Phoenix / NEE Q2, Nov '25–Jul '26"},
+{title:"Florida data-center load pipeline",detail:"FPL evaluating ~21 GW of large-load opportunities, ~12 GW in advanced talks with hyperscale developers — the potential next leg of Florida rate-base growth.",value:"not disclosed",partners:["unnamed hyperscalers"],financing:"Rate base via large-load tariffs",src:"Q2 '26 results, Jul '26"}]},
+{st:"IA",status:"contracted",items:[
+{title:"Duane Arnold nuclear restart — Google PPA",detail:"615 MW plant (shut 2020) restarting by Q1 2029 under a 25-year Google PPA for Iowa cloud/AI; NextEra bought out the remaining 30% stake Q2 '26; $1.9B DOE loan closed Sep 8 '26.",value:"$1.9B DOE loan",partners:["Google (offtaker)","DOE Loan Programs Office"],financing:"DOE loan + long-term corporate PPA — the hyperscaler pays",src:"Utility Dive / ANS, Sep '26"}]},
+{st:"TX",status:"planned",items:[
+{title:"Project Anderson gas complex",detail:"5.2 GW gas generation in Anderson County for ERCOT hyperscale load, advanced under the US–Japan $550B investment framework (Mar '26); definitive agreements pending.",value:"~$16B",partners:["US-Japan investment framework","unnamed hyperscalers"],financing:"Project finance under the framework; PPAs TBD",src:"DCD, Mar '26"}]},
+{st:"PA",status:"planned",items:[
+{title:"Southwest Pennsylvania gas facility",detail:"4.3 GW gas plant for PJM data-center load, paired with Project Anderson under the same Mar '26 framework approval; ~40 'energy hubs' envisioned nationally.",value:"~$17B",partners:["US-Japan investment framework","unnamed hyperscalers"],financing:"Project finance; PPAs TBD",src:"DCD, Mar '26"}]},
+{st:"NM",status:"contracted",items:[
+{title:"Meta solar + storage projects",detail:"Four solar-and-battery projects for Meta under a dedicated large-customer rate structure, in service 2026–28; part of a ~2.5 GW Meta portfolio (11 PPAs + 2 storage deals).",value:"not disclosed",partners:["Meta"],financing:"PPA + special rate structure",src:"Latitude Media, Jan '26"}]},
+{st:"OK",status:"contracted",items:[
+{title:"Google clean-energy agreements",detail:"~600 MW of clean-energy agreements supplying Google in Oklahoma — groundwork for the Dec '25 gigawatt-campus partnership.",value:"~600 MW",partners:["Google"],financing:"Corporate PPA",src:"NextEra/Google release, Dec '25"}]},
+{st:"CO",status:"planned",items:[
+{title:"Xcel Energy co-development alliance",detail:"Feb '26 MOU to co-develop generation, storage and interconnection for data-center load across Xcel territories (CO/TX/NM), supporting Xcel's up-to-6 GW goal by end-2027.",value:"not disclosed",partners:["Xcel Energy"],financing:"Joint development; regulated tariffs pending",src:"POWER, Feb '26"}]},
+{st:"ND",status:"planned",items:[
+{title:"Basin Electric gas exploration",detail:"Partnership with Basin Electric exploring a 1.5 GW combined-cycle plant for large-scale tech infrastructure including data centers.",value:"not disclosed",partners:["Basin Electric Power Cooperative"],financing:"Co-op partnership, structure TBD",src:"Latitude Media, Jan '26"}]},
+{st:"US",status:"planned",items:[
+{title:"Google Cloud partnership — '15 by 35'",detail:"Dec '25 landmark deal to co-develop gigawatt-scale data-center campuses (first three in development, states unnamed) within a 15 GW-by-2035 data-center power target; ~3.5 GW already operating/contracted with Google.",value:"not disclosed",partners:["Google Cloud"],financing:"Co-development; PPAs and project finance, terms undisclosed",src:"NextEra/Google, Dec '25"},
+{title:"Renewables backlog + GE Vernova gas slots",detail:"Record ~35.1 GW renewables/storage backlog (+3.6 GW in Q2 '26), swollen by data-center demand; turbine slots secured for ~4 GW of gas under the 2024 GE Vernova framework.",value:"~35.1 GW backlog",partners:["hyperscalers","GE Vernova"],financing:"PPAs + tax equity / project finance",src:"Q2 '26 results / Latitude Media, Jul '26"}]}]},
+
 {ticker:"D",name:"Dominion Energy",grp:"Regulated Utilities",sector:"Regulated utility (VA / SC)",mktCap:"~$53B",rev:18120,hq:"Richmond, VA",
 note:"The purest utility play on AI demand: Northern Virginia's Data Center Alley is the world's largest cluster, and Dominion's contracted data-center pipeline hit 53.8 GW by mid-2026.",
 states:[
@@ -1731,7 +1755,7 @@ function eShowState(st){
   ph.innerHTML=`<div class="ptype">State · ${rows.length} tracked ${rows.length===1?'company':'companies'}</div><h2>${ENAMES[st]||st}</h2>
   <div class="pval">${nOp} operating · ${nCt} contracted · ${nPl} planned</div>`;
   const pd=document.getElementById('epdeals');
-  if(!rows.length){ pd.innerHTML=`<h3>No tracked presence</h3><div class="deal"><div class="db">None of the 24 tracked companies has a mapped ${Object.entries(eFilters).filter(([k,v])=>v).map(([k])=>EST_LABEL[k].toLowerCase()).join(' / ')} presence here — yet. Energy demand maps are moving fast; this is a curated snapshot, not a census.</div></div>`; }
+  if(!rows.length){ pd.innerHTML=`<h3>No tracked presence</h3><div class="deal"><div class="db">None of the 25 tracked companies has a mapped ${Object.entries(eFilters).filter(([k,v])=>v).map(([k])=>EST_LABEL[k].toLowerCase()).join(' / ')} presence here — yet. Energy demand maps are moving fast; this is a curated snapshot, not a census.</div></div>`; }
   else pd.innerHTML=rows.map(({co,pres})=>
     `<h3>${co.ticker} · ${co.name} ${eBadge(pres.status)}</h3>`+pres.items.map(it=>eDeal(it,pres.status)).join('')
   ).join('');
