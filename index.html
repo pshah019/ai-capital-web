@@ -252,9 +252,10 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <footer><div><b>Sizing</b> by market cap / last valuation, approx June 2026. <b>Sources:</b> Tesla, Samsung, TSMC, xAI &amp; partner releases; TechCrunch, CNBC, Tom's Hardware. A map, not a balance sheet. Not investment advice.</div></footer>
 </div>
 <div id="view-energy" class="webview" style="display:none">
-<p class="sub" style="margin:0 0 16px">The power layer of the AI buildout — 20 publicly traded generators, utilities, nuclear developers and grid builders mapped to the states where they operate, contract and build. Click a state to see who has what there; pick a company to light up its footprint, dollar commitments, financing structure and counterparties. Arrows of money: hyperscaler PPAs, DOE loans, rate-base capex.</p>
+<p class="sub" style="margin:0 0 16px">The power layer of the AI buildout — 24 publicly traded generators, utilities, nuclear developers and grid builders mapped to the states where they operate, contract and build. Click a state to see who has what there; pick a company to light up its footprint, dollar commitments, financing structure and counterparties. Arrows of money: hyperscaler PPAs, DOE loans, rate-base capex.</p>
 <div class="controls">
 <div class="legend-block"><div class="ltitle">Presence type — tap to filter</div><div class="chips" id="chips-energy"></div></div>
+<div class="legend-block"><div class="ltitle">TTM revenue share — top 5 of the 24 tracked</div><div id="eshare"></div></div>
 <div class="legend-block"><div class="ltitle">State shading = tracked companies present</div>
 <div class="key" id="ekey"><span><i style="background:#1a2336;border-color:#26344f"></i> none</span><span><i style="background:#4a4430;border-color:#6b5c33"></i> few</span><span><i style="background:#e7b24a;border-color:#e7b24a"></i> most</span></div>
 <div style="margin-top:12px"><button class="btn" id="reset-energy">⟲ Reset view</button></div></div>
@@ -266,7 +267,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <div class="hint">Tap a state for its energy web · tap a company to light its footprint</div>
 </div>
 <div id="epanel" class="panel"><button class="pclose" id="epclose">×</button><div class="ph" id="eph"></div><div class="pdeals" id="epdeals"></div></div>
-<footer><div><b>Curated snapshot, approx Sept 2026.</b> Operating footprints from company fleet disclosures (EIA-860 lineage); deals, dollar values &amp; financing structures from company IR, DOE, state PSC filings, Utility Dive, Data Center Dynamics, POWER, AJC &amp; trade press. Dollar values shown only where disclosed at state or project level — program-level totals are labeled as such, never split by guesswork. A map, not a balance sheet. Not investment advice.</div></footer>
+<footer><div><b>Curated snapshot, approx Sept 2026.</b> Operating footprints from company fleet disclosures (EIA-860 lineage); deals, dollar values &amp; financing structures from company IR, DOE, state PSC filings, Utility Dive, Data Center Dynamics, POWER, AJC &amp; trade press. TTM revenue per latest earnings summaries (stockanalysis.com, Q2 '26); revenue share is of the 24-company tracked cohort, not any total market. Dollar values shown only where disclosed at state or project level — program-level totals are labeled as such, never split by guesswork. A map, not a balance sheet. Not investment advice.</div></footer>
 </div>
 </div>
 <div class="tip" id="tip"></div>
@@ -1309,7 +1310,7 @@ const US_STATES_GEO={"type":"FeatureCollection","features":[{"type":"Feature","i
 /* ===== ENERGY_DATA — curated snapshot, approx Sept 2026. One object per company; states[] carries presence + deals. status: operating | contracted | planned ===== */
 const ENERGY_DATA=[
 /* ---- IPPs & nuclear generators ---- */
-{ticker:"VST",name:"Vistra",grp:"IPPs & Nuclear Generators",sector:"IPP · nuclear, gas & storage fleet",mktCap:"~$47B",hq:"Irving, TX",
+{ticker:"VST",name:"Vistra",grp:"IPPs & Nuclear Generators",sector:"IPP · nuclear, gas & storage fleet",mktCap:"~$47B",rev:19210,hq:"Irving, TX",
 note:"Largest competitive generator (~41 GW) with nuclear in three states via Energy Harbor. Landmark Meta PJM nuclear package (Jan '26) and a 1.2 GW Comanche Peak PPA.",
 states:[
 {st:"TX",status:"operating",items:[
@@ -1324,7 +1325,7 @@ states:[
 {st:"CA",status:"operating",items:[
 {title:"Moss Landing energy storage",detail:"Flagship grid battery complex (~750 MW at peak) plus CAISO gas; one phase damaged in Jan '25 fire, rebuild ongoing.",value:"not disclosed",partners:["PG&E (resource adequacy)"],financing:"Utility offtake contracts; insurance recovery on fire loss",src:"company disclosures, 2025"}]}]},
 
-{ticker:"CEG",name:"Constellation Energy",grp:"IPPs & Nuclear Generators",sector:"IPP · largest US nuclear fleet + Calpine gas",mktCap:"~$93B",hq:"Baltimore, MD",
+{ticker:"CEG",name:"Constellation Energy",grp:"IPPs & Nuclear Generators",sector:"IPP · largest US nuclear fleet + Calpine gas",mktCap:"~$93B",rev:31270,hq:"Baltimore, MD",
 note:"America's biggest carbon-free generator became its largest overall (~55 GW) after closing the $26.6B Calpine deal Jan '26. Anchor deals: Microsoft's Crane (TMI) restart, Meta's Clinton PPA.",
 states:[
 {st:"PA",status:"operating",items:[
@@ -1342,7 +1343,7 @@ states:[
 {st:"CA",status:"operating",items:[
 {title:"The Geysers geothermal (via Calpine)",detail:"World's largest geothermal complex (~725 MW) + CA gas; firm carbon-free supply marketed to West Coast data centers.",value:"not disclosed",partners:[],financing:"Acquired in Calpine deal; utility + corporate offtake",src:"POWER, Jan '26"}]}]},
 
-{ticker:"TLN",name:"Talen Energy",grp:"IPPs & Nuclear Generators",sector:"IPP · nuclear & gas (PJM)",mktCap:"~$14B",hq:"Houston, TX",
+{ticker:"TLN",name:"Talen Energy",grp:"IPPs & Nuclear Generators",sector:"IPP · nuclear & gas (PJM)",mktCap:"~$14B",rev:3740,hq:"Houston, TX",
 note:"Pioneer of the nuclear-to-data-center model: sold AWS its Susquehanna campus, then a 1.92 GW grid-connected PPA worth ~$18B. Doubling down on PJM gas (Moxie Freedom, Guernsey).",
 states:[
 {st:"PA",status:"operating",items:[
@@ -1354,7 +1355,7 @@ states:[
 {st:"MD",status:"operating",items:[
 {title:"Brandon Shores & Wagner (RMR)",detail:"Baltimore-area units kept online under reliability-must-run agreements through ~2029 while PJM transmission upgrades land.",value:"not disclosed",partners:["PJM","BGE"],financing:"FERC-approved cost-of-service RMR payments",src:"RTO Insider / FERC, 2025"}]}]},
 
-{ticker:"NRG",name:"NRG Energy",grp:"IPPs & Nuclear Generators",sector:"IPP · retail power + gas fleet",mktCap:"~$23B",hq:"Houston, TX",
+{ticker:"NRG",name:"NRG Energy",grp:"IPPs & Nuclear Generators",sector:"IPP · retail power + gas fleet",mktCap:"~$23B",rev:33130,hq:"Houston, TX",
 note:"Doubled its fleet to ~25 GW closing the ~$12B LS Power deal (Feb '26) and locked 5.4 GW of GE Vernova turbine slots. First fruit: a $3.2B, 1.2 GW Texas plant for an unnamed hyperscaler.",
 states:[
 {st:"TX",status:"operating",items:[
@@ -1366,7 +1367,7 @@ states:[
 {st:"PA",status:"operating",items:[
 {title:"PJM gas assets (incl. Hunterstown CCGT)",detail:"Mid-Atlantic gas plants from LS Power give NRG dispatchable PJM capacity to pair with data-center contracts.",value:"not disclosed",partners:["LS Power (seller)"],financing:"Part of portfolio acquisition",src:"DCD, 2025"}]}]},
 
-{ticker:"PEG",name:"PSEG",grp:"IPPs & Nuclear Generators",sector:"Regulated utility + merchant nuclear (NJ)",mktCap:"~$37B",hq:"Newark, NJ",
+{ticker:"PEG",name:"PSEG",grp:"IPPs & Nuclear Generators",sector:"Regulated utility + merchant nuclear (NJ)",mktCap:"~$37B",rev:12540,hq:"Newark, NJ",
 note:"Largest PJM nuclear fleet without a signed hyperscaler deal — in talks since 2024, now offering supply through PJM's bilateral process while NJ clears the way for new nuclear at Artificial Island.",
 states:[
 {st:"NJ",status:"operating",items:[
@@ -1378,7 +1379,7 @@ states:[
 {title:"PSEG Long Island",detail:"Operates LIPA's T&D system under services contract — utility operations, not generation.",value:"not disclosed",partners:["Long Island Power Authority"],financing:"Management services contract",src:"company disclosures, 2025"}]}]},
 
 /* ---- Regulated utilities ---- */
-{ticker:"D",name:"Dominion Energy",grp:"Regulated Utilities",sector:"Regulated utility (VA / SC)",mktCap:"~$53B",hq:"Richmond, VA",
+{ticker:"D",name:"Dominion Energy",grp:"Regulated Utilities",sector:"Regulated utility (VA / SC)",mktCap:"~$53B",rev:18120,hq:"Richmond, VA",
 note:"The purest utility play on AI demand: Northern Virginia's Data Center Alley is the world's largest cluster, and Dominion's contracted data-center pipeline hit 53.8 GW by mid-2026.",
 states:[
 {st:"VA",status:"operating",items:[
@@ -1389,7 +1390,7 @@ states:[
 {st:"SC",status:"operating",items:[
 {title:"Dominion Energy South Carolina",detail:"Unanimous SC rate settlement (2026) supports grid investment as data-center recruitment grows — far smaller than VA.",value:"not disclosed",partners:["SC ratepayers"],financing:"Traditional rate case",src:"Q2 '26 investor deck"}]}]},
 
-{ticker:"DUK",name:"Duke Energy",grp:"Regulated Utilities",sector:"Regulated utility (Carolinas, FL, Midwest)",mktCap:"~$88B",hq:"Charlotte, NC",
+{ticker:"DUK",name:"Duke Energy",grp:"Regulated Utilities",sector:"Regulated utility (Carolinas, FL, Midwest)",mktCap:"~$88B",rev:32800,hq:"Charlotte, NC",
 note:"Largest capex program of any US utility ($103B / 5 yrs), 7.6 GW of executed data-center agreements, named Microsoft and Compass deals in the Carolinas, 14 GW of new generation by 2031.",
 states:[
 {st:"NC",status:"contracted",items:[
@@ -1402,7 +1403,7 @@ states:[
 {st:"FL",status:"operating",items:[
 {title:"Duke Energy Florida",detail:"FL shares in the $103B plan via solar, storage and grid hardening; data-center load a smaller driver than the Carolinas.",value:"not disclosed",partners:["FL ratepayers"],financing:"Florida multi-year rate settlement",src:"Q2 '26 earnings coverage, Aug '26"}]}]},
 
-{ticker:"SO",name:"Southern Company",grp:"Regulated Utilities",sector:"Regulated utility (GA / AL / MS)",mktCap:"~$95B",hq:"Atlanta, GA",
+{ticker:"SO",name:"Southern Company",grp:"Regulated Utilities",sector:"Regulated utility (GA / AL / MS)",mktCap:"~$95B",rev:30180,hq:"Atlanta, GA",
 note:"Owner of the only new US nuclear (Vogtle 3&4) and the marquee Southeast AI franchise: 17 GW contracted large load, a 3.2 GW OpenAI deal, a Google nuclear-uprate partnership and a record $26.5B DOE loan.",
 states:[
 {st:"GA",status:"contracted",items:[
@@ -1415,7 +1416,7 @@ states:[
 {st:"MS",status:"operating",items:[
 {title:"Mississippi Power territory",detail:"Smallest of the three electric utilities; shares in system pipeline (8 GW more in advanced negotiations), no state figures disclosed.",value:"not disclosed",partners:[],financing:"Traditional rate regulation",src:"Utility Dive, Aug '26"}]}]},
 
-{ticker:"AEP",name:"American Electric Power",grp:"Regulated Utilities",sector:"Regulated utility · largest US transmission owner",mktCap:"~$67B",hq:"Columbus, OH",
+{ticker:"AEP",name:"American Electric Power",grp:"Regulated Utilities",sector:"Regulated utility · largest US transmission owner",mktCap:"~$67B",rev:22790,hq:"Columbus, OH",
 note:"Sits under two AI epicenters — central Ohio and Texas — with a large-load pipeline that doubled to 56 GW (≈90% data centers) and a $72B capital plan with $5–8B of upside.",
 states:[
 {st:"OH",status:"operating",items:[
@@ -1427,7 +1428,7 @@ states:[
 {st:"WV",status:"operating",items:[
 {title:"Appalachian Power large-load tariff",detail:"WV regulators approved a large-load tariff insulating existing customers as the state courts data-center development.",value:"not disclosed",partners:["data-center developers"],financing:"Approved large-load tariff; similar pending in VA, OK, MI, TX",src:"Utility Dive, Feb '26"}]}]},
 
-{ticker:"EXC",name:"Exelon",grp:"Regulated Utilities",sector:"Regulated T&D utility (PJM wires)",mktCap:"~$42B",hq:"Chicago, IL",
+{ticker:"EXC",name:"Exelon",grp:"Regulated Utilities",sector:"Regulated T&D utility (PJM wires)",mktCap:"~$42B",rev:25330,hq:"Chicago, IL",
 note:"Pure-wires play on PJM's boom: after demanding signed contracts and collateral, the 'high-probability' pipeline is still 11 GW (9 GW at ComEd), backing ~$42B of capex plus $12–17B of potential transmission.",
 states:[
 {st:"IL",status:"contracted",items:[
@@ -1441,7 +1442,7 @@ states:[
 {st:"DE",status:"operating",items:[
 {title:"Delmarva Power territory",detail:"Spillover interest from the constrained Mid-Atlantic market; no state-level programs disclosed.",value:"not disclosed",partners:[],financing:"Traditional rate regulation",src:"Utility Dive, Aug '26"}]}]},
 
-{ticker:"ETR",name:"Entergy",grp:"Regulated Utilities",sector:"Regulated utility (Gulf South)",mktCap:"~$50B",hq:"New Orleans, LA",
+{ticker:"ETR",name:"Entergy",grp:"Regulated Utilities",sector:"Regulated utility (Gulf South)",mktCap:"~$50B",rev:13480,hq:"New Orleans, LA",
 note:"The regulated-utility face of the boom: Meta's $27B Hyperion campus (LA), AWS's $25B Mississippi buildout and Google in Arkansas all sit in Entergy territory — one of the largest rate-base expansions in the country.",
 states:[
 {st:"LA",status:"operating",items:[
@@ -1457,9 +1458,11 @@ states:[
 {title:"Entergy Texas expansion",detail:"~1.2 GW Orange County Advanced Power Station under construction near Bridge City amid data-center and industrial growth in SE Texas.",value:"not disclosed",partners:[],financing:"Regulated rate base approved by PUCT",src:"company disclosures, 2024–26"}]}]},
 
 /* ---- Equipment & grid builders ---- */
-{ticker:"GEV",name:"GE Vernova",grp:"Equipment & Grid Builders",sector:"OEM · gas turbines, grid equipment, nuclear",mktCap:"~$246B",hq:"Cambridge, MA",
-note:"The arms dealer of the AI power buildout: gas-turbine backlog hit 116 GW (slots sold past 2030), total backlog ~$176B, with data centers outbidding utilities. Expanding US factories in SC, NY, PA and FL.",
+{ticker:"GEV",name:"GE Vernova",grp:"Equipment & Grid Builders",sector:"OEM · gas turbines, grid equipment, nuclear",mktCap:"~$246B",rev:41370,hq:"Cambridge, MA",
+note:"The arms dealer of the AI power buildout: gas-turbine backlog hit 116 GW (slots sold past 2030), total backlog ~$176B, with data centers outbidding utilities. Sep '26: TVA's Clinch River BWRX-300 (TN) won the first US SMR construction permit.",
 states:[
+{st:"TN",status:"contracted",items:[
+{title:"Clinch River BWRX-300 — first US SMR construction permit",detail:"NRC issued TVA a construction permit (Sep 28 '26) for Clinch River Unit 1, Roane County — a 300 MW GE Vernova BWRX-300, the first SMR permitted for construction in the US; completion window 2031–32.",value:"not disclosed",partners:["TVA","GE Hitachi"],financing:"TVA-owned; cost-sharing with industry partners in negotiation; separate operating license still required before fuel load",src:"NRC / GE Vernova, Sep '26"}]},
 {st:"SC",status:"operating",items:[
 {title:"Greenville turbine plant expansion",detail:"Flagship 7HA factory; ~$300M (part of ~$600M US plan) to lift heavy-duty output as gas backlog hit 116 GW by mid-2026.",value:"~$300M",partners:[],financing:"Company capex, backed by reservation fees on turbine slots",src:"Business Wire / Utility Dive, '25–Jul '26"}]},
 {st:"NY",status:"operating",items:[
@@ -1472,7 +1475,7 @@ states:[
 {st:"FL",status:"operating",items:[
 {title:"Pensacola wind factory",detail:"~$70M in onshore wind nacelle manufacturing, part of the ~$600M US factory program.",value:"~$70M",partners:[],financing:"Company capex",src:"Business Wire, Jan '25"}]}]},
 
-{ticker:"PWR",name:"Quanta Services",grp:"Equipment & Grid Builders",sector:"Grid engineering & construction",mktCap:"~$98B",hq:"Houston, TX",
+{ticker:"PWR",name:"Quanta Services",grp:"Equipment & Grid Builders",sector:"Grid engineering & construction",mktCap:"~$98B",rev:32910,hq:"Houston, TX",
 note:"The grid buildout's general contractor: record $53.4B backlog, 41% revenue growth — nearly every utility capex plan on this map flows through contractors like Quanta.",
 states:[
 {st:"TX",status:"operating",items:[
@@ -1480,8 +1483,23 @@ states:[
 {st:"NM",status:"operating",items:[
 {title:"SunZia transmission construction",detail:"Built the ~550-mi, 525kV HVDC SunZia line moving ~3 GW of NM wind west — the template mega-project for AI-era power.",value:"not disclosed (share of ~$11B project)",partners:["Pattern Energy"],financing:"Developer project finance; Quanta paid as EPC contractor",src:"trade press, 2024–26"}]}]},
 
+{ticker:"BE",name:"Bloom Energy",grp:"Equipment & Grid Builders",sector:"Solid oxide fuel cells · on-site power",mktCap:"~$80B",rev:3110,hq:"San Jose, CA",
+note:"The purest 'power for AI' story of 2026: fuel cells deliver on-site data-center power in months vs years-long grid queues. Oracle (up to 2.8 GW), Brookfield's $25B framework, AEP's $2.65B Wyoming offtake and Stargate's Project Jupiter drove S&P 500 inclusion (Sep '26); execution and permits are now the risk.",
+states:[
+{st:"CA",status:"operating",items:[
+{title:"San Jose HQ + Fremont factory",detail:"Fuel-cell stack manufacturing hub; Sep '26 expansion adds ~158,000 sq ft in Fremont; on track for 2 GW annual production by Dec '26, roughly double 2025.",value:"not disclosed",partners:[],financing:"Operating cash flow + prior raises; 45X manufacturing credits",src:"Utility Dive / Seeking Alpha, Oct '25–Sep '26"}]},
+{st:"DE",status:"operating",items:[
+{title:"Newark manufacturing (UD STAR Campus)",detail:"East Coast fuel-cell assembly plant; output expanded through 2025–26 for AI data-center demand alongside Fremont.",value:"not disclosed",partners:["University of Delaware (site)"],financing:"not disclosed",src:"Utility Dive, Oct '25"}]},
+{st:"WY",status:"contracted",items:[
+{title:"Cheyenne AI Factory (BFC Power / Tallgrass)",detail:"900 MW of Bloom fuel cells for phase one of a 1.8 GW AI campus; Wyoming siting council approved Jan 8 '26; gas-fed, hydrogen-ready, carbon capture via Trailblazer pipeline; Oracle cited as primary beneficiary.",value:"~$2.65B (20-yr offtake)",partners:["AEP (offtaker)","Tallgrass (Blackstone)","Oracle"],financing:"20-yr AEP power offtake underpins project; Blackstone-owned Tallgrass develops and owns",src:"Wedbush / Yahoo Finance, Jan '26"}]},
+{st:"NM",status:"contracted",items:[
+{title:"Project Jupiter (Stargate), Doña Ana County",detail:"2.4 GW fuel-cell contract powering STACK Infrastructure's ~$165B AI campus; Oracle anchor tenant serving OpenAI. Sep '26: Oracle force-majeure notice over schedule; parties reaffirmed; pipeline and air permits pending.",value:"not disclosed ($165B campus)",partners:["Oracle","STACK Infrastructure (Blue Owl)","OpenAI (end user)"],financing:"Developer-financed (Blue Owl); Oracle holds payment-deferral rights if schedule slips",src:"ENR / 24-7 Wall St, Sep '26"}]},
+{st:"US",status:"contracted",items:[
+{title:"Oracle master agreement — up to 2.8 GW",detail:"Expanded Apr '26: 1.2 GW firm initial order (deploying into 2027) plus 1.6 GW conditional procurement rights; Bloom once delivered an operational system in 55 days.",value:"not disclosed",partners:["Oracle"],financing:"Warrant issued to Oracle aligning incentives (terms set Oct '25)",src:"Bloom IR, Apr '26"},
+{title:"Brookfield AI infrastructure framework",detail:"Jun 30 '26 expansion of the Oct '25 $5B framework: Brookfield's AI Infrastructure Fund funds fuel-cell deployments at AI data centers globally — a funding ceiling, not a revenue guarantee.",value:"up to $25B (framework)",partners:["Brookfield Asset Management"],financing:"Brookfield capital funds deployments, keeping the buildout off Bloom's balance sheet",src:"TechTimes, Jul '26"}]}]},
+
 /* ---- SMRs, fuel & defense nuclear ---- */
-{ticker:"OKLO",name:"Oklo",grp:"SMRs, Fuel & Defense Nuclear",sector:"SMR · fast microreactors (build-own-operate)",mktCap:"~$7B",hq:"Santa Clara, CA",
+{ticker:"OKLO",name:"Oklo",grp:"SMRs, Fuel & Defense Nuclear",sector:"SMR · fast microreactors (build-own-operate)",mktCap:"~$7B",rev:1.21,hq:"Santa Clara, CA",
 note:"Sells power, not reactors — ~14 GW pipeline concentrated in AI data centers (Switch 12 GW master agreement, Meta 1.2 GW, Equinix LOI). Mostly non-binding LOIs; first reactor targeted late 2027–28.",
 states:[
 {st:"ID",status:"contracted",items:[
@@ -1498,7 +1516,19 @@ states:[
 {st:"WY",status:"planned",items:[
 {title:"Wyoming Hyperscale LOI",detail:"LOI to supply 100 MW to Wyoming Hyperscale's data-center campus; non-binding, no site license filed.",value:"not disclosed",partners:["Wyoming Hyperscale"],financing:"Non-binding LOI → PPA",src:"Power Engineering, Nov '24"}]}]},
 
-{ticker:"SMR",name:"NuScale Power",grp:"SMRs, Fuel & Defense Nuclear",sector:"SMR · only NRC-approved design",mktCap:"~$3B",hq:"Portland, OR",
+{ticker:"XE",name:"X-energy",grp:"SMRs, Fuel & Defense Nuclear",sector:"SMR (Xe-100) + TRISO fuel",mktCap:"~$7.5B",rev:150.28,hq:"Rockville, MD",
+note:"Amazon's SMR horse: went public Apr '26 (Nasdaq: XE, $1.02B raise) on the back of an Amazon-led ~$500M round. Xe-100 projects with Dow in Texas and Energy Northwest in Washington, plus its own TRISO-X fuel plant in Oak Ridge.",
+states:[
+{st:"MD",status:"operating",items:[
+{title:"Rockville HQ — Xe-100 + TRISO-X",detail:"Designs the 80 MWe Xe-100 high-temperature gas reactor (deployed in 4-packs, ~320 MW) and TRISO fuel; IPO'd Apr '26 on Nasdaq raising $1.02B.",value:"$1.02B IPO raise",partners:["Amazon (anchor investor)"],financing:"Amazon-led ~$500M round (Oct '24) + IPO; DOE ARDP cost-share (~$1.2B program)",src:"X-energy IR / DCD, Apr '26"}]},
+{st:"TX",status:"planned",items:[
+{title:"Long Mott Generating Station, Seadrift (with Dow)",detail:"Four Xe-100 units at Dow's Seadrift materials site — first grid-scale advanced reactor planned at a US industrial site; NRC construction-permit review underway.",value:"not disclosed",partners:["Dow","DOE (ARDP)"],financing:"DOE Advanced Reactor Demonstration Program cost-share; Dow joint development",src:"NRC / company disclosures, 2025–26"}]},
+{st:"WA",status:"planned",items:[
+{title:"Energy Northwest — up to 12 modules near Richland",detail:"Amazon-backed agreement for an initial 4-module (~320 MW) Xe-100 plant expandable to 12 modules (~960 MW) serving regional and data-center load.",value:"not disclosed",partners:["Energy Northwest","Amazon"],financing:"Amazon development funding; utility joint development agreement",src:"company disclosures, 2024–26"}]},
+{st:"TN",status:"operating",items:[
+{title:"TRISO-X fuel fabrication facility, Oak Ridge",detail:"First commercial-scale HALEU TRISO fuel plant in the US, under construction/commissioning at Horizon Center — feeds Xe-100 projects and third-party advanced reactors.",value:"not disclosed",partners:["DOE","Centrus (HALEU supply chain)"],financing:"Company capital + DOE ARDP cost-share",src:"company disclosures, 2024–26"}]}]},
+
+{ticker:"SMR",name:"NuScale Power",grp:"SMRs, Fuel & Defense Nuclear",sector:"SMR · only NRC-approved design",mktCap:"~$3B",rev:10.69,hq:"Portland, OR",
 note:"Only SMR with full NRC design approval (77 MWe, May '25), commercialized through developer ENTRA1, which fronts capital and signs PPAs. Flagship 6 GW TVA program is non-binding; no firm US order as of Sept '26.",
 states:[
 {st:"OR",status:"operating",items:[
@@ -1506,7 +1536,7 @@ states:[
 {st:"TN",status:"planned",items:[
 {title:"TVA–ENTRA1 6 GW SMR program (sites TBD)",detail:"Sept '25 collaborative agreement for up to six ENTRA1 plants on NuScale modules across TVA's territory — largest US SMR program; non-binding, no sites or firm orders as of Sept '26.",value:"not disclosed",partners:["TVA","ENTRA1 Energy"],financing:"ENTRA1 would develop, own and finance plants, selling to TVA under future PPAs",src:"TVA/ENTRA1, Sep '25"}]}]},
 
-{ticker:"NNE",name:"Nano Nuclear Energy",grp:"SMRs, Fuel & Defense Nuclear",sector:"Microreactors (KRONOS, ZEUS)",mktCap:"~$0.9B",hq:"New York, NY",
+{ticker:"NNE",name:"Nano Nuclear Energy",grp:"SMRs, Fuel & Defense Nuclear",sector:"Microreactors (KRONOS, ZEUS)",mktCap:"~$0.9B",rev:0.21,hq:"New York, NY",
 note:"Pre-revenue microreactor developer funded by equity raises; first KRONOS deployment targeted 2030. AI angle runs through a non-binding 2+ GW framework with Tillman Digital Gateway.",
 states:[
 {st:"IL",status:"planned",items:[
@@ -1514,7 +1544,7 @@ states:[
 {st:"TN",status:"operating",items:[
 {title:"Technology HQ, Oak Ridge",detail:"Purchased Heritage Center facility (2024) for reactor development and component testing near ORNL.",value:"not disclosed",partners:["City of Oak Ridge"],financing:"Corporate cash from equity raises",src:"NNE / NEI, 2024"}]}]},
 
-{ticker:"LEU",name:"Centrus Energy",grp:"SMRs, Fuel & Defense Nuclear",sector:"Uranium enrichment · sole US HALEU producer",mktCap:"~$2.9B",hq:"Bethesda, MD",
+{ticker:"LEU",name:"Centrus Energy",grp:"SMRs, Fuel & Defense Nuclear",sector:"Uranium enrichment · sole US HALEU producer",mktCap:"~$2.9B",rev:473.9,hq:"Bethesda, MD",
 note:"The fuel gatekeeper for the Oklo/TerraPower class of reactors. DOE is anchor customer; ~$2.3B in utility LEU commitments plus $1.2B+ private capital and a $500M equity raise fund the Piketon buildout.",
 states:[
 {st:"OH",status:"operating",items:[
@@ -1523,7 +1553,7 @@ states:[
 {st:"TN",status:"operating",items:[
 {title:"Centrifuge manufacturing, Oak Ridge",detail:"$60M investment (Nov '24) restarted large-scale AC100M centrifuge manufacturing; expansion tied to the 2026 Piketon award.",value:"$60M initial",partners:["DOE (downstream demand)"],financing:"Corporate capital ahead of DOE task orders",src:"Centrus / Fortune, Nov '24"}]}]},
 
-{ticker:"BWXT",name:"BWX Technologies",grp:"SMRs, Fuel & Defense Nuclear",sector:"Nuclear components, fuel & microreactors",mktCap:"~$12.6B",hq:"Lynchburg, VA",
+{ticker:"BWXT",name:"BWX Technologies",grp:"SMRs, Fuel & Defense Nuclear",sector:"Nuclear components, fuel & microreactors",mktCap:"~$12.6B",rev:3510,hq:"Lynchburg, VA",
 note:"The profitable picks-and-shovels of the nuclear trade: naval propulsion incumbent expanding into SMR components, TRISO fuel and DoD microreactors. Sold its medical unit (up to $800M) to focus on nuclear demand.",
 states:[
 {st:"VA",status:"operating",items:[
@@ -1538,7 +1568,35 @@ states:[
 {title:"Project Pele demo, Idaho National Laboratory",detail:"DoD's transportable 1–5 MWe microreactor, built in Lynchburg with core completed 2026, shipping to INL for the first US military microreactor demonstration.",value:"~$300M (2022 DoD award)",partners:["DoD SCO","INL"],financing:"Fully DoD-funded demonstration contract",src:"BWXT / POWER, 2026"}]}]},
 
 /* ---- Solar & storage manufacturing ---- */
-{ticker:"FSLR",name:"First Solar",grp:"Solar & Storage Manufacturing",sector:"Solar manufacturing (CdTe thin film)",mktCap:"~$19B",hq:"Tempe, AZ",
+{ticker:"EOSE",name:"Eos Energy",grp:"Solar & Storage Manufacturing",sector:"Long-duration zinc battery storage",mktCap:"~$1.1B",rev:214.25,hq:"Edison, NJ → Pittsburgh, PA ('26)",
+note:"American-made zinc batteries (3–12 hr) scaling in western PA on DOE and Cerberus money; pivoting toward AI power via a turbine-plus-storage pairing and a Cerberus-backed developer. Record $807M backlog, still gross-margin negative through the ramp.",
+states:[
+{st:"PA",status:"operating",items:[
+{title:"Turtle Creek 'Project AMAZE' factory",detail:"Flagship plant near Pittsburgh, ~$500M buildout toward ~8 GWh; Line 2 entered commercial production Jun '26, targeting 4 GWh annual run-rate by YE26.",value:"~$500M planned",partners:["DOE Loan Programs Office"],financing:"$303.5M DOE LPO loan guarantee (closed Dec '24, drawn in tranches); 45X credits on US-made cells",src:"DOE / pv magazine, Dec '24–Jun '26"},
+{title:"Marshall Township plant + HQ relocation",detail:"432,000 sq ft second Allegheny County plant ($352.9M) plus HQ move to Pittsburgh's North Shore in H2 '26; ~1,000 jobs.",value:"$352.9M",partners:["Commonwealth of PA","Allegheny County"],financing:"~$27M state/local grants (PA First, RACP); balance from DOE/Cerberus facilities",src:"Energy-Storage.news, Oct '25"}]},
+{st:"US",status:"contracted",items:[
+{title:"Record backlog + Frontier Power USA",detail:"Record ~$807M backlog (Q2 '26, +25% QoQ) on a $24B commercial pipeline; Cerberus-backed Frontier Power USA will build-own-operate Eos storage for data-center and utility markets with a 2 GWh capacity reservation.",value:"~$807M backlog",partners:["Cerberus ($100M equity + $315.5M facility)","data-center developers"],financing:"Cerberus delayed-draw term loan fully funded; Frontier: $100M Cerberus equity + ~$150M conditional Eos contribution",src:"Eos IR, May–Aug '26"},
+{title:"Turbine-X behind-the-meter JDA",detail:"Up to 2 GWh of Eos storage paired with Baker Hughes NovaLT gas turbines for behind-the-meter AI data-center power; 36-month rollout, first deployments expected 2027 — framework, not a firm order.",value:"not disclosed",partners:["Turbine-X Energy","Baker Hughes"],financing:"Non-binding joint development framework",src:"DCD, Apr '26"}]}]},
+
+{ticker:"FLNC",name:"Fluence Energy",grp:"Solar & Storage Manufacturing",sector:"Grid-scale battery storage & software",mktCap:"~$1.7B",rev:2630,hq:"Arlington, VA",
+note:"AES/Siemens-backed storage integrator that onshored its supply chain (~$700M across TN/UT/AZ/TX) and sells batteries as the shock absorber between data centers and the grid. Two hyperscaler MSAs in 2026, but a Houston factory ramp stumble forced a $600M FY26 guidance cut.",
+states:[
+{st:"VA",status:"operating",items:[
+{title:"Arlington HQ",detail:"Global HQ; Siemens and AES remain major shareholders from the JV heritage.",value:"not disclosed",partners:["Siemens","AES"],financing:"$400M convertible notes due 2030 (Dec '24) fund US manufacturing and working capital",src:"Fluence IR, Dec '24"}]},
+{st:"UT",status:"operating",items:[
+{title:"Battery module manufacturing",detail:"Gridstack module production since late 2024; enabled first US domestic-content BESS shipments Sep '25.",value:"not disclosed",partners:["contract manufacturer"],financing:"Part of ~$700M US manufacturing program; earns customers the IRA domestic-content bonus",src:"Fluence IR / ESS News, '24–25"}]},
+{st:"TN",status:"operating",items:[
+{title:"US cell supply, Smyrna",detail:"US-made LFP cells for Fluence products from the Smyrna plant (started under AESC; sold to Fixx Energy May '26, supply continuing).",value:"not disclosed",partners:["AESC / Fixx Energy"],financing:"Supplier-owned capacity supporting 45X economics",src:"Solar Power World, May '26"}]},
+{st:"AZ",status:"operating",items:[
+{title:"Goodyear enclosures + BMS production",detail:"US-steel enclosures and battery-management hardware since May '25 (~250 jobs), completing the domestic Gridstack supply chain.",value:"not disclosed",partners:["contract manufacturer"],financing:"Part of the ~$700M US manufacturing buildout",src:"Fluence IR, May '25"}]},
+{st:"TX",status:"operating",items:[
+{title:"Houston thermal-management facility",detail:"Thermal systems with Bergstrom since Aug '25; automated-welding underperformance drove the Sep '26 FY26 guidance cut (~$2.4B revenue).",value:"not disclosed",partners:["Bergstrom"],financing:"not disclosed",src:"Energy-Storage.news, Sep '26"}]},
+{st:"CA",status:"contracted",items:[
+{title:"Rexford 2 BESS, Tulare County",detail:"800 MWh storage project awarded Jul '26; also supplying domestic-content BESS for Avantus solar-plus-storage projects.",value:"not disclosed",partners:["Avantus"],financing:"Developer project finance; domestic content earns the ITC adder",src:"Solar Power World, Jul '26"}]},
+{st:"US",status:"contracted",items:[
+{title:"Two hyperscaler MSAs + Smartstack",detail:"Master supply agreements with two unnamed hyperscalers (by May '26); ~12 GWh data-center pipeline with first large order booked FY Q4 '26; 10 MWh high-density Smartstack launched Jun '26 for data-center power smoothing.",value:"~$2.9B total backlog",partners:["two unnamed hyperscalers"],financing:"Framework MSAs; orders placed underneath them",src:"DCD / ESS News, May–Aug '26"}]}]},
+
+{ticker:"FSLR",name:"First Solar",grp:"Solar & Storage Manufacturing",sector:"Solar manufacturing (CdTe thin film)",mktCap:"~$19B",rev:5380,hq:"Tempe, AZ",
 note:"The profitable incumbent of US solar manufacturing — no Chinese supply chain, booked out years ahead as utility-scale solar remains the fastest power to deploy for AI. ~14 GW US capacity in 2026 → ~17.7 GW by 2027.",
 states:[
 {st:"OH",status:"operating",items:[
@@ -1550,7 +1608,7 @@ states:[
 {st:"SC",status:"planned",items:[
 {title:"Gaffney finishing facility",detail:"$330M facility finishing Series 6 Plus modules (~3.7 GW/yr, 600+ jobs); operations targeted 2H '26 — lifting US nameplate to 17.7 GW by 2027.",value:"$330M",partners:["State of South Carolina"],financing:"Internal capex; announced Nov '25, under construction",src:"Solar Power World, Nov '25"}]}]},
 
-{ticker:"TE",name:"T1 Energy",grp:"Solar & Storage Manufacturing",sector:"Solar manufacturing (fka FREYR Battery)",mktCap:"~$1.1B",hq:"Austin, TX",
+{ticker:"TE",name:"T1 Energy",grp:"Solar & Storage Manufacturing",sector:"Solar manufacturing (fka FREYR Battery)",mktCap:"~$1.1B",rev:996.85,hq:"Austin, TX",
 note:"Former FREYR reborn as a Texas solar manufacturer after buying Trina's US assets; G1 module plant already profitable on volume + 45X credits, and the G2 cell fab would onshore the supply chain.",
 states:[
 {st:"TX",status:"operating",items:[
@@ -1563,21 +1621,29 @@ const EST_COL={operating:"#34d399",contracted:"#fbbf24",planned:"#5b9dff"};
 const EST_LABEL={operating:"Operating",contracted:"Contracted / signed",planned:"Planned / announced"};
 const EST_RANK={operating:0,contracted:1,planned:2};
 const EST_CLASS={operating:"eop",contracted:"ect",planned:"epl"};
-const ENAMES={AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
+const ENAMES={AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",US:"Multi-state / national"};
 
 /* scoped styles */
 const ecss=document.createElement('style');
 ecss.textContent=`
 #view-energy .stage{padding:0}
 #emap{height:74vh;min-height:540px}
-#eroster{position:absolute;top:12px;right:14px;z-index:5;width:208px;max-height:calc(100% - 56px);overflow-y:auto;
+#eroster{position:absolute;top:12px;right:14px;z-index:5;width:238px;max-height:calc(100% - 56px);overflow-y:auto;
 background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;padding:10px 10px 12px;backdrop-filter:blur(4px)}
 #eroster .rg{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin:10px 4px 5px}
 #eroster .rg:first-child{margin-top:2px}
 #eroster .ero{display:flex;align-items:baseline;gap:7px;padding:4px 7px;border-radius:7px;cursor:pointer;
 font-family:var(--mono);font-size:11px;color:var(--ink-dim);transition:.15s;border:1px solid transparent}
 #eroster .ero b{color:var(--gold);font-weight:600;min-width:38px}
-#eroster .ero span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#eroster .ero span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#eroster .ero em{font-style:normal;font-size:10px;color:var(--ink-faint);white-space:nowrap}
+#eshare{display:flex;flex-direction:column;gap:4px;min-width:230px}
+#eshare .eshr{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);cursor:pointer}
+#eshare .eshr b{color:var(--gold);font-weight:600;width:36px}
+#eshare .eshr i{flex:1;height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+#eshare .eshr i s{display:block;height:100%;background:var(--gold);opacity:.85;border-radius:3px}
+#eshare .eshr em{font-style:normal;color:var(--ink);width:40px;text-align:right}
+#eshare .eshr:hover b{text-decoration:underline}
 #eroster .ero:hover{background:rgba(255,255,255,.04);color:var(--ink)}
 #eroster .ero.on{border-color:var(--gold);background:rgba(231,178,74,.08);color:var(--ink)}
 #emap .est{stroke:#26344f;stroke-width:.7;cursor:pointer;transition:fill .18s,opacity .18s}
@@ -1611,6 +1677,7 @@ function eStateCos(st){ /* companies with filtered presence in state */
 }
 function eCounts(){ const m={}; ENERGY_DATA.forEach(co=>co.states.forEach(s=>{ if(eFilters[s.status]) m[s.st]=(m[s.st]||0)+1; })); return m; }
 
+function eRev(co){const r=co.rev; if(r>=1000) return "$"+(r/1000).toFixed(1)+"B"; if(r>=10) return "$"+Math.round(r)+"M"; if(r>=1) return "$"+r.toFixed(1)+"M"; return "<$1M";}
 function eTip(){ let t=document.getElementById('etip'); if(!t){ t=document.createElement('div'); t.id='etip'; t.className='tip'; document.body.appendChild(t);} return t; }
 
 function ePaint(){
@@ -1664,7 +1731,7 @@ function eShowState(st){
   ph.innerHTML=`<div class="ptype">State · ${rows.length} tracked ${rows.length===1?'company':'companies'}</div><h2>${ENAMES[st]||st}</h2>
   <div class="pval">${nOp} operating · ${nCt} contracted · ${nPl} planned</div>`;
   const pd=document.getElementById('epdeals');
-  if(!rows.length){ pd.innerHTML=`<h3>No tracked presence</h3><div class="deal"><div class="db">None of the 20 tracked companies has a mapped ${Object.entries(eFilters).filter(([k,v])=>v).map(([k])=>EST_LABEL[k].toLowerCase()).join(' / ')} presence here — yet. Energy demand maps are moving fast; this is a curated snapshot, not a census.</div></div>`; }
+  if(!rows.length){ pd.innerHTML=`<h3>No tracked presence</h3><div class="deal"><div class="db">None of the 24 tracked companies has a mapped ${Object.entries(eFilters).filter(([k,v])=>v).map(([k])=>EST_LABEL[k].toLowerCase()).join(' / ')} presence here — yet. Energy demand maps are moving fast; this is a curated snapshot, not a census.</div></div>`; }
   else pd.innerHTML=rows.map(({co,pres})=>
     `<h3>${co.ticker} · ${co.name} ${eBadge(pres.status)}</h3>`+pres.items.map(it=>eDeal(it,pres.status)).join('')
   ).join('');
@@ -1679,7 +1746,7 @@ function eShowCo(co){
   pres.forEach(s=>s.items.forEach(it=>{ if(it.value&&it.value!=='not disclosed'&&!it.value.startsWith('not disclosed')) disclosed.push(`${s.st}: ${it.value}`); }));
   const ph=document.getElementById('eph');
   ph.innerHTML=`<div class="ptype">${co.grp} · ${co.sector}</div><h2>${co.name}</h2>
-  <div class="pval">${co.ticker} · ${co.mktCap} mkt cap · HQ ${co.hq}</div>
+  <div class="pval">${co.ticker} · ${co.mktCap} mkt cap · ${eRev(co)} TTM revenue · HQ ${co.hq}</div>
   <div class="pnote">${co.note}</div>`;
   const pd=document.getElementById('epdeals');
   let html=`<h3>Footprint — ${pres.length} states · ${nProj} projects / positions</h3>`;
@@ -1703,7 +1770,7 @@ function eReset(){
 function initEnergyMap(){
   const svg=d3.select('#emap');
   const geo=US_STATES_GEO;
-  const proj=d3.geoAlbersUsa().fitExtent([[8,8],[742,602]],geo);
+  const proj=d3.geoAlbersUsa().fitExtent([[8,8],[712,602]],geo);
   const path=d3.geoPath(proj);
   const g=svg.append('g');
   const tip=eTip();
@@ -1744,7 +1811,7 @@ function initEnergyMap(){
   const groups=[...new Set(ENERGY_DATA.map(c=>c.grp))];
   roster.innerHTML=groups.map(gname=>
     `<div class="rg">${gname}</div>`+ENERGY_DATA.filter(c=>c.grp===gname).map(c=>
-      `<div class="ero" data-t="${c.ticker}"><b>${c.ticker}</b><span>${c.name}</span></div>`).join('')
+      `<div class="ero" data-t="${c.ticker}"><b>${c.ticker}</b><span>${c.name}</span><em>${eRev(c)}</em></div>`).join('')
   ).join('');
   roster.querySelectorAll('.ero').forEach(el=>el.addEventListener('click',()=>{
     const co=ENERGY_DATA.find(c=>c.ticker===el.dataset.t);
@@ -1771,6 +1838,18 @@ function initEnergyMap(){
       if(first){ eShowCo(ENERGY_DATA.find(c=>c.ticker===first.dataset.t)); }
     }
   });
+
+  /* top-5 TTM revenue share of the tracked cohort */
+  const eTotal=ENERGY_DATA.reduce((s,c)=>s+(c.rev||0),0);
+  const eTop5=ENERGY_DATA.slice().sort((a,b)=>(b.rev||0)-(a.rev||0)).slice(0,5);
+  const eMaxRev=eTop5[0].rev||1;
+  document.getElementById('eshare').innerHTML=eTop5.map(c=>{
+    const pct=100*(c.rev||0)/eTotal;
+    return `<div class="eshr" data-t="${c.ticker}" title="${c.name} — ${eRev(c)} TTM revenue, ${pct.toFixed(1)}% of tracked cohort"><b>${c.ticker}</b><i><s style="width:${(100*(c.rev||0)/eMaxRev).toFixed(1)}%"></s></i><em>${pct.toFixed(1)}%</em></div>`;
+  }).join('');
+  document.querySelectorAll('#eshare .eshr').forEach(el=>el.addEventListener('click',()=>{
+    eShowCo(ENERGY_DATA.find(c=>c.ticker===el.dataset.t));
+  }));
 
   document.getElementById('reset-energy').addEventListener('click',eReset);
   document.getElementById('epclose').addEventListener('click',()=>{ eClosePanel(); eSelSt=null; ePaint(); });
