@@ -367,6 +367,13 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 <div class="srfield" style="flex:1"><label>Tickers <span class="srhint">(comma, space or new line; up to 60)</span></label>
 <textarea id="srsyms" rows="2" spellcheck="false"></textarea></div>
 </div>
+<div class="srrow srfilters" id="srfilters">
+<div class="srfield"><label>Filter · price <span class="srhint">($)</span></label>
+<div class="srinline srrange"><input id="srfpmin" type="number" min="0" step="any" inputmode="decimal" placeholder="min"><span>to</span><input id="srfpmax" type="number" min="0" step="any" inputmode="decimal" placeholder="max"></div></div>
+<div class="srfield"><label>Filter · % below 52W high</label>
+<div class="srinline srrange"><input id="srfhmin" type="number" min="0" max="100" step="any" inputmode="decimal" placeholder="at least"><span>to</span><input id="srfhmax" type="number" min="0" max="100" step="any" inputmode="decimal" placeholder="at most"><span class="srunit">% off</span></div></div>
+<div class="srfield srfbtns"><label>&nbsp;</label><div class="srinline"><button class="btn" id="srfclear">Clear filters</button><span id="srfcount" class="srstatus"></span></div></div>
+</div>
 <div class="srrow" id="srnotesrow" style="display:none"><div class="srfield" style="flex:1"><label>List notes</label><div id="srnotes" class="srnotes"></div></div></div>
 <div class="srrow srbar">
 <button class="btn srrun" id="srrun">▶ Run scan</button>
@@ -2835,6 +2842,12 @@ css.textContent=`
 .btn.srrun{background:var(--gold);color:#0c1322;border-color:var(--gold);font-weight:600}
 .btn.srrun:hover{filter:brightness(1.08);color:#0c1322}
 .btn.srdel{color:#f87171}
+.srfilters{padding:10px 12px;border:1px dashed var(--card-edge);border-radius:11px;background:rgba(231,178,74,.03)}
+.srfilters .srfield{min-width:0}
+.srrange input{width:96px}
+.srrange span{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+.srfilters.on{border-style:solid;border-color:rgba(231,178,74,.55)}
+#srfcount{color:var(--gold)}
 .srstatus{font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
 .srstatus.err{color:#f87171}.srstatus.ok{color:#34d399}
 .srnotes{font-size:13px;color:var(--ink-dim);white-space:pre-wrap;line-height:1.5}
@@ -2906,14 +2919,34 @@ function pickList(){
   $('srnotesrow').style.display=l&&l.notes?'':'none'; $('srnotes').textContent=l?l.notes:'';
   loadRuns();
 }
+const FKEYS=['srfpmin','srfpmax','srfhmin','srfhmax'];
+function fv(id){ const v=$(id).value.trim(); if(v==='') return null; const n=parseFloat(v); return isFinite(n)?n:null; }
+function filt(){ return {pmin:fv('srfpmin'),pmax:fv('srfpmax'),hmin:fv('srfhmin'),hmax:fv('srfhmax')}; }
+function fActive(f){ return Object.values(f).some(v=>v!=null); }
+function passF(r,f){
+  if(!fActive(f)) return true;
+  if(r.error||r.price==null) return false;
+  if(f.pmin!=null&&r.price<f.pmin) return false;
+  if(f.pmax!=null&&r.price>f.pmax) return false;
+  if(f.hmin!=null||f.hmax!=null){ if(r.offHigh52Pct==null) return false; const off=-r.offHigh52Pct;
+    if(f.hmin!=null&&off<f.hmin) return false; if(f.hmax!=null&&off>f.hmax) return false; }
+  return true;
+}
+function visible(){ const f=filt(); return sorted().filter(r=>passF(r,f)); }
+function saveF(){ try{ localStorage.setItem('sr_filters',JSON.stringify(FKEYS.map(k=>$(k).value))); }catch(e){} }
+function loadF(){ try{ const a=JSON.parse(localStorage.getItem('sr_filters')||'null'); if(Array.isArray(a)) FKEYS.forEach((k,i)=>{ $(k).value=a[i]||''; }); }catch(e){} }
 function sorted(){
   if(!sortK) return rows;
   return rows.slice().sort((a,b)=>{ const x=a[sortK],y=b[sortK]; if(x==null&&y==null)return 0; if(x==null)return 1; if(y==null)return -1; return (typeof x==='string'?x.localeCompare(y):x-y)*sortDir; });
 }
 function render(){
   const body=$('srbody'); const prev=(lastResp&&lastResp.previous&&lastResp.previous.prices)||{};
-  if(!rows.length){ body.innerHTML='<tr><td colspan="8" class="srempty">Press <b>Run scan</b> to load prices.</td></tr>'; return; }
-  body.innerHTML=sorted().map(r=>{
+  const f=filt(), on=fActive(f); $('srfilters').classList.toggle('on',on);
+  if(!rows.length){ $('srfcount').textContent=on?'Filters set — they apply when results load':''; body.innerHTML='<tr><td colspan="8" class="srempty">Press <b>Run scan</b> to load prices.</td></tr>'; return; }
+  const vis=visible();
+  $('srfcount').textContent=on?`Showing ${vis.length} of ${rows.length}`+(rows.some(r=>!r.error&&r.offHigh52Pct==null)&&(f.hmin!=null||f.hmax!=null)?' · rows without 52W data are hidden':''):'';
+  if(!vis.length){ body.innerHTML=`<tr><td colspan="8" class="srempty">No names match the filters (${rows.length} scanned). Loosen them or press <b>Clear filters</b>.</td></tr>`; return; }
+  body.innerHTML=vis.map(r=>{
     if(r.error) return `<tr><td class="tk"><b>${esc(r.symbol)}</b></td><td colspan="7" class="err">${esc(r.error)}</td></tr>`;
     return `<tr>
 <td class="tk"><b>${esc(r.symbol)}</b><span title="${esc(r.name||'')}">${esc(r.name||'')}</span></td>
@@ -2951,7 +2984,7 @@ async function loadRun(id){
 function csv(){
   if(!rows.length){ status('Run a scan first.','err'); return; }
   const H=['Ticker','Name','Current price','Prev week high','Prev month high','YTD start','YTD %','52-week high','% off 52W high','IPO / first trade','First trade date','Category','Industry','Source'];
-  const L=[H].concat(rows.map(r=>[r.symbol,r.name,r.price,r.prevWeekHigh,r.prevMonthHigh,r.ytdStart,r.ytdPct,r.high52,r.offHigh52Pct,r.ipoPrice,r.firstTradeDate,r.category,r.industry,r.source]));
+  const L=[H].concat(visible().map(r=>[r.symbol,r.name,r.price,r.prevWeekHigh,r.prevMonthHigh,r.ytdStart,r.ytdPct,r.high52,r.offHigh52Pct,r.ipoPrice,r.firstTradeDate,r.category,r.industry,r.source]));
   const txt=L.map(a=>a.map(v=>{v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',')).join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/csv'})); a.download='stock-research-'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
@@ -2979,6 +3012,9 @@ function init(){
   $('srruns').addEventListener('change',e=>loadRun(e.target.value));
   $('srrun').addEventListener('click',runScan);
   $('srcsv').addEventListener('click',csv);
+  loadF(); FKEYS.forEach(k=>$(k).addEventListener('input',()=>{ saveF(); render(); }));
+  $('srfclear').addEventListener('click',()=>{ FKEYS.forEach(k=>{ $(k).value=''; }); saveF(); render(); });
+  render();
   $('srnew').addEventListener('click',()=>openForm(null));
   $('sredit').addEventListener('click',()=>{ const l=lists.find(x=>x.name===$('srlist').value); if(!l){ status('Pick a saved list to edit (or press + New list).','err'); return; } openForm(l); });
   $('srdelete').addEventListener('click',delList);
