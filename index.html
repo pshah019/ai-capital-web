@@ -355,7 +355,7 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 </div>
 
 <div id="view-stocks" class="webview" style="display:none">
-<p class="sub" style="margin:0 0 16px">A crash-ready price sheet. Press <b>Run scan</b> to pull live prices for your list and see how far each name sits below last week's high, last month's high, where it started the year and where it first traded. Every scan is saved, so you can compare against the last run. Save your own watchlists to reuse on any device.</p>
+<p class="sub" style="margin:0 0 16px">A crash-ready price sheet. Press <b>Run scan</b> to pull live prices for your list and see how far each name sits below last week's high, last month's high, its 52-week high, where it started the year and where it first traded. Every scan is saved, so you can compare against the last run. Save your own watchlists to reuse on any device.</p>
 <div class="srcard">
 <div class="srrow">
 <div class="srfield"><label>Watchlist</label>
@@ -388,10 +388,11 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 <th data-k="prevWeekHigh" title="Highest high of the most recent completed week">C · Wk high</th>
 <th data-k="prevMonthHigh" title="Highest high of the last completed month">D · Mo high</th>
 <th data-k="ytdStart" title="First close of the year, with % change since">E · YTD start</th>
-<th data-k="ipoPrice" title="First traded price, split-adjusted">F · IPO</th>
-<th data-k="category" title="Sector / industry">G · Sector</th>
+<th data-k="offHigh52Pct" title="Highest high of the past 52 weeks, with % the price sits below it (click to sort by % off)">F · 52W high</th>
+<th data-k="ipoPrice" title="First traded price, split-adjusted">G · IPO</th>
+<th data-k="category" title="Sector / industry">H · Sector</th>
 </tr></thead>
-<tbody id="srbody"><tr><td colspan="7" class="srempty">Press <b>Run scan</b> to load prices.</td></tr></tbody>
+<tbody id="srbody"><tr><td colspan="8" class="srempty">Press <b>Run scan</b> to load prices.</td></tr></tbody>
 </table>
 </div>
 <footer><div><b>Data:</b> one source for every number — Yahoo Finance's public chart data (split-adjusted daily bars and the live regular-market price), with Stooq's free daily history as a fallback (the row says when). <b>Prev week high</b> = highest high of the most recent completed Mon–Fri week; <b>prev month high</b> = highest high of the last completed calendar month; <b>YTD start</b> = first close of the year (with % change since); <b>IPO / first trade</b> = first traded price on record, split-adjusted (not the offer price). Red % = how far below that level the stock sits now. Scans and watchlists are stored in Supabase. Prices can be delayed ~15 min. Not financial advice, investment advice, or legal advice.</div></footer>
@@ -2911,15 +2912,16 @@ function sorted(){
 }
 function render(){
   const body=$('srbody'); const prev=(lastResp&&lastResp.previous&&lastResp.previous.prices)||{};
-  if(!rows.length){ body.innerHTML='<tr><td colspan="7" class="srempty">Press <b>Run scan</b> to load prices.</td></tr>'; return; }
+  if(!rows.length){ body.innerHTML='<tr><td colspan="8" class="srempty">Press <b>Run scan</b> to load prices.</td></tr>'; return; }
   body.innerHTML=sorted().map(r=>{
-    if(r.error) return `<tr><td class="tk"><b>${esc(r.symbol)}</b></td><td colspan="6" class="err">${esc(r.error)}</td></tr>`;
+    if(r.error) return `<tr><td class="tk"><b>${esc(r.symbol)}</b></td><td colspan="7" class="err">${esc(r.error)}</td></tr>`;
     return `<tr>
 <td class="tk"><b>${esc(r.symbol)}</b><span title="${esc(r.name||'')}">${esc(r.name||'')}</span></td>
 <td><span class="px">${money(r.price)}</span><span class="sm">${r.source&&r.source!=='Yahoo Finance'?esc(r.source):''}</span></td>
 <td>${money(r.prevWeekHigh)}<span class="sm">${pct(r.offWeekPct)}<i class="dt">${r.prevWeekOf?' · wk of '+r.prevWeekOf.slice(5):''}</i></span></td>
 <td>${money(r.prevMonthHigh)}<span class="sm">${pct(r.offMonthPct)}<i class="dt">${r.prevMonth?' · '+r.prevMonth:''}</i></span></td>
 <td>${money(r.ytdStart)}<span class="sm">${pct(r.ytdPct)}<i class="dt"> YTD</i></span></td>
+<td>${money(r.high52)}<span class="sm">${pct(r.offHigh52Pct)}<i class="dt">${r.high52Date?' · '+esc(r.high52Date.slice(0,7)):''}</i></span></td>
 <td>${money(r.ipoPrice)}<span class="sm">${r.firstTradeDate?esc(r.firstTradeDate.slice(0,4)):''}<i class="dt">${r.vsIpoPct!=null?' · '+pct(r.vsIpoPct):''}</i></span></td>
 <td><span class="cat" title="${esc(r.industry||'')}">${esc(r.category||'—')}</span>${r.industry?`<span class="sm">${esc(r.industry)}</span>`:''}</td></tr>`;
   }).join('');
@@ -2942,14 +2944,14 @@ async function runScan(){
 async function loadRun(id){
   if(!id){ return; }
   try{ const r=await fetch('/api/watchlists?runs=1&id='+encodeURIComponent(id)); const j=await r.json(); const run=j.run; if(!run) return;
-    rows=(run.rows||[]).map(x=>Object.assign({},x,{offWeekPct:x.price&&x.prevWeekHigh?(x.price/x.prevWeekHigh-1)*100:null,offMonthPct:x.price&&x.prevMonthHigh?(x.price/x.prevMonthHigh-1)*100:null,vsIpoPct:x.price&&x.ipoPrice?(x.price/x.ipoPrice-1)*100:null}));
+    rows=(run.rows||[]).map(x=>Object.assign({},x,{offWeekPct:x.price&&x.prevWeekHigh?(x.price/x.prevWeekHigh-1)*100:null,offMonthPct:x.price&&x.prevMonthHigh?(x.price/x.prevMonthHigh-1)*100:null,offHigh52Pct:x.price&&x.high52?(x.price/x.high52-1)*100:null,vsIpoPct:x.price&&x.ipoPrice?(x.price/x.ipoPrice-1)*100:null}));
     lastResp={historic:true,previous:null}; $('srasof').textContent=new Date(run.run_at).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); render(); status('Showing a stored scan — press Run scan for live prices.','');
   }catch(e){ status('Could not load that run — '+e.message,'err'); }
 }
 function csv(){
   if(!rows.length){ status('Run a scan first.','err'); return; }
-  const H=['Ticker','Name','Current price','Prev week high','Prev month high','YTD start','YTD %','IPO / first trade','First trade date','Category','Industry','Source'];
-  const L=[H].concat(rows.map(r=>[r.symbol,r.name,r.price,r.prevWeekHigh,r.prevMonthHigh,r.ytdStart,r.ytdPct,r.ipoPrice,r.firstTradeDate,r.category,r.industry,r.source]));
+  const H=['Ticker','Name','Current price','Prev week high','Prev month high','YTD start','YTD %','52-week high','% off 52W high','IPO / first trade','First trade date','Category','Industry','Source'];
+  const L=[H].concat(rows.map(r=>[r.symbol,r.name,r.price,r.prevWeekHigh,r.prevMonthHigh,r.ytdStart,r.ytdPct,r.high52,r.offHigh52Pct,r.ipoPrice,r.firstTradeDate,r.category,r.industry,r.source]));
   const txt=L.map(a=>a.map(v=>{v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',')).join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/csv'})); a.download='stock-research-'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
