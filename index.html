@@ -2476,7 +2476,18 @@ background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;pa
 #dcmap .dlbl{font-family:var(--mono);fill:var(--ink-dim);paint-order:stroke;stroke:#070a11;stroke-width:2px;pointer-events:none;text-anchor:middle}
 #dcmap .dlbl .cnt{font-size:7.5px;font-weight:600}
 #dcmap .dsite{cursor:pointer;vector-effect:non-scaling-stroke}
-#dcmap .dsl{font-family:var(--mono);fill:var(--ink);paint-order:stroke;stroke:#070a11;pointer-events:none}
+#dcmap .dsn{font-family:var(--mono);font-weight:700;text-anchor:middle;pointer-events:none;letter-spacing:-.02em}
+#dcmap g.ds .dsite{transition:r .15s}
+#dcmap g.ds.dson .dsite{stroke:#fff!important;filter:drop-shadow(0 0 4px rgba(255,255,255,.55))}
+#dcmap .dsleg{stroke:#cfd8e6;stroke-opacity:.45;pointer-events:none}
+#dcmap .dshub{fill:#cfd8e6;fill-opacity:.8;pointer-events:none}
+#dcmap .dscall rect{fill:rgba(9,14,24,.94)}
+#dcmap .dscall text{font-family:var(--mono);fill:var(--ink);pointer-events:none}
+#dcmap .dscall{pointer-events:none}
+.dcnum{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 4px;border-radius:10px;color:#0b111d;font-family:var(--mono);font-size:10.5px;font-weight:700;margin-right:7px;vertical-align:1px}
+.t-num{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:9px;color:#0b111d;font-size:10px;font-weight:700;margin-right:7px;vertical-align:1px}
+.deal.dcg{transition:box-shadow .15s,background .15s}
+.deal.dcg.dchl{box-shadow:0 0 0 1px var(--gold);background:rgba(231,178,74,.06)}
 .dcownleg{position:absolute;left:14px;top:52px;z-index:5;font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);background:rgba(10,16,28,.9);border:1px solid var(--line);border-radius:9px;padding:7px 10px;line-height:1.7}
 .dcownleg i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:6px}
 .dcownleg u{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:6px}
@@ -2576,70 +2587,63 @@ function paint(){
   document.getElementById('dccount').textContent=`${n} campuses shown of ${DC_SITES.length} tracked (${DC_SITES.filter(s=>s.pub).length} public-owned, ${DC_SITES.filter(s=>!s.pub).length} private)`;
 }
 
-/* campus dots — only while zoomed into a state */
+/* campus dots — only while zoomed into a state.
+   Design: numbered pins (no text clutter on the map). Numbers match the cards in the side panel;
+   hovering a pin highlights its card, hovering a card spotlights its pin with a single clean label. */
+const DC_NUM=new Map(); const dcKey=s=>s.n+'|'+s.c;
+const dcDv=s=>{ if(s.d==='ongoing') return 1; const m=/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?/.exec(s.d||''); return m?(+m[1]*10000+(m[2]?+m[2]:1)*100+(m[3]?+m[3]:0)):0; };
+/* same order the panel shows: status group, newest first, then north→south */
+function dcOrder(list){ return ['op','bld','prm','ann'].flatMap(k=>list.filter(s=>s.s===k).sort((a,b)=>dcDv(b)-dcDv(a)||b.lat-a.lat||a.lon-b.lon)); }
 function drawSites(){
   const data=selSt?stSites(selSt):[];
-  const seen={};
-  data.forEach(s=>{ const p=proj([s.lon,s.lat])||[0,0]; const key=Math.round(p[0]/3)+'_'+Math.round(p[1]/3); const i=seen[key]=(seen[key]||0)+1; const a=i*2.4, r=(i-1)*1.1/curK*3; s._x=p[0]+Math.cos(a)*r; s._y=p[1]+Math.sin(a)*r; });
-  const R=7/curK, fs=8.5/curK;
-  /* de-cluster: dots that would overlap are fanned out on a small ring around their true spot, with a thin leader line back to it */
-  data.forEach(s=>{ s._px=s._x; s._py=s._y; });
+  DC_NUM.clear(); dcOrder(data).forEach((s,i)=>DC_NUM.set(dcKey(s),i+1));
+  data.forEach(s=>{ const p=proj([s.lon,s.lat])||[0,0]; s._x=s._px=p[0]; s._y=s._py=p[1]; s._hub=null; });
+  const R=8.2/curK, fs=8.2/curK;
+  /* de-cluster: pins that would overlap fan out evenly on a ring around their true location */
   const par=data.map((_,i)=>i), fd=i=>par[i]===i?i:(par[i]=fd(par[i]));
-  for(let i=0;i<data.length;i++) for(let j=i+1;j<data.length;j++){ if(Math.hypot(data[i]._px-data[j]._px,data[i]._py-data[j]._py)<R*2.3) par[fd(i)]=fd(j); }
+  for(let i=0;i<data.length;i++) for(let j=i+1;j<data.length;j++){ if(Math.hypot(data[i]._px-data[j]._px,data[i]._py-data[j]._py)<R*2.25) par[fd(i)]=fd(j); }
   const grp={}; data.forEach((s,i)=>(grp[fd(i)]=grp[fd(i)]||[]).push(s));
   Object.values(grp).forEach(m=>{ if(m.length<2) return;
     const cx=m.reduce((a,s)=>a+s._px,0)/m.length, cy=m.reduce((a,s)=>a+s._py,0)/m.length;
-    const ring=Math.max(R*3.2, m.length*R*3.6/(2*Math.PI));
-    m.sort((a,b)=>Math.atan2(a._py-cy,a._px-cx)-Math.atan2(b._py-cy,b._px-cx));
+    const ring=Math.max(R*2.2, m.length*R*2.35/(2*Math.PI));
+    m.sort((a,b)=>DC_NUM.get(dcKey(a))-DC_NUM.get(dcKey(b)));
     m.forEach((s,k)=>{ const ang=-Math.PI/2+k*2*Math.PI/m.length; s._x=cx+Math.cos(ang)*ring; s._y=cy+Math.sin(ang)*ring; s._hub=[cx,cy]; }); });
-  data.forEach(s=>{ if(!s._hub||!data.some(o=>o!==s&&o._hub&&o._hub[0]===s._hub[0]&&o._hub[1]===s._hub[1])) s._hub=null; });
-  const lg2=gSites.selectAll('line.dsleg').data(data.filter(s=>s._hub),d=>d.n+d.st+d.c);
+  const lg2=gSites.selectAll('line.dsleg').data(data.filter(s=>s._hub),dcKey);
   lg2.exit().remove();
   lg2.enter().insert('line',':first-child').attr('class','dsleg').merge(lg2)
-    .attr('x1',d=>d._hub[0]).attr('y1',d=>d._hub[1]).attr('x2',d=>d._x).attr('y2',d=>d._y)
-    .attr('stroke','#e6edf7').attr('stroke-opacity',.55).attr('stroke-width',1/curK).style('pointer-events','none');
+    .attr('x1',d=>d._hub[0]).attr('y1',d=>d._hub[1]).attr('x2',d=>d._x).attr('y2',d=>d._y).attr('stroke-width',1/curK);
   const hubs=gSites.selectAll('circle.dshub').data([...new Map(data.filter(s=>s._hub).map(s=>[s._hub.join(','),s._hub])).values()]);
   hubs.exit().remove();
-  hubs.enter().insert('circle',':first-child').attr('class','dshub').merge(hubs).attr('cx',d=>d[0]).attr('cy',d=>d[1]).attr('r',2.2/curK).attr('fill','#e6edf7').style('pointer-events','none');
-  const g=gSites.selectAll('g.ds').data(data,d=>d.n+d.st+d.c);
+  hubs.enter().insert('circle',':first-child').attr('class','dshub').merge(hubs).attr('cx',d=>d[0]).attr('cy',d=>d[1]).attr('r',2/curK);
+  const g=gSites.selectAll('g.ds').data(data,dcKey);
   g.exit().remove();
   const ge=g.enter().append('g').attr('class','ds');
   ge.append('circle').attr('class','dsite');
-  ge.append('text').attr('class','dsl');
+  ge.append('text').attr('class','dsn');
+  ge.append('g').attr('class','dscall').call(c=>{ c.append('rect'); c.append('text'); });
   const all=ge.merge(g);
-  all.attr('transform',d=>`translate(${d._x},${d._y})`)
-    .attr('opacity',d=>selCo&&!roleOf(d,selCo.t)?.25:1);
+  all.attr('transform',d=>`translate(${d._x},${d._y})`).attr('opacity',d=>selCo&&!roleOf(d,selCo.t)?.22:1);
   const isTen=d=>selCo&&d.own!==selCo.t&&(d.ten||[]).includes(selCo.t);
-  all.select('circle').attr('r',R).attr('fill',d=>isTen(d)?'#0b111d':DC_COL[d.s]).attr('stroke',d=>isTen(d)?DC_COL[d.s]:(d.pub?PUBC:PRIVC)).attr('stroke-width',d=>isTen(d)?3:2.2).attr('stroke-dasharray',d=>isTen(d)?'3 2':null)
-    .on('mousemove',(ev,d)=>showTip(ev,`<div class="t-route">${esc(ownTag(d))} · ${esc(d.n)}</div><span class="t-cat" style="color:${DC_COL[d.s]};background:${DC_COL[d.s]}1f">${DC_LBL[d.s]}</span><div class="t-body"><b>Owner:</b> ${esc(d.owner)}${d.own?' ('+d.own+')':''} · ${d.pub?'public':'private'}${(d.ten||[]).length?'<br><b>Tenant:</b> '+d.ten.join(', '):''}<br>${esc(region(d))} — ${esc(d.c)}<br>${esc(d.mw)}${d.v&&d.v!=='—'?' · '+esc(d.v):''}</div>`))
-    .on('mouseleave',hideTip)
-    .on('click',(ev,d)=>{ev.stopPropagation(); const el=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(d.n+'|'+d.c)}"]`); openPanel(); if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.boxShadow='0 0 0 1px var(--gold)'; setTimeout(()=>el.style.boxShadow='',1600);} });
-  all.select('text').attr('x',R+2/curK).attr('y',fs*0.35).style('font-size',fs+'px').style('stroke-width',(2.2/curK)+'px')
-    .text(siteLabel);
-  const HYP=new Set(['AMZN','MSFT','GOOGL','META','ORCL']);
-  /* label placement: try right, left, below, above; if the full label won't fit anywhere, fall back to the ticker alone, so every dot gets a label */
-  const order=data.slice().sort((a,b)=>(selCo?(roleOf(b,selCo.t)?1:0)-(roleOf(a,selCo.t)?1:0):0)||DC_RANK[a.s]-DC_RANK[b.s]||(HYP.has(b.own)?1:0)-(HYP.has(a.own)?1:0));
-  const pos=new Map(), gap=2/curK, h=fs*1.25;
-  const dots=new Map(data.map(d=>[d,[d._x-R,d._y-R,d._x+R,d._y+R]]));
-  const placed=[];
-  const hit=(bx,self)=>placed.some(b=>!(bx[2]<b[0]||bx[0]>b[2]||bx[3]<b[1]||bx[1]>b[3]))||data.some(o=>{ if(o===self) return false; const b=dots.get(o); return !(bx[2]<b[0]||bx[0]>b[2]||bx[3]<b[1]||bx[1]>b[3]); });
-  order.forEach(d=>{ let done=false;
-    for(const txt of [siteLabel(d), ownTag(d)]){ const w=txt.length*fs*0.62;
-      const cands=[
-        {x:R+gap,y:fs*0.35,a:'start',bx:[d._x+R,d._y-h/2,d._x+R+gap+w,d._y+h/2]},
-        {x:-R-gap,y:fs*0.35,a:'end',bx:[d._x-R-gap-w,d._y-h/2,d._x-R,d._y+h/2]},
-        {x:0,y:R+fs*1.05,a:'middle',bx:[d._x-w/2,d._y+R,d._x+w/2,d._y+R+h]},
-        {x:0,y:-R-fs*0.35,a:'middle',bx:[d._x-w/2,d._y-R-h,d._x+w/2,d._y-R]},
-        {x:R+gap,y:fs*0.35-h,a:'start',bx:[d._x+R,d._y-h*1.5,d._x+R+gap+w,d._y-h/2]},
-        {x:R+gap,y:fs*0.35+h,a:'start',bx:[d._x+R,d._y+h/2,d._x+R+gap+w,d._y+h*1.5]},
-        {x:-R-gap,y:fs*0.35-h,a:'end',bx:[d._x-R-gap-w,d._y-h*1.5,d._x-R,d._y-h/2]},
-        {x:-R-gap,y:fs*0.35+h,a:'end',bx:[d._x-R-gap-w,d._y+h/2,d._x-R,d._y+h*1.5]},
-        {x:0,y:R+fs*1.05+h,a:'middle',bx:[d._x-w/2,d._y+R+h,d._x+w/2,d._y+R+2*h]},
-        {x:0,y:-R-fs*0.35-h,a:'middle',bx:[d._x-w/2,d._y-R-2*h,d._x+w/2,d._y-R-h]}];
-      for(const c of cands){ if(!hit(c.bx,d)){ placed.push(c.bx); pos.set(d,{...c,txt}); done=true; break; } }
-      if(done) break; } });
-  all.select('text').each(function(d){ const p=pos.get(d); if(!p) return; d3.select(this).attr('x',p.x).attr('y',p.y).attr('text-anchor',p.a).text(p.txt); });
-  all.select('text').attr('display',d=>pos.has(d)?null:'none');
+  all.select('circle.dsite').attr('r',R).attr('fill',d=>isTen(d)?'#0b111d':DC_COL[d.s]).attr('stroke',d=>isTen(d)?DC_COL[d.s]:(d.pub?'#0b111d':PRIVC)).attr('stroke-width',d=>isTen(d)?2.4:1.6).attr('stroke-dasharray',d=>isTen(d)?'3 2':null)
+    .on('mouseenter',(ev,d)=>dcLink(d,true,'map')).on('mousemove',(ev,d)=>showTip(ev,`<div class="t-route"><span class="t-num" style="background:${DC_COL[d.s]}">${DC_NUM.get(dcKey(d))}</span>${esc(ownTag(d))} · ${esc(d.n)}</div><span class="t-cat" style="color:${DC_COL[d.s]};background:${DC_COL[d.s]}1f">${DC_LBL[d.s]}</span><div class="t-body"><b>Owner:</b> ${esc(d.owner)}${d.own?' ('+d.own+')':''} · ${d.pub?'public':'private'}${(d.ten||[]).length?'<br><b>Tenant:</b> '+d.ten.join(', '):''}<br>${esc(region(d))} — ${esc(d.c)}<br>${esc(d.mw)}${d.v&&d.v!=='—'?' · '+esc(d.v):''}</div>`))
+    .on('mouseleave',(ev,d)=>{hideTip(); dcLink(d,false,'map');})
+    .on('click',(ev,d)=>{ev.stopPropagation(); const el=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(dcKey(d))}"]`); openPanel(); if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('dchl'); setTimeout(()=>el.classList.remove('dchl'),1600);} });
+  all.select('text.dsn').attr('y',fs*0.36).style('font-size',fs+'px').attr('fill',d=>isTen(d)?DC_COL[d.s]:'#0b111d').text(d=>DC_NUM.get(dcKey(d)));
+  /* callout pill (hidden until linked) */
+  const fb=(()=>{ const f=selSt&&feats.find(f=>f.id===selSt); return f?path.bounds(f):null; })();
+  all.select('g.dscall').attr('display','none').each(function(d){ const c=d3.select(this), lf=10/curK, txt=siteLabel(d), w=txt.length*lf*0.6+14/curK, h=lf*2;
+    const flip=fb&&d._x>fb[0][0]+(fb[1][0]-fb[0][0])*0.55; c.attr('transform',`translate(${flip?-(R+5/curK)-w:R+5/curK},${-h/2})`);
+    c.select('rect').attr('width',w).attr('height',h).attr('rx',h/2).attr('stroke',DC_COL[d.s]).attr('stroke-width',1/curK);
+    c.select('text').attr('x',7/curK).attr('y',h*0.66).style('font-size',lf+'px').text(txt); });
+}
+function dcLink(d,on,from){
+  const key=dcKey(d);
+  const gg=gSites.selectAll('g.ds').filter(x=>dcKey(x)===key);
+  if(on) gg.raise();
+  gg.classed('dson',on);
+  if(from==='card') gg.select('g.dscall').attr('display',on?null:'none');
+  const card=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(key)}"]`); if(card) card.classList.toggle('dchl',on);
+  if(on&&from==='map'&&card){ const pd=document.getElementById('dcpdeals'), r=card.getBoundingClientRect(), pr=pd.getBoundingClientRect(); if(r.top<pr.top||r.bottom>pr.bottom) card.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 }
 
 function zoomTo(st){
@@ -2653,7 +2657,7 @@ function zoomTo(st){
   root.transition().duration(650).attr('transform',t.toString());
   document.getElementById('dcback').style.display=st?'':'none';
   const ro=document.getElementById('dcroster'); if(ro) ro.style.display=st?'none':'';
-  document.getElementById('dchint').textContent=st?'Hover a campus for detail · tap it to jump to its card · ← Back to zoom out':'Tap a state to zoom in · tap a company to light its footprint';
+  document.getElementById('dchint').textContent=st?'Pin numbers match the list → hover either one to link them · tap a pin to open its card · ← Back to zoom out':'Tap a state to zoom in · tap a company to light its footprint';
 }
 
 function dealHTML(s,ctx){
@@ -2662,7 +2666,7 @@ function dealHTML(s,ctx){
   const tenants=(s.ten||[]).length?`<div><b>anchor / tenant</b> ${s.ten.join(' · ')}</div>`:'';
   const pwTag=s=>{if(!s.pw||!s.pw.length)return '';if(s.pwv)return `<div class="dcpwv ok" title="${esc(s.pwv)}">✓ confirmed · ${esc(s.pwv)}</div>`;const terr=s.pw.every(([t,r])=>/^(grid utility|wires) \([^,+]*\)$/.test(r));return terr?'<div class="dcpwv terr" title="Assigned from the utility service territory the campus sits in; not yet confirmed from a filing">territory only · unconfirmed</div>':'<div class="dcpwv ann" title="From company or utility announcements / press reports">per announcements</div>';};
   const pwBox=`<div class="dcpw"><div class="dcpwh">⚡ Power</div>${(s.pw&&s.pw.length)?s.pw.map(([t,r])=>`<div class="dcpwi" title="${esc(t==='—'?r:pwName(t)+' — '+r)}"><b>${esc(t)}</b><span>${esc(r)}</span></div>`).join(''):'<div class="dcpwi dim"><span>not disclosed</span></div>'}${pwTag(s)}</div>`;
-  return `<div class="deal dcg dc${s.s}" data-key="${esc(s.n+'|'+s.c)}" data-date="${s.d}"><div class="dcl"><div class="dr"><span><span style="color:${s.pub?PUBC:PRIVC}">${esc(ownTag(s))}</span> · ${esc(s.n)}${ctx==='state'?'':' · '+s.st}</span>${role==='tenant'?' <span class="dcown" style="color:#fbbf24;border:1px solid #fbbf2455">tenant</span>':''}</div>
+  return `<div class="deal dcg dc${s.s}" data-key="${esc(s.n+'|'+s.c)}" data-date="${s.d}"><div class="dcl"><div class="dr"><span>${ctx==='state'&&DC_NUM.has(dcKey(s))?`<span class="dcnum" style="background:${DC_COL[s.s]}">${DC_NUM.get(dcKey(s))}</span>`:''}<span style="color:${s.pub?PUBC:PRIVC}">${esc(ownTag(s))}</span> · ${esc(s.n)}${ctx==='state'?'':' · '+s.st}</span>${role==='tenant'?' <span class="dcown" style="color:#fbbf24;border:1px solid #fbbf2455">tenant</span>':''}</div>
   <div class="db">${esc(region(s))} — ${esc(s.c)}. ${esc(s.note)}</div>
   <div class="dmeta"><div><b>owner</b> ${esc(s.owner)}${s.own?' ('+s.own+')':s.listed?' — '+esc(s.listed):''} ${ownBadge}</div>${tenants}<div><b>size</b> ${esc(s.mw)}</div><div><b>$</b> ${esc(s.v)}</div><div><b>status</b> ${DC_LBL[s.s]}</div></div><div class="dsrc">${esc(s.src)}</div></div>${pwBox}</div>`;
 }
@@ -2678,7 +2682,8 @@ function showState(st){
   <div class="pval"><span style="color:${PUBC}">${pub} public-owned</span> · <span style="color:${PRIVC}">${list.length-pub} private</span>${selCo?` · highlighting ${selCo.t}`:''}</div>${statChips(list)}`;
   const pd=document.getElementById('dcpdeals');
   if(!list.length){ pd.innerHTML=`<h3>No tracked campuses</h3><div class="deal"><div class="db">Nothing in the current filter is tracked here yet — this is a curated snapshot, not a census.</div></div>`; }
-  else pd.innerHTML=['op','bld','prm','ann'].map(k=>{const g=list.filter(s=>s.s===k); return g.length?`<h3>${DC_LBL[k]}</h3>`+g.map(s=>dealHTML(s,'state')).join(''):'';}).join('');
+  else { const ord=dcOrder(list); pd.innerHTML=['op','bld','prm','ann'].map(k=>{const g=ord.filter(s=>s.s===k); return g.length?`<h3>${DC_LBL[k]} · ${g.length}</h3>`+g.map(s=>dealHTML(s,'state')).join(''):'';}).join('');
+    pd.querySelectorAll('.deal[data-key]').forEach(el=>{ const s=list.find(x=>dcKey(x)===el.dataset.key); if(!s) return; el.addEventListener('mouseenter',()=>dcLink(s,true,'card')); el.addEventListener('mouseleave',()=>dcLink(s,false,'card')); }); }
   openPanel();
 }
 function showCo(co){
