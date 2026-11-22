@@ -2256,7 +2256,7 @@ window.__showWeb=function(v){
    utility approval in hand, no vertical construction yet), ann=announced / deal signed (no permits or construction yet). */
 const DC_SITES=[
 /* ---------------- Microsoft ---------------- */
-{n:"Fairwater Wisconsin",st:"WI",c:"Mount Pleasant",lat:42.70,lon:-87.90,owner:"Microsoft",own:"MSFT",pub:1,ten:[],pw:[["WEC","grid utility (We Energies)"]],s:"op",mw:"~369 MW IT live (Epoch est.)",v:"$3.3B + $4B second site",note:"First Fairwater AI factory running; second identical building under construction.",d:"2026-06",src:"Microsoft; Epoch AI"},
+{n:"Fairwater Wisconsin",st:"WI",c:"Mount Pleasant",lat:42.70,lon:-87.90,owner:"Microsoft",own:"MSFT",pub:1,ten:[],pw:[["WEC","grid utility (We Energies)"]],s:"op",mw:"~369 MW IT live (Epoch est.)",v:"$3.3B + $4B second site",note:"First Fairwater AI factory running; second building under construction. Site plans for ~15 more data centers (~2 GW) approved Jan 26, 2026.",d:"2026-06",src:"Microsoft; Epoch AI"},
 {n:"Fairwater Atlanta",st:"GA",c:"Fayetteville",lat:33.45,lon:-84.45,owner:"Microsoft",own:"MSFT",pub:1,ten:[],pw:[["SO","grid utility (Georgia Power)"]],pwv:"Baxtel (QTS Fayetteville)",s:"op",mw:"~636 MW IT (Epoch est.)",v:"not disclosed",note:"Fairwater 2 — online since Oct 2025, linked to Wisconsin over Microsoft's AI WAN.",d:"2025-11",src:"Microsoft"},
 {n:"Pecos AI campus",st:"TX",c:"Reeves County",lat:31.42,lon:-103.49,owner:"Microsoft",own:"MSFT",pub:1,ten:[],pw:[["CVX","20-yr PPA, Project Kilby gas plant (behind the meter)"]],pwv:"Chevron / MSFT PPA",s:"ann",mw:"~2 GW",v:"multibillion (not disclosed)",note:"Announced Jun 2026; on-site gas plant at launch.",d:"2026-06",src:"llmpulse tracker"},
 {n:"Quincy campus",st:"WA",c:"Quincy",lat:47.23,lon:-119.85,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Long-running Azure West campus on cheap Columbia River hydro.",d:"ongoing",src:"Microsoft"},
@@ -2405,7 +2405,24 @@ const DC_SITES=[
 {n:"Meridian campus",st:"MS",c:"Meridian (Lauderdale Co.)",lat:32.36,lon:-88.70,owner:"Compass Datacenters",own:null,pub:0,ten:[],pw:[["SO","Mississippi Power, ~500 MW"]],pwv:"Gov. release / DCD",s:"bld",mw:"not disclosed",v:"$10B",note:"Corrected Nov 2026: campus is in Meridian, not the Jackson area; ground broken, Mississippi Power to supply ~500 MW.",d:"2026-04",src:"MS Governor; DCD"},
 {n:"Project Spectrum (Comanche Peak)",st:"TX",c:"Glen Rose (Somervell Co.)",lat:32.25,lon:-97.79,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],pw:[["VST","20-yr nuclear PPA, up to 1,200 MW (Comanche Peak)"]],pwv:"Vistra 8-K + Amazon release",s:"bld",mw:"up to 1.2 GW (up to 18 bldgs)",v:"~$5B",note:"Nov 2026: Amazon confirmed the campus on Vistra land next to Comanche Peak; site prep underway; first power late 2027.",d:"2026-11",src:"Amazon; Vistra; DCD"},
 {n:"Horizon Junction",st:"TX",c:"Floydada (Floyd Co.)",lat:33.98,lon:-101.34,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"bld",mw:"4 bldgs filed (485 acres, up to 7)",v:"~$1.2B (4 × $300M, TDLR)",note:"Aug 2026: construction start filed for Bldgs A–D, completion Apr 2027; power supplier not disclosed.",d:"2026-08",src:"TDLR; DCD; Baxtel; RFD-TV"},
-{n:"Project Eagle",st:"TX",c:"Boling (Wharton Co.)",lat:29.26,lon:-95.94,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"bld",mw:"10 bldgs planned (~3,000 acres)",v:"~$10B",note:"Sep 2026: Bldgs A–D under construction, 6 more filed; Amazon says no on-site gas plant; power supplier not disclosed.",d:"2026-09",src:"TDLR; DCD; Houston Chronicle; KPRC"}
+{n:"Project Eagle",st:"TX",c:"Boling (Wharton Co.)",lat:29.26,lon:-95.94,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"bld",mw:"10 bldgs planned (~3,000 acres)",v:"~$10B",note:"Sep 2026: Bldgs A–D under construction, 6 more filed; Amazon says no on-site gas plant; power supplier not disclosed.",d:"2026-09",src:"TDLR; DCD; Houston Chronicle; KPRC"},
+{n:"Michigan City campus (Project Maize)",st:"IN",c:"Michigan City (LaPorte Co.)",lat:41.71,lon:-86.87,owner:"Google",own:"GOOGL",pub:1,ten:[],pw:[["NI","grid utility (NIPSCO)"]],s:"bld",mw:"~138 MW bldg 1 (Cleanview)",v:"~$832M",note:"Google took over the Project Maize redevelopment of the vacant Federal-Mogul plant (Apr 2026).",d:"2026-04",src:"Michigan City EDC; DCD; Baxtel"},
+{n:"Morgan County campus",st:"IN",c:"Monrovia (Morgan Co.)",lat:39.58,lon:-86.48,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"bld",mw:"6 buildings + substation (~550 acres)",v:"not disclosed",note:"Google confirmed as developer Oct 2025; site work under way despite local protests.",d:"2026-04",src:"IPM; IBJ; DCD"},
+{n:"LaGrange campus (Project Pegasus)",st:"GA",c:"LaGrange (Troup Co.)",lat:33.07,lon:-85.03,owner:"Google",own:"GOOGL",pub:1,ten:[],pw:[["SO","grid utility (Georgia Power)"]],s:"bld",mw:"600k+ sq ft retrofit + 470k sq ft expansion filed",v:"~$8B (per AJC)",note:"Announced Apr 2026 at 411 Pegasus Pkwy off I-85; takes over a Thor Equities/Form8tion site.",d:"2026-04",src:"AJC; WSB-TV; DCD"},
+{n:"Columbia County campus",st:"GA",c:"Appling (Columbia Co.)",lat:33.55,lon:-82.32,owner:"Google",own:"GOOGL",pub:1,ten:[],pw:[["SO","grid utility (Georgia Power)"]],s:"bld",mw:"23 buildings, ~8M sq ft planned",v:"not disclosed",note:"Google named sole end-user Jul 23, 2026; site work under way on 3,300+ acres off I-20 near Augusta.",d:"2026-09",src:"Columbia Co. EDA; DCD; WRDW"},
+{n:"Dorchester County campuses (2)",st:"SC",c:"Ridgeville & St. George",lat:33.10,lon:-80.32,owner:"Google",own:"GOOGL",pub:1,ten:[],pw:[["D","power supply deal (Dominion Energy SC)"]],pwv:"Dominion supply deal (SC Daily Gazette)",s:"bld",mw:"not disclosed",v:"part of $9B SC plan (Oct 2025)",note:"Two new campuses (Pine Hill / Winding Woods) broken ground Sep 2024; still under construction.",d:"2025-10",src:"Google; SC Governor; SC Daily Gazette"},
+{n:"Cedar Rapids campus (Big Cedar)",st:"IA",c:"Cedar Rapids",lat:41.90,lon:-91.73,owner:"Google",own:"GOOGL",pub:1,ten:[],pw:[["LNT","grid utility (Alliant, site owner)"],["NEE","25-yr Duane Arnold nuclear PPA (615 MW restart)"]],pwv:"Alliant release + NextEra/Google PPA",s:"bld",mw:"not disclosed",v:"part of $7B Iowa plan",note:"Under construction at Alliant's Big Cedar park; Google also exploring up to 6 more buildings near Duane Arnold in Palo.",d:"2026-03",src:"Alliant; NextEra; DCD; The Gazette"},
+{n:"Tulsa County campus (Project Clydesdale)",st:"OK",c:"west of Owasso (Tulsa Co.)",lat:36.28,lon:-95.88,owner:"Google (built by Beale Infrastructure)",own:"GOOGL",pub:1,ten:[],pw:[["AEP","grid utility (PSO)"]],s:"bld",mw:"multi-phase (506 acres)",v:"not disclosed",note:"Google confirmed as operator Aug 19, 2026; Beale broke ground fall 2025.",d:"2026-08",src:"Tulsa Chamber; CoStar; DCD"},
+{n:"Muskogee County campuses (2)",st:"OK",c:"Muskogee County",lat:35.75,lon:-95.37,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"ann",mw:"not disclosed",v:"part of $9B OK plan",note:"Two campuses announced Nov 20, 2025 (Scissortail, Springboard).",d:"2025-11",src:"Google; KRMG; Port of Muskogee"},
+{n:"Wilbarger County campus",st:"TX",c:"Vernon (Wilbarger Co.)",lat:34.15,lon:-99.30,owner:"Google",own:"GOOGL",pub:1,ten:[],pw:[["AES","co-located on-site clean energy"]],pwv:"Google blog (AES partnership)",s:"bld",mw:"~850 MW (Cleanview est.)",v:"2 × $500M filed (TDLR)",note:"Air-cooled site co-located with AES generation; part of Google's $40B Texas plan.",d:"2026-07",src:"Google; DCD; Cleanview"},
+{n:"West Creek campus (Goochland)",st:"VA",c:"Goochland County",lat:37.62,lon:-77.65,owner:"Google",own:"GOOGL",pub:1,ten:[],pw:[["D","grid utility (Dominion)"]],s:"ann",mw:"~1,200 MW proposed (~1,000 acres)",v:"not disclosed",note:"County confirmed Google as the user Oct 28, 2026; still under consideration.",d:"2026-10",src:"Goochland County; Baxtel"},
+{n:"Tulsa campus",st:"OK",c:"Fair Oaks Innovation Park, Tulsa",lat:36.14,lon:-95.80,owner:"Meta",own:"META",pub:1,ten:[],pw:[["AEP","grid utility (PSO); Meta pays full cost"]],pwv:"Meta release",s:"bld",mw:"2M+ sq ft",v:"$1B+",note:"Meta's first Oklahoma site (28th US); broke ground Apr 21, 2026, completion targeted 2028.",d:"2026-04",src:"Meta; Reuters; OK Commerce"},
+{n:"Beaver Dam campus",st:"WI",c:"Beaver Dam (Dodge Co.)",lat:43.46,lon:-88.84,owner:"Meta",own:"META",pub:1,ten:[],pw:[["LNT","10-yr service contract, up to 220 MW; Meta funds ~$200M grid work"]],pwv:"Alliant release + PSC contract filing",s:"bld",mw:"up to 220 MW (Alliant contract)",v:"$1B+",note:"Announced Nov 12, 2025 in Alliant's Beaver Dam Commerce Park; dry-cooled.",d:"2026-03",src:"Meta; Alliant; WisPolitics"},
+{n:"Jeffersonville campus",st:"IN",c:"River Ridge (Clark Co.)",lat:38.37,lon:-85.66,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"~178 MW IT (Epoch est.)",v:"$800M announced",note:"Two buildings largely complete per satellite imagery (Epoch, Jul 2026).",d:"2026-07",src:"IEDC; Epoch AI"},
+{n:"Temple campus",st:"TX",c:"Temple (Bell Co.)",lat:31.13,lon:-97.37,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"760k sq ft",v:"$800M",note:"Meta's first AI-optimized data center to go live (Jul 2026); 240 MW Texas solar PPA signed for it.",d:"2026-07",src:"Spectrum News; DCD"},
+{n:"La Porte campus",st:"IN",c:"La Porte",lat:41.62,lon:-86.72,owner:"Microsoft",own:"MSFT",pub:1,ten:[],pw:[["NI","20-yr deal, ~1,100 MW new generation (NiSource GenCo) from 2028"]],pwv:"NiSource / Microsoft release (Oct 16, 2026)",s:"bld",mw:"~1.1 GW power contracted; up to 17 bldgs",v:"$1B+ (initial)",note:"Broke ground Jun 17, 2026; Microsoft pays for all generation and transmission.",d:"2026-10",src:"Microsoft; NiSource; Baxtel"},
+{n:"Butts & Douglas counties campuses",st:"GA",c:"Butts Co. & Douglasville",lat:33.29,lon:-83.97,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"bld",mw:"not disclosed (543-acre Butts lease + 129 acres Douglasville)",v:"$11B ($6.5B deployed)",note:"Announced Jan 2025; Amazon said $6.5B already spent (Sep 2026).",d:"2026-09",src:"Amazon; AJC"},
+{n:"Falls Township campus",st:"PA",c:"Falls Twp (Bucks Co.)",lat:40.17,lon:-74.78,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"ann",mw:"not disclosed",v:"part of $20B PA plan",note:"Second Pennsylvania campus named in the Jun 9, 2025 announcement (with Salem Twp).",d:"2025-06",src:"Amazon; llmpulse"},
 ];
 /* public companies for the roster (US-listed). rev = latest TTM revenue $M (stockanalysis.com), bk = backlog $M */
 const DC_COS=[
@@ -2490,10 +2507,10 @@ document.head.appendChild(css);
 const F={op:true,bld:true,prm:true,ann:true}, O={pub:true,priv:true};
 let inited=false, selCo=null, selSt=null, proj, path, svg, root, gStates, gLbl, gSites, feats, curK=1;
 const vis=s=>F[s.s]&&(s.pub?O.pub:O.priv);
-const PW_NAMES={CVX:"Chevron",GOOGL:"Alphabet (Intersect Power)",FSLR:"First Solar",WEC:"WEC Energy",'BRK.B':"Berkshire Hathaway Energy",BKH:"Black Hills",PNW:"Pinnacle West (APS)",NI:"NiSource (NIPSCO)",EVRG:"Evergy",DTE:"DTE Energy",LNT:"Alliant Energy",FE:"FirstEnergy",PCG:"PG&E",EIX:"Edison International",FTS:"Fortis",TSLA:"Tesla"};
+const PW_NAMES={CVX:"Chevron",AES:"AES Corp",GOOGL:"Alphabet (Intersect Power)",FSLR:"First Solar",WEC:"WEC Energy",'BRK.B':"Berkshire Hathaway Energy",BKH:"Black Hills",PNW:"Pinnacle West (APS)",NI:"NiSource (NIPSCO)",EVRG:"Evergy",DTE:"DTE Energy",LNT:"Alliant Energy",FE:"FirstEnergy",PCG:"PG&E",EIX:"Edison International",FTS:"Fortis",TSLA:"Tesla"};
 const pwName=t=>{ if(PW_NAMES[t]) return PW_NAMES[t]; const c=(typeof ENERGY_DATA!=='undefined')&&ENERGY_DATA.find(x=>x.ticker===t); return c?c.name:t; };
 const ownTag=s=>s.own||String(s.owner).split(/ \(| \/|,/)[0].replace(/ Data Centers$/,'').trim();
-const siteLabel=s=>{ let t=ownTag(s)+' · '+s.n; if(t.length>34) t=t.slice(0,33)+'…'; if(selCo&&s.own!==selCo.t&&(s.ten||[]).includes(selCo.t)) t+=' ('+selCo.t+' leases)'; return t; };
+const siteLabel=s=>{ let t=ownTag(s)+' · '+s.n; if(t.length>44) t=t.slice(0,43)+'…'; if(selCo&&s.own!==selCo.t&&(s.ten||[]).includes(selCo.t)) t+=' ('+selCo.t+' leases)'; return t; };
 const roleOf=(s,t)=>s.own===t?'owner':((s.ten||[]).includes(t)?'tenant':null);
 const coSites=t=>DC_SITES.filter(s=>roleOf(s,t)&&vis(s));
 const stSites=st=>DC_SITES.filter(s=>s.st===st&&vis(s));
@@ -2565,6 +2582,25 @@ function drawSites(){
   const seen={};
   data.forEach(s=>{ const p=proj([s.lon,s.lat])||[0,0]; const key=Math.round(p[0]/3)+'_'+Math.round(p[1]/3); const i=seen[key]=(seen[key]||0)+1; const a=i*2.4, r=(i-1)*1.1/curK*3; s._x=p[0]+Math.cos(a)*r; s._y=p[1]+Math.sin(a)*r; });
   const R=7/curK, fs=8.5/curK;
+  /* de-cluster: dots that would overlap are fanned out on a small ring around their true spot, with a thin leader line back to it */
+  data.forEach(s=>{ s._px=s._x; s._py=s._y; });
+  const par=data.map((_,i)=>i), fd=i=>par[i]===i?i:(par[i]=fd(par[i]));
+  for(let i=0;i<data.length;i++) for(let j=i+1;j<data.length;j++){ if(Math.hypot(data[i]._px-data[j]._px,data[i]._py-data[j]._py)<R*2.3) par[fd(i)]=fd(j); }
+  const grp={}; data.forEach((s,i)=>(grp[fd(i)]=grp[fd(i)]||[]).push(s));
+  Object.values(grp).forEach(m=>{ if(m.length<2) return;
+    const cx=m.reduce((a,s)=>a+s._px,0)/m.length, cy=m.reduce((a,s)=>a+s._py,0)/m.length;
+    const ring=Math.max(R*3.2, m.length*R*3.6/(2*Math.PI));
+    m.sort((a,b)=>Math.atan2(a._py-cy,a._px-cx)-Math.atan2(b._py-cy,b._px-cx));
+    m.forEach((s,k)=>{ const ang=-Math.PI/2+k*2*Math.PI/m.length; s._x=cx+Math.cos(ang)*ring; s._y=cy+Math.sin(ang)*ring; s._hub=[cx,cy]; }); });
+  data.forEach(s=>{ if(!s._hub||!data.some(o=>o!==s&&o._hub&&o._hub[0]===s._hub[0]&&o._hub[1]===s._hub[1])) s._hub=null; });
+  const lg2=gSites.selectAll('line.dsleg').data(data.filter(s=>s._hub),d=>d.n+d.st+d.c);
+  lg2.exit().remove();
+  lg2.enter().insert('line',':first-child').attr('class','dsleg').merge(lg2)
+    .attr('x1',d=>d._hub[0]).attr('y1',d=>d._hub[1]).attr('x2',d=>d._x).attr('y2',d=>d._y)
+    .attr('stroke','#e6edf7').attr('stroke-opacity',.55).attr('stroke-width',1/curK).style('pointer-events','none');
+  const hubs=gSites.selectAll('circle.dshub').data([...new Map(data.filter(s=>s._hub).map(s=>[s._hub.join(','),s._hub])).values()]);
+  hubs.exit().remove();
+  hubs.enter().insert('circle',':first-child').attr('class','dshub').merge(hubs).attr('cx',d=>d[0]).attr('cy',d=>d[1]).attr('r',2.2/curK).attr('fill','#e6edf7').style('pointer-events','none');
   const g=gSites.selectAll('g.ds').data(data,d=>d.n+d.st+d.c);
   g.exit().remove();
   const ge=g.enter().append('g').attr('class','ds');
@@ -2580,12 +2616,30 @@ function drawSites(){
     .on('click',(ev,d)=>{ev.stopPropagation(); const el=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(d.n+'|'+d.c)}"]`); openPanel(); if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.boxShadow='0 0 0 1px var(--gold)'; setTimeout(()=>el.style.boxShadow='',1600);} });
   all.select('text').attr('x',R+2/curK).attr('y',fs*0.35).style('font-size',fs+'px').style('stroke-width',(2.2/curK)+'px')
     .text(siteLabel);
-  /* greedy label collision: bigger / company-relevant campuses first, skip labels that would overlap */
-  const placed=[]; const order=data.slice().sort((a,b)=>(selCo?(roleOf(b,selCo.t)?1:0)-(roleOf(a,selCo.t)?1:0):0)||DC_RANK[a.s]-DC_RANK[b.s]);
-  const show=new Set();
-  order.forEach(d=>{ const w=(siteLabel(d).length*fs*0.62)+R+2/curK, h=fs*1.25; const box=[d._x-R,d._y-h/2,d._x+w,d._y+h/2];
-    if(!placed.some(b=>!(box[2]<b[0]||box[0]>b[2]||box[3]<b[1]||box[1]>b[3]))){ placed.push(box); show.add(d); } });
-  all.select('text').attr('display',d=>show.has(d)?null:'none');
+  const HYP=new Set(['AMZN','MSFT','GOOGL','META','ORCL']);
+  /* label placement: try right, left, below, above; if the full label won't fit anywhere, fall back to the ticker alone, so every dot gets a label */
+  const order=data.slice().sort((a,b)=>(selCo?(roleOf(b,selCo.t)?1:0)-(roleOf(a,selCo.t)?1:0):0)||DC_RANK[a.s]-DC_RANK[b.s]||(HYP.has(b.own)?1:0)-(HYP.has(a.own)?1:0));
+  const pos=new Map(), gap=2/curK, h=fs*1.25;
+  const dots=new Map(data.map(d=>[d,[d._x-R,d._y-R,d._x+R,d._y+R]]));
+  const placed=[];
+  const hit=(bx,self)=>placed.some(b=>!(bx[2]<b[0]||bx[0]>b[2]||bx[3]<b[1]||bx[1]>b[3]))||data.some(o=>{ if(o===self) return false; const b=dots.get(o); return !(bx[2]<b[0]||bx[0]>b[2]||bx[3]<b[1]||bx[1]>b[3]); });
+  order.forEach(d=>{ let done=false;
+    for(const txt of [siteLabel(d), ownTag(d)]){ const w=txt.length*fs*0.62;
+      const cands=[
+        {x:R+gap,y:fs*0.35,a:'start',bx:[d._x+R,d._y-h/2,d._x+R+gap+w,d._y+h/2]},
+        {x:-R-gap,y:fs*0.35,a:'end',bx:[d._x-R-gap-w,d._y-h/2,d._x-R,d._y+h/2]},
+        {x:0,y:R+fs*1.05,a:'middle',bx:[d._x-w/2,d._y+R,d._x+w/2,d._y+R+h]},
+        {x:0,y:-R-fs*0.35,a:'middle',bx:[d._x-w/2,d._y-R-h,d._x+w/2,d._y-R]},
+        {x:R+gap,y:fs*0.35-h,a:'start',bx:[d._x+R,d._y-h*1.5,d._x+R+gap+w,d._y-h/2]},
+        {x:R+gap,y:fs*0.35+h,a:'start',bx:[d._x+R,d._y+h/2,d._x+R+gap+w,d._y+h*1.5]},
+        {x:-R-gap,y:fs*0.35-h,a:'end',bx:[d._x-R-gap-w,d._y-h*1.5,d._x-R,d._y-h/2]},
+        {x:-R-gap,y:fs*0.35+h,a:'end',bx:[d._x-R-gap-w,d._y+h/2,d._x-R,d._y+h*1.5]},
+        {x:0,y:R+fs*1.05+h,a:'middle',bx:[d._x-w/2,d._y+R+h,d._x+w/2,d._y+R+2*h]},
+        {x:0,y:-R-fs*0.35-h,a:'middle',bx:[d._x-w/2,d._y-R-2*h,d._x+w/2,d._y-R-h]}];
+      for(const c of cands){ if(!hit(c.bx,d)){ placed.push(c.bx); pos.set(d,{...c,txt}); done=true; break; } }
+      if(done) break; } });
+  all.select('text').each(function(d){ const p=pos.get(d); if(!p) return; d3.select(this).attr('x',p.x).attr('y',p.y).attr('text-anchor',p.a).text(p.txt); });
+  all.select('text').attr('display',d=>pos.has(d)?null:'none');
 }
 
 function zoomTo(st){
