@@ -295,7 +295,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <div class="hint" id="dchint">Tap a state to zoom in · tap a company to light its footprint</div>
 </div>
 <div id="dcpanel" class="panel"><button class="pclose" id="dcpclose">×</button><div class="ph" id="dcph"></div><div class="pdeals" id="dcpdeals"></div></div>
-<footer><div><b>Curated snapshot, Nov 21, 2026</b> — <span id="dccount"></span>. Not a census of every US data center: it tracks the campuses that matter for the AI build-out plus each listed operator's flagship hubs. Locations are city / county level. <b>Status:</b> operating = running (incl. partially live) · under construction · approved / permitted = zoning, permits or utility approval in hand but no vertical build · announced = deal or plan signed, no permits or construction yet. <b>⚡ Power</b> = publicly traded utilities, generators, gas suppliers and turbine / fuel-cell / storage makers tied to a campus — the local grid utility where the service territory is clear, plus disclosed supply deals (non-listed public power like TVA, co-ops and municipal utilities is left out; "not disclosed" where no public company is confirmed). <b>Public</b> = the owner / operator is listed (SoftBank-led sites count as public via SoftBank Group, Tokyo: 9984; JV sites count with their listed sponsor). Revenue = latest TTM on stockanalysis.com (mostly through Jun 30, 2026); backlog = company-reported RPO / contracted lease value (— where none is reported). <b>Leased / owned</b> = counts of tracked campuses only (not every site a company uses); leased $ = total disclosed lease or capacity-contract value where public (* = compute contracts that include GPUs, not pure building leases). Sources: company releases &amp; filings, Epoch AI, llmpulse &amp; ElectricChoice trackers, DCD, CoStar, state economic-development offices. Not financial advice, investment advice, or legal advice.</div></footer>
+<footer><div><b>Curated snapshot, Nov 21, 2026</b> — <span id="dccount"></span>. Not a census of every US data center: it tracks the campuses that matter for the AI build-out plus each listed operator's flagship hubs. Locations are city / county level. <b>Status:</b> operating = running (incl. partially live) · under construction · approved / permitted = zoning, permits or utility approval in hand but no vertical build · announced = deal or plan signed, no permits or construction yet. <b>⚡ Power</b> = publicly traded utilities, generators, gas suppliers and turbine / fuel-cell / storage makers tied to a campus — the local grid utility where the service territory is clear, plus disclosed supply deals (non-listed public power like TVA, co-ops and municipal utilities is left out; "not disclosed" where no public company is confirmed). <b>Public</b> = the owner / operator is listed (SoftBank-led sites count as public via SoftBank Group, Tokyo: 9984; JV sites count with their listed sponsor). Revenue = latest TTM on stockanalysis.com (mostly through Jun 30, 2026); backlog = company-reported RPO / contracted lease value (— where none is reported). <b>Overseas</b> = countries outside the US where the company has data centers, from company disclosures (hyperscalers report cloud regions instead; L = leased / colocation). <b>Leased / US</b> = counts of tracked US campuses only (not every site a company uses); leased $ = total disclosed lease or capacity-contract value where public (* = compute contracts that include GPUs, not pure building leases). Sources: company releases &amp; filings, Epoch AI, llmpulse &amp; ElectricChoice trackers, DCD, CoStar, state economic-development offices. Not financial advice, investment advice, or legal advice.</div></footer>
 </div>
 
 <div id="view-stocks" class="webview" style="display:none">
@@ -2407,21 +2407,21 @@ const DC_SITES=[
 ];
 /* public companies for the roster (US-listed). rev = latest TTM revenue $M (stockanalysis.com), bk = backlog $M */
 const DC_COS=[
-{t:"MSFT",n:"Microsoft",g:"Hyperscalers & AI clouds",rev:331840,bk:677000,bkn:"commercial RPO, Sep 30 2026",lv:26700,lvn:"compute contracts that include GPUs, not pure building leases: Nebius Vineland ~$17–19B (low end used) + IREN Childress $9.7B; Crusoe Abilene expansion not disclosed",lvStar:1},
-{t:"AMZN",n:"Amazon",g:"Hyperscalers & AI clouds",rev:775680,bk:578000,bkn:"performance obligations (mostly AWS), Sep 30 2026"},
-{t:"GOOGL",n:"Alphabet",g:"Hyperscalers & AI clouds",rev:445870,bk:560800,bkn:"Google Cloud backlog, Sep 30 2026"},
-{t:"META",n:"Meta",g:"Hyperscalers & AI clouds",rev:241610,bk:null},
-{t:"ORCL",n:"Oracle",g:"Hyperscalers & AI clouds",rev:71780,bk:664000,bkn:"RPO, Aug 31 2026"},
+{t:"MSFT",n:"Microsoft",g:"Hyperscalers & AI clouds",rev:331840,bk:677000,bkn:"commercial RPO, Sep 30 2026",lv:26700,lvn:"compute contracts that include GPUs, not pure building leases: Nebius Vineland ~$17–19B (low end used) + IREN Childress $9.7B; Crusoe Abilene expansion not disclosed",lvStar:1,os:"60+ rgn",osn:"Azure: 60+ cloud regions worldwide (owned + leased mix); 2025 adds incl. Austria, Belgium, Indonesia, Malaysia, Chile"},
+{t:"AMZN",n:"Amazon",g:"Hyperscalers & AI clouds",rev:775680,bk:578000,bkn:"performance obligations (mostly AWS), Sep 30 2026",os:"global",osn:"AWS regions on six continents; 2025–26 adds incl. Mexico, New Zealand, Taiwan, Thailand and the EU Sovereign region (Germany)"},
+{t:"GOOGL",n:"Alphabet",g:"Hyperscalers & AI clouds",rev:445870,bk:560800,bkn:"Google Cloud backlog, Sep 30 2026",os:"43 rgn",osn:"Google Cloud: 43 regions / 130 zones (count includes US regions); Sweden added 2025"},
+{t:"META",n:"Meta",g:"Hyperscalers & AI clouds",rev:241610,bk:null,os:"4",osn:"Owned overseas campuses: Luleå (Sweden), Clonee (Ireland), Odense (Denmark), Singapore; plus a planned ~1 GW Alberta, Canada campus (Jul 2026)"},
+{t:"ORCL",n:"Oracle",g:"Hyperscalers & AI clouds",rev:71780,bk:664000,bkn:"RPO, Aug 31 2026",os:"100+ rgn",osn:"OCI: ~100+ regions incl. dedicated/government realms (Apr 2025 count) — mostly leased capacity"},
 {t:"SPCX",n:"SpaceX (SpaceXAI)",g:"Hyperscalers & AI clouds",rev:23040,bk:null},
-{t:"EQIX",n:"Equinix",g:"Data center REITs",rev:9810,bk:null},
-{t:"DLR",n:"Digital Realty",g:"Data center REITs",rev:6770,bk:2500,bkn:"signed-not-commenced annual rent, 100% share, Sep 30 2026"},
-{t:"IRM",n:"Iron Mountain",g:"Data center REITs",rev:7560,bk:null},
+{t:"EQIX",n:"Equinix",g:"Data center REITs",rev:9810,bk:null,os:"35",osn:"282 data centers in 77 metros across 36 countries (Q3 2026) → 35 outside the US"},
+{t:"DLR",n:"Digital Realty",g:"Data center REITs",rev:6770,bk:2500,bkn:"signed-not-commenced annual rent, 100% share, Sep 30 2026",os:"25+",osn:"300+ facilities in 50+ metros across 25+ countries"},
+{t:"IRM",n:"Iron Mountain",g:"Data center REITs",rev:7560,bk:null,os:"6",osn:"Data centers in Amsterdam, Frankfurt, London, Madrid, Singapore and six metros in India"},
 {t:"AMT",n:"American Tower (CoreSite)",g:"Data center REITs",rev:10940,bk:null},
 {t:"PLD",n:"Prologis",g:"Data center REITs",rev:null,bk:null},
-{t:"CRWV",n:"CoreWeave",g:"Neoclouds & AI hosts",rev:7590,bk:132500,bkn:"revenue backlog, Sep 30 2026",lv:36200,lvn:"landlord-disclosed contract values: Galaxy Helios >$1B/yr avg over 15 yrs (~$15B) + Applied Digital Polaris Forge ~$11B + Core Scientific ~$10.2B across 6 sites / ~590 MW (map tracks Denton only)"},
-{t:"NBIS",n:"Nebius",g:"Neoclouds & AI hosts",rev:1360,revn:"TTM through Jun 30 2026 — Q3 alone was $981M",bk:38700,bkn:"RPO, Sep 30 2026 (Microsoft & Meta are the largest pieces)",lvn:"landlord lease values (DataOne, Patmos) not disclosed"},
+{t:"CRWV",n:"CoreWeave",g:"Neoclouds & AI hosts",rev:7590,bk:132500,bkn:"revenue backlog, Sep 30 2026",lv:36200,lvn:"landlord-disclosed contract values: Galaxy Helios >$1B/yr avg over 15 yrs (~$15B) + Applied Digital Polaris Forge ~$11B + Core Scientific ~$10.2B across 6 sites / ~590 MW (map tracks Denton only)",os:"5 L",osn:"Europe: 9 data centers in 5 countries (UK, Spain, Sweden, Norway, Denmark) — leased / colocation"},
+{t:"NBIS",n:"Nebius",g:"Neoclouds & AI hosts",rev:1360,revn:"TTM through Jun 30 2026 — Q3 alone was $981M",bk:38700,bkn:"RPO, Sep 30 2026 (Microsoft & Meta are the largest pieces)",lvn:"landlord lease values (DataOne, Patmos) not disclosed",os:"1 +4L",osn:"Owns Mäntsälä, Finland; leases capacity in the UK, France, Iceland and Israel"},
 {t:"APLD",n:"Applied Digital",g:"Neoclouds & AI hosts",rev:611,bk:35700,bkn:"minimum contracted lease payments, Aug 31 2026"},
-{t:"IREN",n:"IREN",g:"Neoclouds & AI hosts",rev:695,bk:13957,bkn:"remaining contracted lease value, Sep 30 2026"},
+{t:"IREN",n:"IREN",g:"Neoclouds & AI hosts",rev:695,bk:13957,bkn:"remaining contracted lease value, Sep 30 2026",os:"1",osn:"3 owned data centers in British Columbia, Canada (~160 MW)"},
 {t:"CORZ",n:"Core Scientific",g:"Neoclouds & AI hosts",rev:440,bk:null},
 {t:"CIFR",n:"Cipher Digital",g:"Neoclouds & AI hosts",rev:191,bk:16600,bkn:"base-term contracted HPC revenue, Nov 2026"},
 {t:"WULF",n:"TeraWulf",g:"Neoclouds & AI hosts",rev:165,bk:19000,bkn:"Anthropic 20-yr Hawesville lease alone"},
@@ -2440,14 +2440,14 @@ const PUBC="#2dd4bf", PRIVC="#c4a7f0";
 const ENAMES={AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",US:"Multi-state / national"}
 const css=document.createElement('style');
 css.textContent=`
-#dcroster{position:absolute;top:12px;right:14px;z-index:5;width:420px;max-height:calc(100% - 56px);overflow-y:auto;
+#dcroster{position:absolute;top:12px;right:14px;z-index:5;width:470px;max-height:calc(100% - 56px);overflow-y:auto;
 background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;padding:8px 6px;font-family:var(--mono);font-size:11px}
 #dcroster .rg{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:9px 7px 3px}
-#dcroster .rhead{display:grid;grid-template-columns:40px minmax(0,1fr) 48px 48px 78px 34px;column-gap:6px;padding:2px 7px 4px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line)}
+#dcroster .rhead{display:grid;grid-template-columns:40px minmax(0,1fr) 46px 46px 76px 28px 50px;column-gap:6px;padding:2px 7px 4px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line)}
 #dcroster .rhead i{font-style:normal;grid-column:1/3} #dcroster .rhead em{font-style:normal;text-align:right}
-#dcroster .dro{display:grid;grid-template-columns:40px minmax(0,1fr) 48px 48px 78px 34px;column-gap:6px;align-items:baseline;padding:4px 7px;border-radius:7px;cursor:pointer;color:var(--ink-dim);border:1px solid transparent}
+#dcroster .dro{display:grid;grid-template-columns:40px minmax(0,1fr) 46px 46px 76px 28px 50px;column-gap:6px;align-items:baseline;padding:4px 7px;border-radius:7px;cursor:pointer;color:var(--ink-dim);border:1px solid transparent}
 #dcroster .dro b{color:var(--gold);font-weight:600} #dcroster .dro span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#dcroster .dro em{font-style:normal;text-align:right;color:var(--ink-faint)} #dcroster .dro em.bk{color:var(--gold)} #dcroster .dro em.ls{color:#f0b45a;white-space:nowrap} #dcroster .dro em.ow{color:#5eead4}
+#dcroster .dro em{font-style:normal;text-align:right;color:var(--ink-faint)} #dcroster .dro em.bk{color:var(--gold)} #dcroster .dro em.ls{color:#f0b45a;white-space:nowrap} #dcroster .dro em.ow{color:#5eead4} #dcroster .dro em.os{color:#93c5fd;white-space:nowrap}
 #dcroster .dro:hover{background:rgba(255,255,255,.04);color:var(--ink)}
 #dcroster .dro.on{border-color:var(--gold);background:rgba(231,178,74,.08);color:var(--ink)}
 #dcmap{display:block;width:100%;height:74vh;min-height:540px}
@@ -2621,7 +2621,7 @@ function showCo(co){
   const owned=list.filter(s=>s.own===co.t).length;
   document.getElementById('dcph').innerHTML=`<div class="ptype">${co.g}</div><h2>${co.n}</h2>
   <div class="pval">${co.t} · ${fmt(co.rev)} TTM revenue${co.revn?` (${co.revn})`:''}${co.bk?` · ${fmt(co.bk)} backlog (${co.bkn})`:''}</div>
-  ${co.lv?`<div class="pval" style="color:#f0b45a">Leased value ≈ ${fmt(co.lv)}${co.lvStar?'*':''} — ${esc(co.lvn)}</div>`:''}<div class="pval">${list.length} tracked campus${list.length===1?'':'es'} in ${sts.length} state${sts.length===1?'':'s'} · ${owned} owned${list.length-owned?` · ${list.length-owned} leased from other owners (tenant)`:''}</div>${statChips(list)}`;
+  ${co.lv?`<div class="pval" style="color:#f0b45a">Leased value ≈ ${fmt(co.lv)}${co.lvStar?'*':''} — ${esc(co.lvn)}</div>`:''}${co.os?`<div class="pval" style="color:#93c5fd">Overseas: ${esc(co.osn)}</div>`:''}<div class="pval">${list.length} tracked campus${list.length===1?'':'es'} in ${sts.length} state${sts.length===1?'':'s'} · ${owned} owned${list.length-owned?` · ${list.length-owned} leased from other owners (tenant)`:''}</div>${statChips(list)}`;
   const pd=document.getElementById('dcpdeals');
   pd.innerHTML=list.length?sts.map(st=>{const c=cc[st];return `<h3>${ENAMES[st]||st} — ${['op','bld','prm','ann'].filter(k=>c[k]).map(k=>c[k]+' '+DC_ABBR[k]).join(' · ')}</h3>`+list.filter(s=>s.st===st).sort((a,b)=>DC_RANK[a.s]-DC_RANK[b.s]).map(s=>dealHTML(s,'co')).join('');}).join(''):`<div class="deal"><div class="db">No tracked campuses in the current filter.</div></div>`;
   openPanel(); paint();
@@ -2670,10 +2670,10 @@ function init(){
 
   const roster=document.getElementById('dcroster');
   const groups=[...new Set(DC_COS.map(c=>c.g))];
-  roster.innerHTML='<div class="rhead"><i>company</i><em>TTM rev</em><em>backlog</em><em title="Tracked campuses where the company is the tenant, plus total disclosed lease / contract value">leased</em><em title="Tracked campuses the company owns or operates">owned</em></div>'+groups.map(g=>`<div class="rg">${g}</div>`+DC_COS.filter(c=>c.g===g).map(c=>{
+  roster.innerHTML='<div class="rhead"><i>company</i><em>TTM rev</em><em>backlog</em><em title="Tracked campuses where the company is the tenant, plus total disclosed lease / contract value">leased</em><em title="Tracked US campuses the company owns or operates">US</em><em title="Countries outside the US with company data centers (company disclosures). L = leased / colocation">overseas</em></div>'+groups.map(g=>`<div class="rg">${g}</div>`+DC_COS.filter(c=>c.g===g).map(c=>{
     const nl=DC_SITES.filter(s=>roleOf(s,c.t)==='tenant').length, no=DC_SITES.filter(s=>s.own===c.t).length;
     const lcell=nl?nl+(c.lv?' · '+fmt(c.lv)+(c.lvStar?'*':''):''):'—';
-    return `<div class="dro" data-t="${c.t}" title="${esc(c.n)} — owns ${no}, leases ${nl} tracked campus${nl===1?'':'es'}${c.lv?' · lease value: '+esc(c.lvn):nl?' · lease values not disclosed':''}${c.bk?' · backlog: '+esc(c.bkn):''}${c.revn?' · revenue '+esc(c.revn):''}"><b>${c.t}</b><span>${esc(c.n)}</span><em>${fmt(c.rev)}</em><em class="bk">${fmt(c.bk)}</em><em class="ls">${lcell}</em><em class="ow">${no||'—'}</em></div>`;}).join('')).join('');
+    return `<div class="dro" data-t="${c.t}" title="${esc(c.n)} — owns ${no}, leases ${nl} tracked campus${nl===1?'':'es'}${c.lv?' · lease value: '+esc(c.lvn):nl?' · lease values not disclosed':''}${c.bk?' · backlog: '+esc(c.bkn):''}${c.revn?' · revenue '+esc(c.revn):''}"><b>${c.t}</b><span>${esc(c.n)}</span><em>${fmt(c.rev)}</em><em class="bk">${fmt(c.bk)}</em><em class="ls">${lcell}</em><em class="ow">${no||'—'}</em><em class="os" title="${esc(c.osn||'No disclosed data centers outside the US')}">${c.os||'—'}</em></div>`;}).join('')).join('');
   roster.querySelectorAll('.dro').forEach(el=>el.addEventListener('click',()=>{ const co=DC_COS.find(c=>c.t===el.dataset.t); if(selCo===co) reset(); else showCo(co); }));
   const search=document.getElementById('dcsearch');
   search.addEventListener('input',()=>{ const q=search.value.trim().toLowerCase();
