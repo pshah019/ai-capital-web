@@ -129,6 +129,62 @@ padding:10px 17px;cursor:pointer;transition:.18s}
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
+<script>
+const pEsc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* ===== shared map-pin helpers (Data Center + Energy maps) =====
+   Pins are ticker pills colored by status. Pins that would overlap are stacked into a tidy
+   column next to their cluster, with a hairline back to each true location. */
+function pinShort(t){ t=String(t||''); if(t.length<=9) return t; const w=t.split(/\s+/)[0]; return w.length<=10?w:w.slice(0,9)+'…'; }
+function pillLayout(items,k,bounds){
+  const fs=8.8/k, h=15/k, pad=5/k, gap=2.5/k, dr=2.6/k;
+  items.forEach(d=>{ d._w=d._t.length*fs*0.62+pad*2; d._h=h; d._hub=false; });
+  const boxes=[], dots=items.map(d=>[d._tx-dr,d._ty-dr,d._tx+dr,d._ty+dr,d]);
+  const free=(b,self)=>!boxes.some(o=>!(b[2]+gap<o[0]||o[2]+gap<b[0]||b[3]+gap<o[1]||o[3]+gap<b[1]))&&!dots.some(o=>o[4]!==self&&!(b[2]<o[0]||o[2]<b[0]||b[3]<o[1]||o[3]<b[1]));
+  /* place crowded pins first so they get the spots nearest their true location */
+  const crowd=d=>items.filter(o=>o!==d&&Math.abs(o._tx-d._tx)<(o._w+d._w)/2&&Math.abs(o._ty-d._ty)<h*1.2).length;
+  const order=items.slice().sort((a,b)=>crowd(a)-crowd(b));
+  order.forEach(d=>{ let best=null;
+    const cand=[[0,0]];
+    for(let j=1;j<=14;j++){ const ry=(h+gap)*j*0.5, rx=(d._w/2+8/k)+ (j-1)*6/k;
+      cand.push([rx,0],[-rx,0],[0,-ry*2],[0,ry*2],[rx,-ry],[rx,ry],[-rx,-ry],[-rx,ry],[rx,-ry*2],[rx,ry*2],[-rx,-ry*2],[-rx,ry*2]); }
+    for(const [dx,dy] of cand){ const cx=d._tx+dx, cy=d._ty+dy, b=[cx-d._w/2,cy-h/2,cx+d._w/2,cy+h/2];
+      if(dx===0&&dy===0){ if(free(b,d)){ best=[cx,cy,b]; break; } continue; }
+      if(free(b,d)){ best=[cx,cy,b]; break; } }
+    if(!best){ const b=[d._tx-d._w/2,d._ty-h/2,d._tx+d._w/2,d._ty+h/2]; best=[d._tx,d._ty,b]; }
+    d._cx=best[0]; d._cy=best[1]; d._hub=(best[0]!==d._tx||best[1]!==d._ty); boxes.push(best[2]); });
+  return {fs,h};
+}
+/* draw pills into a d3 group: items need _tx,_ty,_t,key; style(d) -> {fill,stroke,dash,text,op} */
+function drawPills(G,items,k,bounds,key,style,on){
+  const {fs,h}=pillLayout(items,k,bounds);
+  const L=G.selectAll('line.pleg').data(items.filter(d=>d._hub),key); L.exit().remove();
+  L.enter().insert('line',':first-child').attr('class','pleg').merge(L)
+    .attr('x1',d=>d._tx).attr('y1',d=>d._ty).attr('x2',d=>d._cx).attr('y2',d=>d._cy).attr('stroke-width',0.9/k);
+  const D=G.selectAll('circle.pdot').data(items.filter(d=>d._hub),key); D.exit().remove();
+  D.enter().insert('circle',':first-child').attr('class','pdot').merge(D).attr('cx',d=>d._tx).attr('cy',d=>d._ty).attr('r',2.1/k).attr('fill',d=>style(d).fill);
+  const P=G.selectAll('g.pin').data(items,key); P.exit().remove();
+  const pe=P.enter().append('g').attr('class','pin'); pe.append('rect').attr('class','pbg'); pe.append('text').attr('class','ptx');
+  pe.append('g').attr('class','pcall').call(c=>{ c.append('rect'); c.append('text'); });
+  const all=pe.merge(P).attr('transform',d=>`translate(${d._cx},${d._cy})`).attr('opacity',d=>style(d).op);
+  all.select('rect.pbg').attr('x',d=>-d._w/2).attr('y',-h/2).attr('width',d=>d._w).attr('height',h).attr('rx',h/2)
+    .attr('fill',d=>style(d).fill).attr('stroke',d=>style(d).stroke).attr('stroke-width',d=>(style(d).sw||1.3)/k).attr('stroke-dasharray',d=>style(d).dash?`${3/k} ${2/k}`:null);
+  all.select('text.ptx').attr('y',fs*0.36).style('font-size',fs+'px').attr('fill',d=>style(d).text).text(d=>d._t);
+  all.select('g.pcall').attr('display','none').each(function(d){ const c=d3.select(this), lf=9.5/k, t=d._call||'', w=t.length*lf*0.6+14/k, hh=lf*2;
+    const flip=bounds&&d._tx>bounds[0][0]+(bounds[1][0]-bounds[0][0])*0.55;
+    c.attr('transform',`translate(${flip?-d._w/2-6/k-w:d._w/2+6/k},${-hh/2})`);
+    c.select('rect').attr('width',w).attr('height',hh).attr('rx',hh/2).attr('stroke',style(d).fill).attr('stroke-width',1/k);
+    c.select('text').attr('x',7/k).attr('y',hh*0.66).style('font-size',lf+'px').text(t); });
+  on(all);
+  return all;
+}
+/* "who's here" chips: [{t,n,pub}] -> html */
+function mixChips(arr,attr){
+  const m=new Map(); arr.forEach(x=>{ const o=m.get(x.t)||{t:x.t,n:0,col:x.col}; o.n++; m.set(x.t,o); });
+  const list=[...m.values()].sort((a,b)=>b.n-a.n||a.t.localeCompare(b.t));
+  return `<div class="mix"><span class="mixh">Who's here</span>${list.map(o=>`<span class="mixc" ${attr}="${pEsc(o.t)}"${o.col?` style="--mc:${o.col}"`:''}><b>${pEsc(o.t)}</b>${o.n>1?`<i>×${o.n}</i>`:''}</span>`).join('')}</div>`;
+}
+function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||0)+1)); const l=[...m.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])); return l.slice(0,max).map(([t,n])=>`<b>${pEsc(t)}</b>${n>1?' ×'+n:''}`).join(' · ')+(l.length>max?` · +${l.length-max} more`:''); }
+</script>
 </head>
 <body>
 <div class="grain"></div>
@@ -2012,28 +2068,29 @@ function eZoom(st){
   const ro=document.getElementById('eroster'); if(ro) ro.style.display=st?'none':'';
   const lg=document.getElementById('eloclg'); if(lg) lg.style.display=st?'':'none';
 }
+let eFocusCo=null;
 function eDrawSites(){
   if(!eSitesG) return;
   const data=[];
   if(eSelSt){ ENERGY_DATA.forEach(co=>co.states.forEach(pr=>{ if(pr.st!==eSelSt||!eFilters[pr.status]) return;
-    (ENERGY_LOC[co.ticker+'|'+pr.st]||[]).forEach((L,i)=>{ const p=eProj([L[1],L[0]]); if(p) data.push({co,pr,lab:L[2],ap:!!L[3],x:p[0],y:p[1],key:co.ticker+pr.st+i}); }); })); }
-  const seen={}; data.forEach(d=>{ const k=Math.round(d.x/2.5)+'_'+Math.round(d.y/2.5); const i=seen[k]=(seen[k]||0)+1; if(i>1){ const a=i*2.1, r=(i-1)*3.2/eK; d.x+=Math.cos(a)*r; d.y+=Math.sin(a)*r; } });
-  const R=6.5/eK, fs=8.5/eK;
-  const g=eSitesG.selectAll('g.esg').data(data,d=>d.key); g.exit().remove();
-  const ge=g.enter().append('g').attr('class','esg'); ge.append('circle'); ge.append('text');
-  const all=ge.merge(g).attr('transform',d=>`translate(${d.x},${d.y})`).style('cursor','pointer');
-  all.select('circle').attr('r',R).attr('fill',d=>d.ap?'#0b111d':EST_COL[d.pr.status]).attr('stroke',d=>d.ap?EST_COL[d.pr.status]:'#070a11')
-    .attr('vector-effect','non-scaling-stroke').attr('stroke-width',d=>d.ap?2.2:1.2).attr('stroke-dasharray',d=>d.ap?'3 2':null).attr('opacity',d=>eSelCo&&eSelCo!==d.co?.3:1)
-    .on('mousemove',(ev,d)=>{ const t=eTip(); t.innerHTML=`<div class="t-route">${d.co.ticker} · ${d.lab}</div><div class="t-body">${d.co.name} — ${EST_LABEL[d.pr.status]}${d.ap?' · approximate location (territory / company-wide / site not disclosed)':''}<br>${d.pr.items.map(i=>i.title).join(' · ')}</div>`; t.style.opacity=1; t.style.left=Math.min(ev.clientX+14,innerWidth-320)+'px'; t.style.top=Math.min(ev.clientY+12,innerHeight-110)+'px'; })
-    .on('mouseleave',()=>{ eTip().style.opacity=0; })
-    .on('click',(ev,d)=>{ ev.stopPropagation(); eTip().style.opacity=0; const h=[...document.querySelectorAll('#epdeals h3')].find(x=>x.textContent.startsWith(d.co.ticker+' ')); if(h){ document.getElementById('epanel').classList.add('open'); h.scrollIntoView({behavior:'smooth',block:'start'}); } });
-  const lt=d=>{ const t=d.co.ticker+' · '+d.lab; return t.length>36?t.slice(0,35)+'…':t; };
-  all.select('text').attr('x',R+2/eK).attr('y',fs*0.35).style('font-size',fs+'px').style('font-family','var(--mono)').style('fill',d=>d.ap?'var(--ink-dim)':'var(--ink)')
-    .style('paint-order','stroke').style('stroke','#070a11').style('stroke-width',(2.2/eK)+'px').style('pointer-events','none').text(lt);
-  const placed=[], show=new Set();
-  data.slice().sort((a,b)=>(a.ap-b.ap)||((eSelCo===b.co)-(eSelCo===a.co))).forEach(d=>{ const w=lt(d).length*fs*0.62+R, h=fs*1.3; const bx=[d.x-R,d.y-h/2,d.x+w,d.y+h/2];
-    if(!placed.some(b=>!(bx[2]<b[0]||bx[0]>b[2]||bx[3]<b[1]||bx[1]>b[3]))){ placed.push(bx); show.add(d); } });
-  all.select('text').attr('display',d=>show.has(d)?null:'none');
+    (ENERGY_LOC[co.ticker+'|'+pr.st]||[]).forEach((L,i)=>{ const p=eProj([L[1],L[0]]); if(p) data.push({co,pr,lab:L[2],ap:!!L[3],_tx:p[0],_ty:p[1],_t:co.ticker,_call:L[2],key:co.ticker+pr.st+i}); }); })); }
+  const f=eSelSt&&eFeats.find(x=>x.id===eSelSt), fb=f?ePathFn.bounds(f):null;
+  const dim=d=>(eSelCo&&eSelCo!==d.co)||(eFocusCo&&eFocusCo!==d.co.ticker);
+  drawPills(eSitesG,data,eK,fb,d=>d.key,d=>({fill:d.ap?'#0b111d':EST_COL[d.pr.status],stroke:d.ap?EST_COL[d.pr.status]:'#070a11',sw:d.ap?1.5:1,dash:d.ap,text:d.ap?EST_COL[d.pr.status]:'#0b111d',op:dim(d)?.18:1}),
+    all=>all.style('cursor','pointer')
+      .on('mouseenter',(ev,d)=>eLink(d.co.ticker,true,'map'))
+      .on('mousemove',(ev,d)=>{ const t=eTip(); t.innerHTML=`<div class="t-route">${d.co.ticker} · ${d.lab}</div><div class="t-body">${d.co.name} — ${EST_LABEL[d.pr.status]}${d.ap?' · approximate location (territory / company-wide / site not disclosed)':''}<br>${d.pr.items.map(i=>i.title).join(' · ')}</div>`; t.style.opacity=1; t.style.left=Math.min(ev.clientX+14,innerWidth-320)+'px'; t.style.top=Math.min(ev.clientY+12,innerHeight-110)+'px'; })
+      .on('mouseleave',(ev,d)=>{ eTip().style.opacity=0; eLink(d.co.ticker,false,'map'); })
+      .on('click',(ev,d)=>{ ev.stopPropagation(); eTip().style.opacity=0; const h=document.querySelector(`#epdeals h3[data-t="${CSS.escape(d.co.ticker)}"]`); if(h){ document.getElementById('epanel').classList.add('open'); h.scrollIntoView({behavior:'smooth',block:'start'}); } }));
+}
+function eLink(tk,on,from){
+  const gg=eSitesG.selectAll('g.pin').filter(x=>x.co.ticker===tk);
+  if(on) gg.raise(); gg.classed('pon',on);
+  if(from==='card') gg.select('g.pcall').attr('display',on?null:'none');
+  const h=document.querySelector(`#epdeals h3[data-t="${CSS.escape(tk)}"]`); if(!h) return;
+  let n=h; const els=[h]; while((n=n.nextElementSibling)&&n.tagName!=='H3') els.push(n);
+  els.forEach(e=>e.classList.toggle('dchl',on));
+  if(on&&from==='map'){ const pd=document.getElementById('epdeals'), r=h.getBoundingClientRect(), pr=pd.getBoundingClientRect(); if(r.top<pr.top||r.bottom>pr.bottom) h.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 }
 
 function ePres(co){ /* filtered states list for a company */
@@ -2102,12 +2159,14 @@ function eShowState(st){
         nPl=rows.filter(r=>r.pres.status==='planned').length;
   const ph=document.getElementById('eph');
   ph.innerHTML=`<div class="ptype">State · ${rows.length} tracked ${rows.length===1?'company':'companies'}</div><h2>${ENAMES[st]||st}</h2>
-  <div class="pval">${nOp} operating · ${nCt} contracted · ${nPl} planned</div>`;
+  <div class="pval">${nOp} operating · ${nCt} contracted · ${nPl} planned</div>${rows.length?mixChips(rows.map(r=>({t:r.co.ticker,col:EST_COL[r.pres.status]})),'data-co'):''}`;
+  ph.querySelectorAll('.mixc').forEach(ch=>{ ch.addEventListener('mouseenter',()=>{ eFocusCo=ch.dataset.co; eDrawSites(); }); ch.addEventListener('mouseleave',()=>{ eFocusCo=null; eDrawSites(); }); ch.addEventListener('click',()=>{ const h=document.querySelector(`#epdeals h3[data-t="${CSS.escape(ch.dataset.co)}"]`); if(h) h.scrollIntoView({behavior:'smooth',block:'start'}); }); });
   const pd=document.getElementById('epdeals');
   if(!rows.length){ pd.innerHTML=`<h3>No tracked presence</h3><div class="deal"><div class="db">None of the 25 tracked companies has a mapped ${Object.entries(eFilters).filter(([k,v])=>v).map(([k])=>EST_LABEL[k].toLowerCase()).join(' / ')} presence here — yet. Energy demand maps are moving fast; this is a curated snapshot, not a census.</div></div>`; }
   else pd.innerHTML=rows.map(({co,pres})=>
-    `<h3>${co.ticker} · ${co.name} ${eBadge(pres.status)}</h3>`+pres.items.map(it=>eDeal(it,pres.status)).join('')
+    `<h3 data-t="${co.ticker}">${co.ticker} · ${co.name} ${eBadge(pres.status)}</h3>`+pres.items.map(it=>eDeal(it,pres.status).replace('<div class="deal ',`<div data-t="${co.ticker}" class="deal `)).join('')
   ).join('');
+  pd.querySelectorAll('[data-t]').forEach(el=>{ el.addEventListener('mouseenter',()=>eLink(el.dataset.t,true,'card')); el.addEventListener('mouseleave',()=>eLink(el.dataset.t,false,'card')); });
   eOpenPanel(); eZoom(st); ePaint();
 }
 
@@ -2157,7 +2216,7 @@ function initEnergyMap(){
       if(eSelCo){
         const pres=ePres(eSelCo).find(s=>s.st===d.id);
         body=pres?`${eSelCo.ticker} — ${EST_LABEL[pres.status]} · ${pres.items.length} item${pres.items.length>1?'s':''}`:`No mapped ${eSelCo.ticker} presence`;
-      } else body=`${c} tracked ${c===1?'company':'companies'}`;
+      } else body=c?`${c} tracked ${c===1?'company':'companies'}<br>${mixText(eStateCos(d.id).map(r=>r.co.ticker),8)}`:'No tracked companies';
       tip.innerHTML=`<div class="t-route">${ENAMES[d.id]||d.id}</div><div class="t-body">${body} — tap for detail</div>`;
       tip.style.opacity=1;
       const x=Math.min(ev.clientX+14,window.innerWidth-320), y=Math.min(ev.clientY+12,window.innerHeight-90);
@@ -2476,6 +2535,20 @@ background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;pa
 #dcmap .dlbl{font-family:var(--mono);fill:var(--ink-dim);paint-order:stroke;stroke:#070a11;stroke-width:2px;pointer-events:none;text-anchor:middle}
 #dcmap .dlbl .cnt{font-size:7.5px;font-weight:600}
 #dcmap .dsite{cursor:pointer;vector-effect:non-scaling-stroke}
+#dcmap .pin text.ptx,#emap .pin text.ptx{font-family:var(--mono);font-weight:700;text-anchor:middle;pointer-events:none;letter-spacing:.02em}
+#dcmap .pin,#emap .pin{transition:opacity .15s}
+#dcmap .pin.pon rect.pbg,#emap .pin.pon rect.pbg{stroke:#fff!important;filter:drop-shadow(0 0 5px rgba(255,255,255,.6))}
+#dcmap .pleg,#emap .pleg{stroke:#cfd8e6;stroke-opacity:.5;pointer-events:none}
+#dcmap .pdot,#emap .pdot{stroke:#070a11;stroke-width:.6px;vector-effect:non-scaling-stroke;pointer-events:none}
+#dcmap .pcall,#emap .pcall{pointer-events:none}
+#dcmap .pcall rect,#emap .pcall rect{fill:rgba(9,14,24,.95)}
+#dcmap .pcall text,#emap .pcall text{font-family:var(--mono);fill:var(--ink)}
+.mix{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:9px}
+.mixh{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-right:3px}
+.mixc{--mc:#9aa6bd;display:inline-flex;gap:4px;align-items:baseline;font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--mc) 45%,transparent);background:color-mix(in srgb,var(--mc) 9%,transparent);cursor:pointer;transition:background .15s}
+.mixc b{color:var(--mc);font-weight:600}.mixc i{font-style:normal;color:var(--ink-dim)}
+.mixc:hover{background:color-mix(in srgb,var(--mc) 22%,transparent)}
+#epdeals .dchl{box-shadow:0 0 0 1px var(--gold);background:rgba(231,178,74,.06)}
 #dcmap .dsn{font-family:var(--mono);font-weight:700;text-anchor:middle;pointer-events:none;letter-spacing:-.02em}
 #dcmap g.ds .dsite{transition:r .15s}
 #dcmap g.ds.dson .dsite{stroke:#fff!important;filter:drop-shadow(0 0 4px rgba(255,255,255,.55))}
@@ -2587,61 +2660,33 @@ function paint(){
   document.getElementById('dccount').textContent=`${n} campuses shown of ${DC_SITES.length} tracked (${DC_SITES.filter(s=>s.pub).length} public-owned, ${DC_SITES.filter(s=>!s.pub).length} private)`;
 }
 
-/* campus dots — only while zoomed into a state.
-   Design: numbered pins (no text clutter on the map). Numbers match the cards in the side panel;
-   hovering a pin highlights its card, hovering a card spotlights its pin with a single clean label. */
-const DC_NUM=new Map(); const dcKey=s=>s.n+'|'+s.c;
+/* campus pins — only while zoomed into a state.
+   Design: ticker pills colored by status (no free-floating text). Hover a pin → its card lights up;
+   hover a card → its pin glows and shows the campus name; hover a "Who's here" chip → that company's pins stand out. */
+const dcKey=s=>s.n+'|'+s.c;
 const dcDv=s=>{ if(s.d==='ongoing') return 1; const m=/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?/.exec(s.d||''); return m?(+m[1]*10000+(m[2]?+m[2]:1)*100+(m[3]?+m[3]:0)):0; };
-/* same order the panel shows: status group, newest first, then north→south */
 function dcOrder(list){ return ['op','bld','prm','ann'].flatMap(k=>list.filter(s=>s.s===k).sort((a,b)=>dcDv(b)-dcDv(a)||b.lat-a.lat||a.lon-b.lon)); }
+const dcPin=s=>s.own||pinShort(ownTag(s));
+let dcFocusCo=null;
 function drawSites(){
   const data=selSt?stSites(selSt):[];
-  DC_NUM.clear(); dcOrder(data).forEach((s,i)=>DC_NUM.set(dcKey(s),i+1));
-  data.forEach(s=>{ const p=proj([s.lon,s.lat])||[0,0]; s._x=s._px=p[0]; s._y=s._py=p[1]; s._hub=null; });
-  const R=8.2/curK, fs=8.2/curK;
-  /* de-cluster: pins that would overlap fan out evenly on a ring around their true location */
-  const par=data.map((_,i)=>i), fd=i=>par[i]===i?i:(par[i]=fd(par[i]));
-  for(let i=0;i<data.length;i++) for(let j=i+1;j<data.length;j++){ if(Math.hypot(data[i]._px-data[j]._px,data[i]._py-data[j]._py)<R*2.25) par[fd(i)]=fd(j); }
-  const grp={}; data.forEach((s,i)=>(grp[fd(i)]=grp[fd(i)]||[]).push(s));
-  Object.values(grp).forEach(m=>{ if(m.length<2) return;
-    const cx=m.reduce((a,s)=>a+s._px,0)/m.length, cy=m.reduce((a,s)=>a+s._py,0)/m.length;
-    const ring=Math.max(R*2.2, m.length*R*2.35/(2*Math.PI));
-    m.sort((a,b)=>DC_NUM.get(dcKey(a))-DC_NUM.get(dcKey(b)));
-    m.forEach((s,k)=>{ const ang=-Math.PI/2+k*2*Math.PI/m.length; s._x=cx+Math.cos(ang)*ring; s._y=cy+Math.sin(ang)*ring; s._hub=[cx,cy]; }); });
-  const lg2=gSites.selectAll('line.dsleg').data(data.filter(s=>s._hub),dcKey);
-  lg2.exit().remove();
-  lg2.enter().insert('line',':first-child').attr('class','dsleg').merge(lg2)
-    .attr('x1',d=>d._hub[0]).attr('y1',d=>d._hub[1]).attr('x2',d=>d._x).attr('y2',d=>d._y).attr('stroke-width',1/curK);
-  const hubs=gSites.selectAll('circle.dshub').data([...new Map(data.filter(s=>s._hub).map(s=>[s._hub.join(','),s._hub])).values()]);
-  hubs.exit().remove();
-  hubs.enter().insert('circle',':first-child').attr('class','dshub').merge(hubs).attr('cx',d=>d[0]).attr('cy',d=>d[1]).attr('r',2/curK);
-  const g=gSites.selectAll('g.ds').data(data,dcKey);
-  g.exit().remove();
-  const ge=g.enter().append('g').attr('class','ds');
-  ge.append('circle').attr('class','dsite');
-  ge.append('text').attr('class','dsn');
-  ge.append('g').attr('class','dscall').call(c=>{ c.append('rect'); c.append('text'); });
-  const all=ge.merge(g);
-  all.attr('transform',d=>`translate(${d._x},${d._y})`).attr('opacity',d=>selCo&&!roleOf(d,selCo.t)?.22:1);
+  data.forEach(s=>{ const p=proj([s.lon,s.lat])||[0,0]; s._tx=p[0]; s._ty=p[1]; s._t=dcPin(s); s._call=s.n; });
+  const f=selSt&&feats.find(f=>f.id===selSt), fb=f?path.bounds(f):null;
   const isTen=d=>selCo&&d.own!==selCo.t&&(d.ten||[]).includes(selCo.t);
-  all.select('circle.dsite').attr('r',R).attr('fill',d=>isTen(d)?'#0b111d':DC_COL[d.s]).attr('stroke',d=>isTen(d)?DC_COL[d.s]:(d.pub?'#0b111d':PRIVC)).attr('stroke-width',d=>isTen(d)?2.4:1.6).attr('stroke-dasharray',d=>isTen(d)?'3 2':null)
-    .on('mouseenter',(ev,d)=>dcLink(d,true,'map')).on('mousemove',(ev,d)=>showTip(ev,`<div class="t-route"><span class="t-num" style="background:${DC_COL[d.s]}">${DC_NUM.get(dcKey(d))}</span>${esc(ownTag(d))} · ${esc(d.n)}</div><span class="t-cat" style="color:${DC_COL[d.s]};background:${DC_COL[d.s]}1f">${DC_LBL[d.s]}</span><div class="t-body"><b>Owner:</b> ${esc(d.owner)}${d.own?' ('+d.own+')':''} · ${d.pub?'public':'private'}${(d.ten||[]).length?'<br><b>Tenant:</b> '+d.ten.join(', '):''}<br>${esc(region(d))} — ${esc(d.c)}<br>${esc(d.mw)}${d.v&&d.v!=='—'?' · '+esc(d.v):''}</div>`))
-    .on('mouseleave',(ev,d)=>{hideTip(); dcLink(d,false,'map');})
-    .on('click',(ev,d)=>{ev.stopPropagation(); const el=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(dcKey(d))}"]`); openPanel(); if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('dchl'); setTimeout(()=>el.classList.remove('dchl'),1600);} });
-  all.select('text.dsn').attr('y',fs*0.36).style('font-size',fs+'px').attr('fill',d=>isTen(d)?DC_COL[d.s]:'#0b111d').text(d=>DC_NUM.get(dcKey(d)));
-  /* callout pill (hidden until linked) */
-  const fb=(()=>{ const f=selSt&&feats.find(f=>f.id===selSt); return f?path.bounds(f):null; })();
-  all.select('g.dscall').attr('display','none').each(function(d){ const c=d3.select(this), lf=10/curK, txt=siteLabel(d), w=txt.length*lf*0.6+14/curK, h=lf*2;
-    const flip=fb&&d._x>fb[0][0]+(fb[1][0]-fb[0][0])*0.55; c.attr('transform',`translate(${flip?-(R+5/curK)-w:R+5/curK},${-h/2})`);
-    c.select('rect').attr('width',w).attr('height',h).attr('rx',h/2).attr('stroke',DC_COL[d.s]).attr('stroke-width',1/curK);
-    c.select('text').attr('x',7/curK).attr('y',h*0.66).style('font-size',lf+'px').text(txt); });
+  const dim=d=>(selCo&&!roleOf(d,selCo.t))||(dcFocusCo&&dcPin(d)!==dcFocusCo);
+  drawPills(gSites,data,curK,fb,dcKey,d=>({fill:isTen(d)?'#0b111d':DC_COL[d.s],stroke:isTen(d)?DC_COL[d.s]:(d.pub?'#0b111d':'#f5f0ff'),sw:d.pub?1.1:1.6,dash:isTen(d),text:isTen(d)?DC_COL[d.s]:'#0b111d',op:dim(d)?.18:1}),
+    all=>all.style('cursor','pointer')
+      .on('mouseenter',(ev,d)=>dcLink(d,true,'map'))
+      .on('mousemove',(ev,d)=>showTip(ev,`<div class="t-route">${esc(ownTag(d))} · ${esc(d.n)}</div><span class="t-cat" style="color:${DC_COL[d.s]};background:${DC_COL[d.s]}1f">${DC_LBL[d.s]}</span><div class="t-body"><b>Owner:</b> ${esc(d.owner)}${d.own?' ('+d.own+')':''} · ${d.pub?'public':'private'}${(d.ten||[]).length?'<br><b>Tenant:</b> '+d.ten.join(', '):''}<br>${esc(region(d))} — ${esc(d.c)}<br>${esc(d.mw)}${d.v&&d.v!=='—'?' · '+esc(d.v):''}</div>`))
+      .on('mouseleave',(ev,d)=>{hideTip(); dcLink(d,false,'map');})
+      .on('click',(ev,d)=>{ev.stopPropagation(); const el=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(dcKey(d))}"]`); openPanel(); if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('dchl'); setTimeout(()=>el.classList.remove('dchl'),1600);} }));
 }
 function dcLink(d,on,from){
   const key=dcKey(d);
-  const gg=gSites.selectAll('g.ds').filter(x=>dcKey(x)===key);
+  const gg=gSites.selectAll('g.pin').filter(x=>dcKey(x)===key);
   if(on) gg.raise();
-  gg.classed('dson',on);
-  if(from==='card') gg.select('g.dscall').attr('display',on?null:'none');
+  gg.classed('pon',on);
+  if(from==='card') gg.select('g.pcall').attr('display',on?null:'none');
   const card=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(key)}"]`); if(card) card.classList.toggle('dchl',on);
   if(on&&from==='map'&&card){ const pd=document.getElementById('dcpdeals'), r=card.getBoundingClientRect(), pr=pd.getBoundingClientRect(); if(r.top<pr.top||r.bottom>pr.bottom) card.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 }
@@ -2657,7 +2702,7 @@ function zoomTo(st){
   root.transition().duration(650).attr('transform',t.toString());
   document.getElementById('dcback').style.display=st?'':'none';
   const ro=document.getElementById('dcroster'); if(ro) ro.style.display=st?'none':'';
-  document.getElementById('dchint').textContent=st?'Pin numbers match the list → hover either one to link them · tap a pin to open its card · ← Back to zoom out':'Tap a state to zoom in · tap a company to light its footprint';
+  document.getElementById('dchint').textContent=st?'Pins show the owner\'s ticker, colored by status · hover a pin or a card to link them · hover a name under Who\'s here to isolate it · ← Back':'Tap a state to zoom in · tap a company to light its footprint';
 }
 
 function dealHTML(s,ctx){
@@ -2666,7 +2711,7 @@ function dealHTML(s,ctx){
   const tenants=(s.ten||[]).length?`<div><b>anchor / tenant</b> ${s.ten.join(' · ')}</div>`:'';
   const pwTag=s=>{if(!s.pw||!s.pw.length)return '';if(s.pwv)return `<div class="dcpwv ok" title="${esc(s.pwv)}">✓ confirmed · ${esc(s.pwv)}</div>`;const terr=s.pw.every(([t,r])=>/^(grid utility|wires) \([^,+]*\)$/.test(r));return terr?'<div class="dcpwv terr" title="Assigned from the utility service territory the campus sits in; not yet confirmed from a filing">territory only · unconfirmed</div>':'<div class="dcpwv ann" title="From company or utility announcements / press reports">per announcements</div>';};
   const pwBox=`<div class="dcpw"><div class="dcpwh">⚡ Power</div>${(s.pw&&s.pw.length)?s.pw.map(([t,r])=>`<div class="dcpwi" title="${esc(t==='—'?r:pwName(t)+' — '+r)}"><b>${esc(t)}</b><span>${esc(r)}</span></div>`).join(''):'<div class="dcpwi dim"><span>not disclosed</span></div>'}${pwTag(s)}</div>`;
-  return `<div class="deal dcg dc${s.s}" data-key="${esc(s.n+'|'+s.c)}" data-date="${s.d}"><div class="dcl"><div class="dr"><span>${ctx==='state'&&DC_NUM.has(dcKey(s))?`<span class="dcnum" style="background:${DC_COL[s.s]}">${DC_NUM.get(dcKey(s))}</span>`:''}<span style="color:${s.pub?PUBC:PRIVC}">${esc(ownTag(s))}</span> · ${esc(s.n)}${ctx==='state'?'':' · '+s.st}</span>${role==='tenant'?' <span class="dcown" style="color:#fbbf24;border:1px solid #fbbf2455">tenant</span>':''}</div>
+  return `<div class="deal dcg dc${s.s}" data-key="${esc(s.n+'|'+s.c)}" data-date="${s.d}"><div class="dcl"><div class="dr"><span><span style="color:${s.pub?PUBC:PRIVC}">${esc(ownTag(s))}</span> · ${esc(s.n)}${ctx==='state'?'':' · '+s.st}</span>${role==='tenant'?' <span class="dcown" style="color:#fbbf24;border:1px solid #fbbf2455">tenant</span>':''}</div>
   <div class="db">${esc(region(s))} — ${esc(s.c)}. ${esc(s.note)}</div>
   <div class="dmeta"><div><b>owner</b> ${esc(s.owner)}${s.own?' ('+s.own+')':s.listed?' — '+esc(s.listed):''} ${ownBadge}</div>${tenants}<div><b>size</b> ${esc(s.mw)}</div><div><b>$</b> ${esc(s.v)}</div><div><b>status</b> ${DC_LBL[s.s]}</div></div><div class="dsrc">${esc(s.src)}</div></div>${pwBox}</div>`;
 }
@@ -2679,7 +2724,8 @@ function showState(st){
   const list=stSites(st).sort((a,b)=>DC_RANK[a.s]-DC_RANK[b.s]);
   const pub=list.filter(s=>s.pub).length;
   document.getElementById('dcph').innerHTML=`<div class="ptype">State · ${list.length} tracked campus${list.length===1?'':'es'}</div><h2>${ENAMES[st]||st}</h2>
-  <div class="pval"><span style="color:${PUBC}">${pub} public-owned</span> · <span style="color:${PRIVC}">${list.length-pub} private</span>${selCo?` · highlighting ${selCo.t}`:''}</div>${statChips(list)}`;
+  <div class="pval"><span style="color:${PUBC}">${pub} public-owned</span> · <span style="color:${PRIVC}">${list.length-pub} private</span>${selCo?` · highlighting ${selCo.t}`:''}</div>${statChips(list)}${list.length?mixChips(list.map(s=>({t:dcPin(s),col:s.pub?PUBC:PRIVC})),'data-co'):''}`;
+  document.querySelectorAll('#dcph .mixc').forEach(ch=>{ ch.addEventListener('mouseenter',()=>{ dcFocusCo=ch.dataset.co; drawSites(); }); ch.addEventListener('mouseleave',()=>{ dcFocusCo=null; drawSites(); }); });
   const pd=document.getElementById('dcpdeals');
   if(!list.length){ pd.innerHTML=`<h3>No tracked campuses</h3><div class="deal"><div class="db">Nothing in the current filter is tracked here yet — this is a curated snapshot, not a census.</div></div>`; }
   else { const ord=dcOrder(list); pd.innerHTML=['op','bld','prm','ann'].map(k=>{const g=ord.filter(s=>s.s===k); return g.length?`<h3>${DC_LBL[k]} · ${g.length}</h3>`+g.map(s=>dealHTML(s,'state')).join(''):'';}).join('');
@@ -2724,7 +2770,7 @@ function init(){
           +(own.length?`<br>Owns: ${own.map(s=>esc(s.n)).join(', ')}`:'')
           +(ten.length?`<br>Leases (tenant): ${ten.map(s=>esc(s.n)+' — owned by '+esc(ownTag(s))).join(', ')}`:''); }
         else body=`No tracked ${selCo.t} campus`; }
-      else body=c?`<span style="color:${PUBC}">${c.pub} public</span> · <span style="color:${PRIVC}">${c.priv} private</span> — ${c.op} operating, ${c.bld} building, ${c.prm} permitted, ${c.ann} announced`:'No tracked campuses';
+      else body=c?`${mixText(stSites(d.id).map(dcPin),6)}<br><span style="color:${PUBC}">${c.pub} public</span> · <span style="color:${PRIVC}">${c.priv} private</span> — ${c.op} operating, ${c.bld} building, ${c.prm} permitted, ${c.ann} announced`:'No tracked campuses';
       showTip(ev,`<div class="t-route">${ENAMES[d.id]||d.id}</div><div class="t-body">${body}${selSt===d.id?'':' — tap to zoom in'}</div>`); })
     .on('mouseleave',hideTip)
     .on('click',(ev,d)=>{ ev.stopPropagation(); hideTip(); if(selSt===d.id) return; showState(d.id); });
