@@ -2289,6 +2289,9 @@ background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;pa
 #dcmap .dlbl .cnt{font-size:7.5px;font-weight:600}
 #dcmap .dsite{cursor:pointer;vector-effect:non-scaling-stroke}
 #dcmap .dsl{font-family:var(--mono);fill:var(--ink);paint-order:stroke;stroke:#070a11;pointer-events:none}
+.dcownleg{position:absolute;left:14px;top:52px;z-index:5;font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);background:rgba(10,16,28,.9);border:1px solid var(--line);border-radius:9px;padding:7px 10px;line-height:1.7}
+.dcownleg i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+.dcownleg u{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:6px}
 .dcback{position:absolute;top:12px;left:220px;z-index:6;font-family:var(--mono);font-size:11px;color:var(--ink);background:rgba(10,16,28,.9);border:1px solid var(--gold);border-radius:9px;padding:6px 11px;cursor:pointer}
 .deal.dcop{border-left-color:#34d399}.deal.dcbld{border-left-color:#fbbf24}.deal.dcprm{border-left-color:#5b9dff}.deal.dcann{border-left-color:#e879f9}
 .dcown{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:1px 6px;border-radius:5px;margin-left:6px;vertical-align:1px}
@@ -2302,7 +2305,7 @@ const F={op:true,bld:true,prm:true,ann:true}, O={pub:true,priv:true};
 let inited=false, selCo=null, selSt=null, proj, path, svg, root, gStates, gLbl, gSites, feats, curK=1;
 const vis=s=>F[s.s]&&(s.pub?O.pub:O.priv);
 const ownTag=s=>s.own||String(s.owner).split(/ \(| \/|,/)[0].replace(/ Data Centers$/,'').trim();
-const siteLabel=s=>{ const t=ownTag(s)+' · '+s.n; return t.length>34?t.slice(0,33)+'…':t; };
+const siteLabel=s=>{ let t=ownTag(s)+' · '+s.n; if(t.length>34) t=t.slice(0,33)+'…'; if(selCo&&s.own!==selCo.t&&(s.ten||[]).includes(selCo.t)) t+=' ('+selCo.t+' leases)'; return t; };
 const roleOf=(s,t)=>s.own===t?'owner':((s.ten||[]).includes(t)?'tenant':null);
 const coSites=t=>DC_SITES.filter(s=>roleOf(s,t)&&vis(s));
 const stSites=st=>DC_SITES.filter(s=>s.st===st&&vis(s));
@@ -2331,7 +2334,7 @@ function paint(){
   const base=d3.interpolateRgb("#16233a","#2a8f86");
   const cc=selCo?coCounts(selCo.t):null;
   gStates.selectAll('path').attr('fill',d=>{
-    if(cc){ const c=cc[d.id]; if(!c) return "#121a2a"; return c.op?"#2b5a63":"#3a3f5c"; }
+    if(cc){ const c=cc[d.id]; if(!c) return "#121a2a"; const ls=coSites(selCo.t).filter(s=>s.st===d.id); return ls.some(s=>s.own===selCo.t)?"#2b6a6f":(selSt===d.id?"#3b3222":"url(#dchatch)"); }
     const c=C[d.id]; return c?base(0.15+0.85*Math.sqrt(c.n/max)):"#121a2a";
   }).attr('opacity',d=>{
     if(selSt) return d.id===selSt?1:.18;
@@ -2348,6 +2351,11 @@ function paint(){
       const parts=['op','bld','prm','ann'].filter(x=>k[x]);
       const t=el.append('tspan').attr('x',el.attr('x')).attr('dy',big?'1.15em':0).attr('class','cnt');
       parts.forEach((x,i)=>{ t.append('tspan').attr('fill',DC_COL[x]).text((i?' ':'')+k[x]+DC_ABBR[x]); });
+      const ls=coSites(selCo.t).filter(s=>s.st===d.id), no=ls.filter(s=>s.own===selCo.t).length, nl=ls.length-no;
+      const t2=el.append('tspan').attr('x',el.attr('x')).attr('dy','1.15em').attr('class','cnt');
+      if(no) t2.append('tspan').attr('fill','#5eead4').text(no+' own');
+      if(no&&nl) t2.append('tspan').attr('fill','#9aa6bd').text(' · ');
+      if(nl) t2.append('tspan').attr('fill','#f0b45a').text(nl+' lease');
     } else if(c){
       const t=el.append('tspan').attr('x',el.attr('x')).attr('dy',big?'1.15em':0).attr('class','cnt');
       if(c.pub) t.append('tspan').attr('fill',PUBC).text(c.pub);
@@ -2356,6 +2364,8 @@ function paint(){
     }
   });
   drawSites();
+  const lg=document.getElementById('dcownleg');
+  if(lg){ if(selCo){ lg.style.display=''; lg.innerHTML=`<b style="color:var(--gold)">${selCo.t}</b><br><i style="background:#2b6a6f"></i>owns campuses here<br><i style="background:repeating-linear-gradient(45deg,#c98a2b 0 2px,#16233a 2px 5px)"></i>only leases here (tenant)<br><u style="background:#34d399"></u>solid dot = owner<br><u style="border:2px solid #f0b45a;width:8px;height:8px"></u>hollow dot = tenant`; } else lg.style.display='none'; }
   document.querySelectorAll('#dcroster .dro').forEach(el=>el.classList.toggle('on',!!selCo&&el.dataset.t===selCo.t));
   const n=DC_SITES.filter(vis).length;
   document.getElementById('dccount').textContent=`${n} campuses shown of ${DC_SITES.length} tracked (${DC_SITES.filter(s=>s.pub).length} public-owned, ${DC_SITES.filter(s=>!s.pub).length} private)`;
@@ -2375,8 +2385,9 @@ function drawSites(){
   const all=ge.merge(g);
   all.attr('transform',d=>`translate(${d._x},${d._y})`)
     .attr('opacity',d=>selCo&&!roleOf(d,selCo.t)?.25:1);
-  all.select('circle').attr('r',R).attr('fill',d=>DC_COL[d.s]).attr('stroke',d=>d.pub?PUBC:PRIVC).attr('stroke-width',2.2)
-    .on('mousemove',(ev,d)=>showTip(ev,`<div class="t-route">${esc(ownTag(d))} · ${esc(d.n)}</div><span class="t-cat" style="color:${DC_COL[d.s]};background:${DC_COL[d.s]}1f">${DC_LBL[d.s]}</span><div class="t-body"><b>${esc(d.owner)}</b>${d.own?' ('+d.own+')':''} · ${d.pub?'public':'private'}<br>${esc(region(d))} — ${esc(d.c)}<br>${esc(d.mw)}${d.v&&d.v!=='—'?' · '+esc(d.v):''}</div>`))
+  const isTen=d=>selCo&&d.own!==selCo.t&&(d.ten||[]).includes(selCo.t);
+  all.select('circle').attr('r',R).attr('fill',d=>isTen(d)?'#0b111d':DC_COL[d.s]).attr('stroke',d=>isTen(d)?DC_COL[d.s]:(d.pub?PUBC:PRIVC)).attr('stroke-width',d=>isTen(d)?3:2.2).attr('stroke-dasharray',d=>isTen(d)?'3 2':null)
+    .on('mousemove',(ev,d)=>showTip(ev,`<div class="t-route">${esc(ownTag(d))} · ${esc(d.n)}</div><span class="t-cat" style="color:${DC_COL[d.s]};background:${DC_COL[d.s]}1f">${DC_LBL[d.s]}</span><div class="t-body"><b>Owner:</b> ${esc(d.owner)}${d.own?' ('+d.own+')':''} · ${d.pub?'public':'private'}${(d.ten||[]).length?'<br><b>Tenant:</b> '+d.ten.join(', '):''}<br>${esc(region(d))} — ${esc(d.c)}<br>${esc(d.mw)}${d.v&&d.v!=='—'?' · '+esc(d.v):''}</div>`))
     .on('mouseleave',hideTip)
     .on('click',(ev,d)=>{ev.stopPropagation(); const el=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(d.n+'|'+d.c)}"]`); openPanel(); if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.boxShadow='0 0 0 1px var(--gold)'; setTimeout(()=>el.style.boxShadow='',1600);} });
   all.select('text').attr('x',R+2/curK).attr('y',fs*0.35).style('font-size',fs+'px').style('stroke-width',(2.2/curK)+'px')
@@ -2430,7 +2441,7 @@ function showCo(co){
   const owned=list.filter(s=>s.own===co.t).length;
   document.getElementById('dcph').innerHTML=`<div class="ptype">${co.g}</div><h2>${co.n}</h2>
   <div class="pval">${co.t} · ${fmt(co.rev)} TTM revenue${co.revn?` (${co.revn})`:''}${co.bk?` · ${fmt(co.bk)} backlog (${co.bkn})`:''}</div>
-  <div class="pval">${list.length} tracked campus${list.length===1?'':'es'} in ${sts.length} state${sts.length===1?'':'s'} · ${owned} owned${list.length-owned?` · ${list.length-owned} as tenant / anchor`:''}</div>${statChips(list)}`;
+  <div class="pval">${list.length} tracked campus${list.length===1?'':'es'} in ${sts.length} state${sts.length===1?'':'s'} · ${owned} owned${list.length-owned?` · ${list.length-owned} leased from other owners (tenant)`:''}</div>${statChips(list)}`;
   const pd=document.getElementById('dcpdeals');
   pd.innerHTML=list.length?sts.map(st=>{const c=cc[st];return `<h3>${ENAMES[st]||st} — ${['op','bld','prm','ann'].filter(k=>c[k]).map(k=>c[k]+' '+DC_ABBR[k]).join(' · ')}</h3>`+list.filter(s=>s.st===st).sort((a,b)=>DC_RANK[a.s]-DC_RANK[b.s]).map(s=>dealHTML(s,'co')).join('');}).join(''):`<div class="deal"><div class="db">No tracked campuses in the current filter.</div></div>`;
   openPanel(); paint();
@@ -2448,10 +2459,20 @@ function init(){
   proj=d3.geoAlbersUsa().fitExtent([[8,8],[658,602]],geo);
   path=d3.geoPath(proj);
   feats=geo.features.filter(f=>path(f));
+  const defs=svg.append('defs');
+  const pat=defs.append('pattern').attr('id','dchatch').attr('patternUnits','userSpaceOnUse').attr('width',6).attr('height',6).attr('patternTransform','rotate(45)');
+  pat.append('rect').attr('width',6).attr('height',6).attr('fill','#16233a');
+  pat.append('rect').attr('width',2.4).attr('height',6).attr('fill','#c98a2b');
   root=svg.append('g'); gStates=root.append('g'); gLbl=root.append('g'); gSites=root.append('g');
+  const leg=document.createElement('div'); leg.id='dcownleg'; leg.className='dcownleg'; leg.style.display='none';
+  document.querySelector('#view-datacenter .stage').appendChild(leg);
   gStates.selectAll('path').data(feats).join('path').attr('class','dst').attr('d',path)
     .on('mousemove',(ev,d)=>{ const c=counts()[d.id]; let body;
-      if(selCo){ const k=coCounts(selCo.t)[d.id]; body=k?`${selCo.t}: `+['op','bld','prm','ann'].filter(x=>k[x]).map(x=>k[x]+' '+DC_LBL[x].toLowerCase()).join(' · '):`No tracked ${selCo.t} campus`; }
+      if(selCo){ const k=coCounts(selCo.t)[d.id]; if(k){ const ls=coSites(selCo.t).filter(s=>s.st===d.id); const own=ls.filter(s=>s.own===selCo.t), ten=ls.filter(s=>s.own!==selCo.t);
+        body=`${selCo.t}: `+['op','bld','prm','ann'].filter(x=>k[x]).map(x=>k[x]+' '+DC_LBL[x].toLowerCase()).join(' · ')
+          +(own.length?`<br>Owns: ${own.map(s=>esc(s.n)).join(', ')}`:'')
+          +(ten.length?`<br>Leases (tenant): ${ten.map(s=>esc(s.n)+' — owned by '+esc(ownTag(s))).join(', ')}`:''); }
+        else body=`No tracked ${selCo.t} campus`; }
       else body=c?`<span style="color:${PUBC}">${c.pub} public</span> · <span style="color:${PRIVC}">${c.priv} private</span> — ${c.op} operating, ${c.bld} building, ${c.prm} permitted, ${c.ann} announced`:'No tracked campuses';
       showTip(ev,`<div class="t-route">${ENAMES[d.id]||d.id}</div><div class="t-body">${body}${selSt===d.id?'':' — tap to zoom in'}</div>`); })
     .on('mouseleave',hideTip)
