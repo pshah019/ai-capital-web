@@ -287,7 +287,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <div class="key" style="cursor:default"><span style="cursor:default"><b style="color:#2dd4bf;font-weight:600">7</b>&nbsp;public · <b style="color:#c4a7f0;font-weight:600">3</b>&nbsp;private campuses</span></div>
 <div style="margin-top:12px"><button class="btn" id="reset-dc">⟲ Reset / zoom out</button></div></div>
 </div>
-<div class="stage" style="overflow:visible">
+<div class="stage dcstage" style="overflow:visible">
 <div class="netsearch"><input id="dcsearch" placeholder="Search company / ticker…" autocomplete="off"></div>
 <div id="dcroster"></div>
 <div id="dcback" class="dcback" style="display:none">← Back to US map</div>
@@ -2476,6 +2476,11 @@ background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;pa
 .dcown{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:1px 6px;border-radius:5px;margin-left:6px;vertical-align:1px}
 .dcstat{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .dcstat span{font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:6px;border:1px solid}
+.dcstage{display:grid;grid-template-columns:minmax(0,1fr) 470px;align-items:start}
+.dcstage #dcmap{grid-column:1;grid-row:1;height:auto;aspect-ratio:975/610;min-height:0;max-height:78vh;align-self:center;margin-top:44px}
+.dcstage #dcroster{position:static;grid-column:2;grid-row:1;margin:12px 12px 12px 0;max-height:calc(74vh - 24px);min-height:0}
+.dcstage.zoomed{grid-template-columns:minmax(0,1fr)}
+@media (max-width:1180px){.dcstage{grid-template-columns:minmax(0,1fr)}.dcstage #dcmap{grid-row:1}.dcstage #dcroster{grid-column:1;grid-row:2;width:auto;margin:0 12px 12px;max-height:420px}}
 @media (max-width:680px){#dcroster{position:static;width:auto;max-height:170px;margin:10px 10px 0;font-size:10px}#dcmap{height:52vh;min-height:340px}.dcback{left:auto;right:12px;top:auto;bottom:34px}}
 `;
 document.head.appendChild(css);
@@ -2583,9 +2588,11 @@ function drawSites(){
 
 function zoomTo(st){
   const f=feats.find(f=>f.id===st);
+  { const ro0=document.getElementById('dcroster'); if(ro0) ro0.style.display=st?'none':''; const stg=document.querySelector('.dcstage'); if(stg) stg.classList.toggle('zoomed',!!st); }
   let t=d3.zoomIdentity;
   if(f){ const b=path.bounds(f), dx=b[1][0]-b[0][0], dy=b[1][1]-b[0][1], x=(b[0][0]+b[1][0])/2, y=(b[0][1]+b[1][1])/2;
-    const k=Math.max(1,Math.min(14,0.82/Math.max(dx/975,dy/610))); t=d3.zoomIdentity.translate(975/2-k*x,610/2-k*y).scale(k); }
+    let vw=975; try{ const r=document.getElementById('dcmap').getBoundingClientRect(); if(r.width>0&&window.innerWidth>620){ const vis=Math.min(r.right,window.innerWidth-490)-r.left; if(vis>200&&vis<r.width) vw=975*vis/r.width; } }catch(e){}
+    const k=Math.max(1,Math.min(14,0.82/Math.max(dx/vw,dy/610))); t=d3.zoomIdentity.translate(vw/2-k*x,610/2-k*y).scale(k); }
   curK=t.k;
   root.transition().duration(650).attr('transform',t.toString());
   document.getElementById('dcback').style.display=st?'':'none';
@@ -2639,7 +2646,7 @@ function reset(){
 function init(){
   svg=d3.select('#dcmap');
   const geo=US_STATES_GEO;
-  proj=d3.geoAlbersUsa().fitExtent([[8,8],[658,602]],geo);
+  proj=d3.geoAlbersUsa().fitExtent([[10,10],[965,600]],geo);
   path=d3.geoPath(proj);
   feats=geo.features.filter(f=>path(f));
   const defs=svg.append('defs');
