@@ -327,13 +327,13 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <div class="srtablewrap">
 <table class="srtable" id="srtable">
 <thead><tr>
-<th data-k="symbol">A · Ticker</th>
-<th data-k="price">B · Current price <span class="srsub" id="srasof">(vs last run)</span></th>
-<th data-k="prevWeekHigh">C · Prev week high</th>
-<th data-k="prevMonthHigh">D · Prev month high</th>
-<th data-k="ytdStart">E · YTD start</th>
-<th data-k="ipoPrice">F · IPO / first trade</th>
-<th data-k="category">G · Category</th>
+<th data-k="symbol" title="Ticker">A · Ticker</th>
+<th data-k="price" title="Current price, as of the last scan">B · Price <span class="srsub" id="srasof"></span></th>
+<th data-k="prevWeekHigh" title="Highest high of the most recent completed week">C · Wk high</th>
+<th data-k="prevMonthHigh" title="Highest high of the last completed month">D · Mo high</th>
+<th data-k="ytdStart" title="First close of the year, with % change since">E · YTD start</th>
+<th data-k="ipoPrice" title="First traded price, split-adjusted">F · IPO</th>
+<th data-k="category" title="Sector / industry">G · Sector</th>
 </tr></thead>
 <tbody id="srbody"><tr><td colspan="7" class="srempty">Press <b>Run scan</b> to load prices.</td></tr></tbody>
 </table>
@@ -2519,28 +2519,46 @@ css.textContent=`
 .srstatus.err{color:#f87171}.srstatus.ok{color:#34d399}
 .srnotes{font-size:13px;color:var(--ink-dim);white-space:pre-wrap;line-height:1.5}
 .srtablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:rgba(7,10,17,.55)}
-.srtable{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;min-width:860px}
-.srtable th{position:sticky;top:0;background:#0f1626;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;padding:10px 12px;border-bottom:1px solid var(--card-edge);cursor:pointer;white-space:nowrap}
+.srtable{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;min-width:600px}
+.srtable th{position:sticky;top:0;background:#0f1626;text-align:left;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;padding:8px 8px;border-bottom:1px solid var(--card-edge);cursor:pointer;white-space:nowrap}
 .srtable th:hover{color:var(--ink)} .srtable th.on{color:var(--gold)}
 .srtable th .srsub{text-transform:none;letter-spacing:0;opacity:.8}
-.srtable td{padding:9px 12px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:top;white-space:nowrap}
+.srtable td{padding:7px 8px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:top;white-space:nowrap}
 .srtable tr:hover td{background:rgba(255,255,255,.025)}
 .srtable td.tk b{color:var(--gold);font-weight:600;font-size:13px}
-.srtable td.tk span{display:block;font-size:10.5px;color:var(--ink-faint);max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.srtable td.tk span{display:block;font-size:10px;color:var(--ink-faint);max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .srtable .px{font-size:13.5px;font-weight:600}
 .srtable .pp{font-size:10.5px;color:var(--ink-faint);margin-left:5px}
 .srtable .sm{display:block;font-size:10.5px;color:var(--ink-faint);margin-top:2px}
+.srtable i.dt{font-style:normal}
 .srtable .dn{color:#f87171}.srtable .up{color:#34d399}
 .srtable .cat{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--card-edge);color:var(--ink-dim)}
 .srtable td.err{color:#f87171;white-space:normal}
 .srempty{text-align:center;color:var(--ink-faint);padding:26px !important}
+.srtable th:first-child,.srtable td.tk{position:sticky;left:0;z-index:1;background:#0b111d}
+.srtable th:first-child{z-index:2;background:#0f1626}
+@media (max-width:680px){
+.srtable{font-size:10.5px;min-width:0}
+.srtable .dt{display:none}
+.srtable i.dt{font-style:normal}
+.srtable th{font-size:8px;padding:6px 4px;letter-spacing:0;white-space:normal;line-height:1.25}
+.srtable td{padding:6px 4px}
+.srtable .px{font-size:11px}
+.srtable .sm{font-size:9.5px}
+.srtable td.tk span{display:none}
+.srtable td:last-child .sm{display:none}
+.srtable .cat{font-size:8.5px;padding:0;border:none;max-width:54px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+.srtablewrap{border-radius:10px}
+.srcard select{min-width:0;width:100%}
+.srfield{min-width:0;width:100%}
+}
 `;
 document.head.appendChild(css);
 
 let inited=false, lists=[], rows=[], lastResp=null, sortK=null, sortDir=1, configured=null;
 const $=id=>document.getElementById(id);
 const money=v=>v==null?'—':'$'+Number(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-const pct=v=>v==null?'':`<span class="${v<0?'dn':'up'}">${v>0?'+':''}${v.toFixed(1)}%</span>`;
+const pct=v=>v==null?'':`<span class="${v<0?'dn':'up'}">${v>0?'+':''}${Math.abs(v)>=1000?Math.round(v).toLocaleString():v.toFixed(1)}%</span>`;
 const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 function status(msg,cls,el){ const s=$(el||'srstatus'); s.textContent=msg; s.className='srstatus'+(cls?' '+cls:''); }
 function curListName(){ return $('srlist').value||'Default'; }
@@ -2577,15 +2595,13 @@ function render(){
   if(!rows.length){ body.innerHTML='<tr><td colspan="7" class="srempty">Press <b>Run scan</b> to load prices.</td></tr>'; return; }
   body.innerHTML=sorted().map(r=>{
     if(r.error) return `<tr><td class="tk"><b>${esc(r.symbol)}</b></td><td colspan="6" class="err">${esc(r.error)}</td></tr>`;
-    const p=prev[r.symbol]; const chg=p&&r.price!=null?(r.price/p-1)*100:null;
-    const paren=p!=null?`<span class="pp">(last run ${money(p)}${chg!=null?' · '+pct(chg):''})</span>`:(lastResp&&lastResp.historic?'':`<span class="pp">(first run)</span>`);
     return `<tr>
 <td class="tk"><b>${esc(r.symbol)}</b><span title="${esc(r.name||'')}">${esc(r.name||'')}</span></td>
-<td><span class="px">${money(r.price)}</span>${paren}<span class="sm">${r.source&&r.source!=='Yahoo Finance'?esc(r.source):''}</span></td>
-<td>${money(r.prevWeekHigh)}<span class="sm">${pct(r.offWeekPct)}${r.prevWeekOf?' · wk of '+r.prevWeekOf.slice(5):''}</span></td>
-<td>${money(r.prevMonthHigh)}<span class="sm">${pct(r.offMonthPct)}${r.prevMonth?' · '+r.prevMonth:''}</span></td>
-<td>${money(r.ytdStart)}<span class="sm">${pct(r.ytdPct)} YTD</span></td>
-<td>${money(r.ipoPrice)}<span class="sm">${r.firstTradeDate?esc(r.firstTradeDate):''}${r.vsIpoPct!=null?' · '+pct(r.vsIpoPct):''}</span></td>
+<td><span class="px">${money(r.price)}</span><span class="sm">${r.source&&r.source!=='Yahoo Finance'?esc(r.source):''}</span></td>
+<td>${money(r.prevWeekHigh)}<span class="sm">${pct(r.offWeekPct)}<i class="dt">${r.prevWeekOf?' · wk of '+r.prevWeekOf.slice(5):''}</i></span></td>
+<td>${money(r.prevMonthHigh)}<span class="sm">${pct(r.offMonthPct)}<i class="dt">${r.prevMonth?' · '+r.prevMonth:''}</i></span></td>
+<td>${money(r.ytdStart)}<span class="sm">${pct(r.ytdPct)}<i class="dt"> YTD</i></span></td>
+<td>${money(r.ipoPrice)}<span class="sm">${r.firstTradeDate?esc(r.firstTradeDate.slice(0,4)):''}<i class="dt">${r.vsIpoPct!=null?' · '+pct(r.vsIpoPct):''}</i></span></td>
 <td><span class="cat" title="${esc(r.industry||'')}">${esc(r.category||'—')}</span>${r.industry?`<span class="sm">${esc(r.industry)}</span>`:''}</td></tr>`;
   }).join('');
 }
@@ -2596,7 +2612,7 @@ async function runScan(){
     const r=await fetch('/api/stocks?save=1&list='+encodeURIComponent(curListName())+'&symbols='+encodeURIComponent(syms));
     const j=await r.json(); if(!j.ok) throw new Error(j.error||'scan failed');
     lastResp=j; rows=j.rows||[]; $('srruns').value='';
-    $('srasof').textContent=`(as of ${new Date(j.runAt).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}${j.previous?' · vs run of '+new Date(j.previous.runAt).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):''})`;
+    $('srasof').textContent=new Date(j.runAt).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
     render();
     const bad=rows.filter(x=>x.error).length;
     status(`${rows.length-bad} of ${rows.length} loaded${j.saved?' · saved to Supabase':j.configured?'':' · not saved (Supabase key not set)'}${j.storageError?' · storage error: '+j.storageError:''}`, j.storageError?'err':'ok');
@@ -2608,7 +2624,7 @@ async function loadRun(id){
   if(!id){ return; }
   try{ const r=await fetch('/api/watchlists?runs=1&id='+encodeURIComponent(id)); const j=await r.json(); const run=j.run; if(!run) return;
     rows=(run.rows||[]).map(x=>Object.assign({},x,{offWeekPct:x.price&&x.prevWeekHigh?(x.price/x.prevWeekHigh-1)*100:null,offMonthPct:x.price&&x.prevMonthHigh?(x.price/x.prevMonthHigh-1)*100:null,vsIpoPct:x.price&&x.ipoPrice?(x.price/x.ipoPrice-1)*100:null}));
-    lastResp={historic:true,previous:null}; $('srasof').textContent='(stored run of '+new Date(run.run_at).toLocaleString()+')'; render(); status('Showing a stored scan — press Run scan for live prices.','');
+    lastResp={historic:true,previous:null}; $('srasof').textContent=new Date(run.run_at).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); render(); status('Showing a stored scan — press Run scan for live prices.','');
   }catch(e){ status('Could not load that run — '+e.message,'err'); }
 }
 function csv(){
