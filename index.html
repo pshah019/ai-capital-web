@@ -295,7 +295,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <div class="hint" id="dchint">Tap a state to zoom in · tap a company to light its footprint</div>
 </div>
 <div id="dcpanel" class="panel"><button class="pclose" id="dcpclose">×</button><div class="ph" id="dcph"></div><div class="pdeals" id="dcpdeals"></div></div>
-<footer><div><b>Curated snapshot, Nov 21, 2026</b> — <span id="dccount"></span>. Not a census of every US data center: it tracks the campuses that matter for the AI build-out plus each listed operator's flagship hubs. Locations are city / county level. <b>Status:</b> operating = running (incl. partially live) · under construction · approved / permitted = zoning, permits or utility approval in hand but no vertical build · announced = deal or plan signed, no permits or construction yet. <b>Public</b> = the owner / operator is listed (SoftBank-led sites count as public via SoftBank Group, Tokyo: 9984; JV sites count with their listed sponsor). Revenue = latest TTM on stockanalysis.com (mostly through Jun 30, 2026); backlog = company-reported RPO / contracted lease value (— where none is reported). Sources: company releases &amp; filings, Epoch AI, llmpulse &amp; ElectricChoice trackers, DCD, CoStar, state economic-development offices. Not financial advice, investment advice, or legal advice.</div></footer>
+<footer><div><b>Curated snapshot, Nov 21, 2026</b> — <span id="dccount"></span>. Not a census of every US data center: it tracks the campuses that matter for the AI build-out plus each listed operator's flagship hubs. Locations are city / county level. <b>Status:</b> operating = running (incl. partially live) · under construction · approved / permitted = zoning, permits or utility approval in hand but no vertical build · announced = deal or plan signed, no permits or construction yet. <b>Public</b> = the owner / operator is listed (SoftBank-led sites count as public via SoftBank Group, Tokyo: 9984; JV sites count with their listed sponsor). Revenue = latest TTM on stockanalysis.com (mostly through Jun 30, 2026); backlog = company-reported RPO / contracted lease value (— where none is reported). <b>Leased / owned</b> = counts of tracked campuses only (not every site a company uses); leased $ = total disclosed lease or capacity-contract value where public (* = compute contracts that include GPUs, not pure building leases). Sources: company releases &amp; filings, Epoch AI, llmpulse &amp; ElectricChoice trackers, DCD, CoStar, state economic-development offices. Not financial advice, investment advice, or legal advice.</div></footer>
 </div>
 
 <div id="view-stocks" class="webview" style="display:none">
@@ -2175,8 +2175,8 @@ const DC_SITES=[
 {n:"Polaris Forge 2",st:"ND",c:"Harwood",lat:46.98,lon:-96.88,owner:"Applied Digital",own:"APLD",pub:1,ten:[],s:"bld",mw:"200 MW IT",v:"$2.15B notes",note:"Investment-grade hyperscaler tenant (unnamed).",d:"2026-03",src:"llmpulse tracker"},
 {n:"Horizon (Childress)",st:"TX",c:"Childress",lat:34.43,lon:-100.20,owner:"IREN",own:"IREN",pub:1,ten:["MSFT"],s:"op",mw:"750 MW site",v:"$9.7B MSFT contract",note:"Horizon 1 accepted (reported Aug 2026); ramping.",d:"2026-08",src:"llmpulse tracker"},
 {n:"Sweetwater campus",st:"TX",c:"Nolan County",lat:32.47,lon:-100.41,owner:"IREN",own:"IREN",pub:1,ten:[],s:"bld",mw:"2 GW",v:"not disclosed",note:"1.4 GW substation energised; no tenant named.",d:"2026-05",src:"llmpulse tracker"},
-{n:"Barber Lake",st:"TX",c:"Colorado City",lat:32.39,lon:-100.86,owner:"Cipher Digital",own:"CIFR",pub:1,ten:["GOOGL"],s:"bld",mw:"300 MW",v:"part of $16.6B contracted",note:"Fluidstack lease (Google backstop) extended to the full site, Sep 2026.",d:"2026-09-25",src:"24/7 Wall St; Zacks"},
-{n:"Lake Mariner",st:"NY",c:"Barker",lat:43.33,lon:-78.55,owner:"TeraWulf",own:"WULF",pub:1,ten:["GOOGL"],s:"op",mw:"440 MW IT contracted",v:"not disclosed",note:"Fluidstack & Core42 leases; running in part. Google credit backstop.",d:"2026-10",src:"llmpulse; Futurum"},
+{n:"Barber Lake",st:"TX",c:"Colorado City",lat:32.39,lon:-100.86,owner:"Cipher Digital",own:"CIFR",pub:1,ten:[],s:"bld",mw:"300 MW",v:"part of $16.6B contracted",note:"Fluidstack lease (Google backstop) extended to the full site, Sep 2026.",d:"2026-09-25",src:"24/7 Wall St; Zacks"},
+{n:"Lake Mariner",st:"NY",c:"Barker",lat:43.33,lon:-78.55,owner:"TeraWulf",own:"WULF",pub:1,ten:[],s:"op",mw:"440 MW IT contracted",v:"not disclosed",note:"Fluidstack & Core42 leases; running in part. Google credit backstop.",d:"2026-10",src:"llmpulse; Futurum"},
 {n:"Hawesville campus",st:"KY",c:"Hawesville",lat:37.90,lon:-86.75,owner:"TeraWulf",own:"WULF",pub:1,ten:[],s:"bld",mw:"401 MW",v:"~$19B 20-yr Anthropic lease",note:"Anthropic anchor; first capacity 2H 2027.",d:"2026-11-06",src:"Futurum; llmpulse"},
 {n:"Helios",st:"TX",c:"Dickens County",lat:33.62,lon:-100.84,owner:"Galaxy Digital",own:"GLXY",pub:1,ten:["CRWV"],s:"op",mw:"133 MW IT live; 800 MW leased",v:">$1B/yr avg rent (15-yr)",note:"Phase I delivered Q2 2026; Phase II halls from Q2 2027 ($3.5B notes).",d:"2026-10-27",src:"Galaxy Q3; SEC"},
 {n:"River Bend",st:"LA",c:"West Feliciana Parish",lat:30.78,lon:-91.38,owner:"Hut 8",own:"HUT",pub:1,ten:[],s:"bld",mw:"245 MW IT",v:"~$7B lease",note:"Fluidstack/Anthropic; early 2027.",d:"2026-04",src:"llmpulse tracker"},
@@ -2238,7 +2238,7 @@ const DC_SITES=[
 ];
 /* public companies for the roster (US-listed). rev = latest TTM revenue $M (stockanalysis.com), bk = backlog $M */
 const DC_COS=[
-{t:"MSFT",n:"Microsoft",g:"Hyperscalers & AI clouds",rev:331840,bk:677000,bkn:"commercial RPO, Sep 30 2026"},
+{t:"MSFT",n:"Microsoft",g:"Hyperscalers & AI clouds",rev:331840,bk:677000,bkn:"commercial RPO, Sep 30 2026",lv:26700,lvn:"compute contracts that include GPUs, not pure building leases: Nebius Vineland ~$17–19B (low end used) + IREN Childress $9.7B; Crusoe Abilene expansion not disclosed",lvStar:1},
 {t:"AMZN",n:"Amazon",g:"Hyperscalers & AI clouds",rev:775680,bk:578000,bkn:"performance obligations (mostly AWS), Sep 30 2026"},
 {t:"GOOGL",n:"Alphabet",g:"Hyperscalers & AI clouds",rev:445870,bk:560800,bkn:"Google Cloud backlog, Sep 30 2026"},
 {t:"META",n:"Meta",g:"Hyperscalers & AI clouds",rev:241610,bk:null},
@@ -2249,7 +2249,7 @@ const DC_COS=[
 {t:"IRM",n:"Iron Mountain",g:"Data center REITs",rev:7560,bk:null},
 {t:"AMT",n:"American Tower (CoreSite)",g:"Data center REITs",rev:10940,bk:null},
 {t:"PLD",n:"Prologis",g:"Data center REITs",rev:null,bk:null},
-{t:"CRWV",n:"CoreWeave",g:"Neoclouds & AI hosts",rev:7590,bk:132500,bkn:"revenue backlog, Sep 30 2026"},
+{t:"CRWV",n:"CoreWeave",g:"Neoclouds & AI hosts",rev:7590,bk:132500,bkn:"revenue backlog, Sep 30 2026",lv:36200,lvn:"landlord-disclosed contract values: Galaxy Helios >$1B/yr avg over 15 yrs (~$15B) + Applied Digital Polaris Forge ~$11B + Core Scientific ~$10.2B across 6 sites / ~590 MW (map tracks Denton only)"},
 {t:"NBIS",n:"Nebius",g:"Neoclouds & AI hosts",rev:1360,bk:null},
 {t:"APLD",n:"Applied Digital",g:"Neoclouds & AI hosts",rev:611,bk:35700,bkn:"minimum contracted lease payments, Aug 31 2026"},
 {t:"IREN",n:"IREN",g:"Neoclouds & AI hosts",rev:695,bk:13957,bkn:"remaining contracted lease value, Sep 30 2026"},
@@ -2271,14 +2271,14 @@ const PUBC="#2dd4bf", PRIVC="#c4a7f0";
 const ENAMES={AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",US:"Multi-state / national"}
 const css=document.createElement('style');
 css.textContent=`
-#dcroster{position:absolute;top:12px;right:14px;z-index:5;width:300px;max-height:calc(100% - 56px);overflow-y:auto;
+#dcroster{position:absolute;top:12px;right:14px;z-index:5;width:420px;max-height:calc(100% - 56px);overflow-y:auto;
 background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;padding:8px 6px;font-family:var(--mono);font-size:11px}
 #dcroster .rg{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:9px 7px 3px}
-#dcroster .rhead{display:grid;grid-template-columns:42px minmax(0,1fr) 54px 58px;column-gap:6px;padding:2px 7px 4px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line)}
+#dcroster .rhead{display:grid;grid-template-columns:40px minmax(0,1fr) 48px 48px 78px 34px;column-gap:6px;padding:2px 7px 4px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line)}
 #dcroster .rhead i{font-style:normal;grid-column:1/3} #dcroster .rhead em{font-style:normal;text-align:right}
-#dcroster .dro{display:grid;grid-template-columns:42px minmax(0,1fr) 54px 58px;column-gap:6px;align-items:baseline;padding:4px 7px;border-radius:7px;cursor:pointer;color:var(--ink-dim);border:1px solid transparent}
+#dcroster .dro{display:grid;grid-template-columns:40px minmax(0,1fr) 48px 48px 78px 34px;column-gap:6px;align-items:baseline;padding:4px 7px;border-radius:7px;cursor:pointer;color:var(--ink-dim);border:1px solid transparent}
 #dcroster .dro b{color:var(--gold);font-weight:600} #dcroster .dro span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#dcroster .dro em{font-style:normal;text-align:right;color:var(--ink-faint)} #dcroster .dro em.bk{color:var(--gold)}
+#dcroster .dro em{font-style:normal;text-align:right;color:var(--ink-faint)} #dcroster .dro em.bk{color:var(--gold)} #dcroster .dro em.ls{color:#f0b45a;white-space:nowrap} #dcroster .dro em.ow{color:#5eead4}
 #dcroster .dro:hover{background:rgba(255,255,255,.04);color:var(--ink)}
 #dcroster .dro.on{border-color:var(--gold);background:rgba(231,178,74,.08);color:var(--ink)}
 #dcmap{display:block;width:100%;height:74vh;min-height:540px}
@@ -2297,7 +2297,7 @@ background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;pa
 .dcown{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:1px 6px;border-radius:5px;margin-left:6px;vertical-align:1px}
 .dcstat{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .dcstat span{font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:6px;border:1px solid}
-@media (max-width:680px){#dcroster{position:static;width:auto;max-height:140px;margin:10px 10px 0}#dcmap{height:52vh;min-height:340px}.dcback{left:auto;right:12px;top:auto;bottom:34px}}
+@media (max-width:680px){#dcroster{position:static;width:auto;max-height:170px;margin:10px 10px 0;font-size:10px}#dcmap{height:52vh;min-height:340px}.dcback{left:auto;right:12px;top:auto;bottom:34px}}
 `;
 document.head.appendChild(css);
 
@@ -2441,7 +2441,7 @@ function showCo(co){
   const owned=list.filter(s=>s.own===co.t).length;
   document.getElementById('dcph').innerHTML=`<div class="ptype">${co.g}</div><h2>${co.n}</h2>
   <div class="pval">${co.t} · ${fmt(co.rev)} TTM revenue${co.revn?` (${co.revn})`:''}${co.bk?` · ${fmt(co.bk)} backlog (${co.bkn})`:''}</div>
-  <div class="pval">${list.length} tracked campus${list.length===1?'':'es'} in ${sts.length} state${sts.length===1?'':'s'} · ${owned} owned${list.length-owned?` · ${list.length-owned} leased from other owners (tenant)`:''}</div>${statChips(list)}`;
+  ${co.lv?`<div class="pval" style="color:#f0b45a">Leased value ≈ ${fmt(co.lv)}${co.lvStar?'*':''} — ${esc(co.lvn)}</div>`:''}<div class="pval">${list.length} tracked campus${list.length===1?'':'es'} in ${sts.length} state${sts.length===1?'':'s'} · ${owned} owned${list.length-owned?` · ${list.length-owned} leased from other owners (tenant)`:''}</div>${statChips(list)}`;
   const pd=document.getElementById('dcpdeals');
   pd.innerHTML=list.length?sts.map(st=>{const c=cc[st];return `<h3>${ENAMES[st]||st} — ${['op','bld','prm','ann'].filter(k=>c[k]).map(k=>c[k]+' '+DC_ABBR[k]).join(' · ')}</h3>`+list.filter(s=>s.st===st).sort((a,b)=>DC_RANK[a.s]-DC_RANK[b.s]).map(s=>dealHTML(s,'co')).join('');}).join(''):`<div class="deal"><div class="db">No tracked campuses in the current filter.</div></div>`;
   openPanel(); paint();
@@ -2490,9 +2490,10 @@ function init(){
 
   const roster=document.getElementById('dcroster');
   const groups=[...new Set(DC_COS.map(c=>c.g))];
-  roster.innerHTML='<div class="rhead"><i>company</i><em>TTM rev</em><em>backlog</em></div>'+groups.map(g=>`<div class="rg">${g}</div>`+DC_COS.filter(c=>c.g===g).map(c=>{
-    const n=DC_SITES.filter(s=>roleOf(s,c.t)).length;
-    return `<div class="dro" data-t="${c.t}" title="${esc(c.n)} — ${n} tracked campus${n===1?'':'es'}${c.bk?' · backlog: '+esc(c.bkn):''}${c.revn?' · revenue '+esc(c.revn):''}"><b>${c.t}</b><span>${esc(c.n)}</span><em>${fmt(c.rev)}</em><em class="bk">${fmt(c.bk)}</em></div>`;}).join('')).join('');
+  roster.innerHTML='<div class="rhead"><i>company</i><em>TTM rev</em><em>backlog</em><em title="Tracked campuses where the company is the tenant, plus total disclosed lease / contract value">leased</em><em title="Tracked campuses the company owns or operates">owned</em></div>'+groups.map(g=>`<div class="rg">${g}</div>`+DC_COS.filter(c=>c.g===g).map(c=>{
+    const nl=DC_SITES.filter(s=>roleOf(s,c.t)==='tenant').length, no=DC_SITES.filter(s=>s.own===c.t).length;
+    const lcell=nl?nl+(c.lv?' · '+fmt(c.lv)+(c.lvStar?'*':''):''):'—';
+    return `<div class="dro" data-t="${c.t}" title="${esc(c.n)} — owns ${no}, leases ${nl} tracked campus${nl===1?'':'es'}${c.lv?' · lease value: '+esc(c.lvn):nl?' · lease values not disclosed':''}${c.bk?' · backlog: '+esc(c.bkn):''}${c.revn?' · revenue '+esc(c.revn):''}"><b>${c.t}</b><span>${esc(c.n)}</span><em>${fmt(c.rev)}</em><em class="bk">${fmt(c.bk)}</em><em class="ls">${lcell}</em><em class="ow">${no||'—'}</em></div>`;}).join('')).join('');
   roster.querySelectorAll('.dro').forEach(el=>el.addEventListener('click',()=>{ const co=DC_COS.find(c=>c.t===el.dataset.t); if(selCo===co) reset(); else showCo(co); }));
   const search=document.getElementById('dcsearch');
   search.addEventListener('input',()=>{ const q=search.value.trim().toLowerCase();
