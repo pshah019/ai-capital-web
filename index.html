@@ -1861,7 +1861,7 @@ font-family:var(--mono);font-size:11px;color:var(--ink-dim);transition:.15s;bord
 #eshare .eshr:hover b{text-decoration:underline}
 #eroster .ero:hover{background:rgba(255,255,255,.04);color:var(--ink)}
 #eroster .ero.on{border-color:var(--gold);background:rgba(231,178,74,.08);color:var(--ink)}
-#emap .est{stroke:#26344f;stroke-width:.7;cursor:pointer;transition:fill .18s,opacity .18s}
+#emap .est{stroke:#26344f;stroke-width:.7;cursor:pointer;transition:fill .18s,opacity .18s;vector-effect:non-scaling-stroke}
 #emap .est:hover{stroke:var(--gold);stroke-width:1.4}
 #emap .est.sel{stroke:var(--gold);stroke-width:1.6}
 #emap .elbl{font-family:var(--mono);font-size:9px;fill:var(--ink-dim);paint-order:stroke;stroke:#070a11;stroke-width:2px;pointer-events:none}
@@ -1880,6 +1880,161 @@ document.head.appendChild(ecss);
 let eInited=false, eSelCo=null, eSelSt=null;
 const eFilters={operating:true,contracted:true,planned:true};
 let ePaths=null, eLabels=null, eCountScale=null;
+let eG=null,eProj=null,ePathFn=null,eFeats=null,eK=1,eSitesG=null;
+/* Energy Map site locations: "TICKER|ST" -> [[lat,lon,label,approx]] (approx=1 → service territory / company-wide / site not disclosed) */
+const ENERGY_LOC={
+"VST|TX":[[32.30,-97.79,"Comanche Peak nuclear"],[31.6,-97.0,"ERCOT gas/coal/solar fleet",1]],
+"VST|OH":[[41.80,-81.14,"Perry nuclear"],[41.60,-83.09,"Davis-Besse nuclear"]],
+"VST|PA":[[40.62,-80.43,"Beaver Valley nuclear"]],
+"VST|IL":[[38.20,-89.85,"Illinois Power / Dynegy fleet",1]],
+"VST|CA":[[36.80,-121.78,"Moss Landing storage"]],
+"CEG|PA":[[40.15,-76.72,"Crane (TMI-1) restart"],[40.22,-75.59,"Limerick nuclear"],[39.76,-76.27,"Peach Bottom nuclear"]],
+"CEG|IL":[[40.17,-88.83,"Clinton nuclear"],[42.07,-89.28,"Byron nuclear"],[41.24,-88.23,"Braidwood nuclear"]],
+"CEG|NJ":[[39.46,-75.54,"Salem nuclear"]],
+"CEG|NY":[[43.52,-76.41,"Nine Mile Pt / FitzPatrick"]],
+"CEG|MD":[[38.43,-76.44,"Calvert Cliffs nuclear"]],
+"CEG|TX":[[29.72,-95.13,"Calpine ERCOT gas fleet",1]],
+"CEG|CA":[[38.79,-122.76,"The Geysers geothermal"]],
+"TLN|PA":[[41.09,-76.15,"Susquehanna nuclear"],[41.07,-76.67,"Montour campus"]],
+"TLN|OH":[[40.03,-81.54,"Guernsey Power Station"]],
+"TLN|MD":[[39.18,-76.53,"Brandon Shores & Wagner"]],
+"NRG|TX":[[29.76,-95.37,"ERCOT fleet / new CCGTs (sites TBD)",1]],
+"NRG|NY":[[40.76,-73.95,"Ravenswood"]],
+"NRG|PA":[[39.87,-77.16,"Hunterstown CCGT"]],
+"PEG|NJ":[[39.47,-75.53,"Salem / Hope Creek"]],
+"PEG|PA":[[39.76,-76.27,"Peach Bottom (50%)"]],
+"PEG|NY":[[40.79,-73.13,"PSEG Long Island territory",1]],
+"NEE|FL":[[26.88,-80.06,"FPL territory (Juno Beach HQ)",1]],
+"NEE|IA":[[42.10,-91.78,"Duane Arnold restart"]],
+"NEE|TX":[[31.8,-95.65,"Project Anderson gas (approx)",1]],
+"NEE|PA":[[40.0,-80.0,"SW Pennsylvania gas (approx)",1]],
+"NEE|NM":[[34.8,-106.85,"Meta solar + storage (approx)",1]],
+"NEE|OK":[[36.4,-97.6,"Google clean-energy projects (approx)",1]],
+"NEE|CO":[[39.7,-104.9,"Xcel co-development (approx)",1]],
+"NEE|ND":[[46.8,-100.8,"Basin Electric gas (approx)",1]],
+"D|VA":[[39.04,-77.49,"Data Center Alley (Loudoun)"],[37.38,-77.42,"Chesterfield reliability center"],[36.85,-75.98,"Coastal Virginia Offshore Wind"]],
+"D|SC":[[33.97,-81.07,"Dominion Energy SC territory",1]],
+"DUK|NC":[[35.23,-80.84,"Duke Energy Carolinas territory",1]],
+"DUK|SC":[[34.50,-82.65,"Anderson County CCGT"]],
+"DUK|IN":[[39.70,-86.40,"Duke Energy Indiana territory",1]],
+"DUK|FL":[[27.77,-82.64,"Duke Energy Florida territory",1]],
+"SO|GA":[[32.37,-81.32,"OpenAI 3.2 GW (Effingham / Savannah)"],[33.14,-81.76,"Plant Vogtle nuclear"],[33.75,-84.39,"Georgia Power territory",1]],
+"SO|AL":[[33.52,-86.80,"Alabama Power territory",1]],
+"SO|MS":[[30.37,-89.09,"Mississippi Power territory",1]],
+"AEP|OH":[[40.0,-82.9,"AEP Ohio territory",1]],
+"AEP|TX":[[27.8,-97.4,"AEP Texas / 765kV lines",1]],
+"AEP|IN":[[41.70,-86.51,"New Carlisle (Project Rainier)"]],
+"AEP|WV":[[38.35,-81.63,"Appalachian Power territory",1]],
+"EXC|IL":[[41.88,-87.63,"ComEd territory",1]],
+"EXC|MD":[[39.29,-76.61,"BGE / Pepco territory",1]],
+"EXC|PA":[[39.95,-75.17,"PECO territory",1]],
+"EXC|NJ":[[39.36,-74.42,"Atlantic City Electric",1]],
+"EXC|DE":[[39.74,-75.55,"Delmarva Power territory",1]],
+"ETR|LA":[[32.46,-91.67,"Meta Hyperion power buildout"],[30.76,-91.33,"River Bend nuclear"]],
+"ETR|MS":[[32.61,-90.04,"AWS Madison County"],[32.01,-91.05,"Grand Gulf nuclear"]],
+"ETR|AR":[[35.15,-90.18,"Google West Memphis supply"],[35.31,-93.23,"Arkansas Nuclear One"]],
+"ETR|TX":[[30.08,-94.10,"Entergy Texas territory",1]],
+"GEV|TN":[[35.89,-84.38,"Clinch River BWRX-300"]],
+"GEV|SC":[[34.85,-82.39,"Greenville turbine plant"]],
+"GEV|NY":[[42.81,-73.94,"Schenectady campus"]],
+"GEV|PA":[[40.14,-79.90,"Charleroi grid equipment"],[40.54,-79.16,"Homer City turbines"]],
+"GEV|NC":[[34.32,-77.91,"GE Hitachi Nuclear, Wilmington"]],
+"GEV|FL":[[30.42,-87.22,"Pensacola wind factory"]],
+"PWR|TX":[[29.76,-95.37,"Houston HQ / ERCOT work"]],
+"PWR|NM":[[34.2,-106.4,"SunZia transmission",1]],
+"BE|CA":[[37.34,-121.89,"San Jose HQ"],[37.55,-121.99,"Fremont factory"]],
+"BE|DE":[[39.68,-75.75,"Newark factory"]],
+"BE|WY":[[41.14,-104.82,"Cheyenne AI Factory"]],
+"BE|NM":[[31.86,-106.65,"Project Jupiter (Doña Ana)"]],
+"OKLO|ID":[[43.52,-112.95,"Aurora at INL"]],
+"OKLO|OH":[[39.07,-83.01,"Meta 1.2 GW, Piketon"]],
+"OKLO|TN":[[36.01,-84.27,"Advanced Fuel Center, Oak Ridge"]],
+"OKLO|AK":[[64.67,-147.10,"Eielson AFB microreactor"]],
+"OKLO|TX":[[31.99,-102.08,"Diamondback LOI (Permian)",1]],
+"OKLO|WY":[[42.9,-107.5,"Wyoming Hyperscale LOI",1]],
+"XE|MD":[[39.08,-77.15,"Rockville HQ"]],
+"XE|TX":[[28.41,-96.71,"Long Mott (Seadrift, with Dow)"]],
+"XE|WA":[[46.29,-119.28,"Energy Northwest, Richland"]],
+"XE|TN":[[35.96,-84.29,"TRISO-X fuel, Oak Ridge"]],
+"SMR|OR":[[45.52,-122.68,"Portland HQ"],[44.56,-123.26,"Corvallis engineering"]],
+"SMR|TN":[[35.96,-83.92,"TVA–ENTRA1 program (sites TBD)",1]],
+"NNE|IL":[[40.11,-88.21,"KRONOS, Urbana-Champaign"]],
+"NNE|TN":[[36.02,-84.25,"Oak Ridge tech HQ"]],
+"LEU|OH":[[39.01,-83.00,"American Centrifuge, Piketon"]],
+"LEU|TN":[[35.98,-84.30,"Centrifuge manufacturing, Oak Ridge"]],
+"BWXT|VA":[[37.41,-79.14,"Lynchburg campus"]],
+"BWXT|OH":[[41.01,-81.60,"Barberton plant"],[41.59,-81.53,"Euclid plant"]],
+"BWXT|IN":[[37.93,-87.90,"Mount Vernon plant"]],
+"BWXT|TN":[[36.15,-82.42,"NFS Erwin"]],
+"BWXT|ID":[[43.50,-112.88,"Project Pele at INL"]],
+"EOSE|PA":[[40.41,-79.82,"Turtle Creek factory"],[40.66,-80.10,"Marshall Township HQ"]],
+"FLNC|VA":[[38.88,-77.10,"Arlington HQ"]],
+"FLNC|UT":[[40.76,-111.89,"Battery module plant",1]],
+"FLNC|TN":[[35.98,-86.52,"Smyrna cell supply"]],
+"FLNC|AZ":[[33.44,-112.36,"Goodyear production"]],
+"FLNC|TX":[[29.76,-95.37,"Houston thermal facility"]],
+"FLNC|CA":[[36.2,-119.35,"Rexford 2 BESS, Tulare County"]],
+"FSLR|OH":[[41.56,-83.63,"Perrysburg factories"]],
+"FSLR|AL":[[34.52,-87.31,"Lawrence County factory"]],
+"FSLR|LA":[[30.0,-91.82,"Iberia Parish factory"]],
+"FSLR|SC":[[35.07,-81.65,"Gaffney facility"]],
+"TE|TX":[[32.59,-96.68,"G1 module plant, Wilmer"],[30.79,-96.98,"G2 cell fab, Milam County"]],
+"VRT|OH":[[40.13,-82.93,"Westerville HQ (company-wide)",1]],
+"ETN|OH":[[41.46,-81.51,"Cleveland-area HQ (company-wide)",1]],
+"CAT|OH":[[40.09,-82.78,"Meta campus engines, New Albany"]],
+"CMI|IN":[[39.20,-85.92,"Columbus HQ (company-wide)",1]],
+"BW|OH":[[41.08,-81.52,"Akron HQ (site undisclosed)",1]],
+"WMB|OH":[[40.08,-82.80,"Socrates N/S, New Albany"]],
+"KMI|TX":[[31.8,-102.4,"Permian Link (approx)",1]],
+"ET|AZ":[[33.45,-112.07,"Desert Southwest pipeline (to Phoenix)",1]],
+"ET|LA":[[32.40,-91.75,"Entergy / Meta supply, Richland Parish"]],
+"ET|TX":[[35.33,-101.55,"Fermi HyperGrid gas, Amarillo"],[31.0,-97.4,"Central-Texas AI campus supply",1]],
+"XEL|MN":[[44.98,-93.27,"Xcel territory",1]],
+"PPL|PA":[[40.60,-75.49,"PPL Electric territory",1]],
+"PPL|KY":[[38.25,-85.76,"LG&E / KU territory",1]],
+"AEE|MO":[[38.91,-91.45,"Google / Amazon, New Florence"],[38.63,-90.20,"Ameren Missouri territory",1]],
+"SRE|TX":[[32.78,-96.80,"Oncor territory",1]],
+"AES|IN":[[39.77,-86.16,"AES Indiana territory",1]],
+"AES|OH":[[39.76,-84.19,"AES Ohio territory",1]],
+"BEP|PA":[[39.83,-76.33,"Holtwood hydro"],[39.92,-76.39,"Safe Harbor hydro"]],
+"CCJ|PA":[[40.69,-80.10,"Westinghouse HQ (AP1000 sites TBD)",1]],
+"FRMI|TX":[[35.33,-101.55,"Project Matador, Amarillo"]],
+"EFXT|TX":[[31.0,-99.0,">1 GW award (site undisclosed)",1]]
+};
+
+function eZoom(st){
+  if(!eG) return;
+  const f=st&&eFeats.find(x=>x.id===st); let t=d3.zoomIdentity;
+  if(f){ const b=ePathFn.bounds(f), dx=b[1][0]-b[0][0], dy=b[1][1]-b[0][1], x=(b[0][0]+b[1][0])/2, y=(b[0][1]+b[1][1])/2;
+    const k=Math.max(1,Math.min(14,0.8/Math.max(dx/975,dy/610))); t=d3.zoomIdentity.translate(975/2-k*x,610/2-k*y).scale(k); }
+  eK=t.k; eG.transition().duration(650).attr('transform',t.toString());
+  const bk=document.getElementById('eback'); if(bk) bk.style.display=st?'':'none';
+  const ro=document.getElementById('eroster'); if(ro) ro.style.display=st?'none':'';
+  const lg=document.getElementById('eloclg'); if(lg) lg.style.display=st?'':'none';
+}
+function eDrawSites(){
+  if(!eSitesG) return;
+  const data=[];
+  if(eSelSt){ ENERGY_DATA.forEach(co=>co.states.forEach(pr=>{ if(pr.st!==eSelSt||!eFilters[pr.status]) return;
+    (ENERGY_LOC[co.ticker+'|'+pr.st]||[]).forEach((L,i)=>{ const p=eProj([L[1],L[0]]); if(p) data.push({co,pr,lab:L[2],ap:!!L[3],x:p[0],y:p[1],key:co.ticker+pr.st+i}); }); })); }
+  const seen={}; data.forEach(d=>{ const k=Math.round(d.x/2.5)+'_'+Math.round(d.y/2.5); const i=seen[k]=(seen[k]||0)+1; if(i>1){ const a=i*2.1, r=(i-1)*3.2/eK; d.x+=Math.cos(a)*r; d.y+=Math.sin(a)*r; } });
+  const R=6.5/eK, fs=8.5/eK;
+  const g=eSitesG.selectAll('g.esg').data(data,d=>d.key); g.exit().remove();
+  const ge=g.enter().append('g').attr('class','esg'); ge.append('circle'); ge.append('text');
+  const all=ge.merge(g).attr('transform',d=>`translate(${d.x},${d.y})`).style('cursor','pointer');
+  all.select('circle').attr('r',R).attr('fill',d=>d.ap?'#0b111d':EST_COL[d.pr.status]).attr('stroke',d=>d.ap?EST_COL[d.pr.status]:'#070a11')
+    .attr('vector-effect','non-scaling-stroke').attr('stroke-width',d=>d.ap?2.2:1.2).attr('stroke-dasharray',d=>d.ap?'3 2':null).attr('opacity',d=>eSelCo&&eSelCo!==d.co?.3:1)
+    .on('mousemove',(ev,d)=>{ const t=eTip(); t.innerHTML=`<div class="t-route">${d.co.ticker} · ${d.lab}</div><div class="t-body">${d.co.name} — ${EST_LABEL[d.pr.status]}${d.ap?' · approximate location (territory / company-wide / site not disclosed)':''}<br>${d.pr.items.map(i=>i.title).join(' · ')}</div>`; t.style.opacity=1; t.style.left=Math.min(ev.clientX+14,innerWidth-320)+'px'; t.style.top=Math.min(ev.clientY+12,innerHeight-110)+'px'; })
+    .on('mouseleave',()=>{ eTip().style.opacity=0; })
+    .on('click',(ev,d)=>{ ev.stopPropagation(); eTip().style.opacity=0; const h=[...document.querySelectorAll('#epdeals h3')].find(x=>x.textContent.startsWith(d.co.ticker+' ')); if(h){ document.getElementById('epanel').classList.add('open'); h.scrollIntoView({behavior:'smooth',block:'start'}); } });
+  const lt=d=>{ const t=d.co.ticker+' · '+d.lab; return t.length>36?t.slice(0,35)+'…':t; };
+  all.select('text').attr('x',R+2/eK).attr('y',fs*0.35).style('font-size',fs+'px').style('font-family','var(--mono)').style('fill',d=>d.ap?'var(--ink-dim)':'var(--ink)')
+    .style('paint-order','stroke').style('stroke','#070a11').style('stroke-width',(2.2/eK)+'px').style('pointer-events','none').text(lt);
+  const placed=[], show=new Set();
+  data.slice().sort((a,b)=>(a.ap-b.ap)||((eSelCo===b.co)-(eSelCo===a.co))).forEach(d=>{ const w=lt(d).length*fs*0.62+R, h=fs*1.3; const bx=[d.x-R,d.y-h/2,d.x+w,d.y+h/2];
+    if(!placed.some(b=>!(bx[2]<b[0]||bx[0]>b[2]||bx[3]<b[1]||bx[1]>b[3]))){ placed.push(bx); show.add(d); } });
+  all.select('text').attr('display',d=>show.has(d)?null:'none');
+}
 
 function ePres(co){ /* filtered states list for a company */
   return co.states.filter(s=>eFilters[s.status]);
@@ -1919,6 +2074,8 @@ function ePaint(){
     return ePres(eSelCo).some(s=>s.st===d.id)?1:.25;
   });
   document.querySelectorAll('#eroster .ero').forEach(el=>el.classList.toggle('on',!!eSelCo&&el.dataset.t===eSelCo.ticker));
+  if(eSelSt){ eLabels.attr('opacity',0); ePaths.attr('opacity',d=>d.id===eSelSt?1:.25).filter(d=>d.id===eSelSt).attr('fill','#1f2c40'); }
+  eDrawSites();
 }
 
 function eMeta(it){
@@ -1951,7 +2108,7 @@ function eShowState(st){
   else pd.innerHTML=rows.map(({co,pres})=>
     `<h3>${co.ticker} · ${co.name} ${eBadge(pres.status)}</h3>`+pres.items.map(it=>eDeal(it,pres.status)).join('')
   ).join('');
-  eOpenPanel(); ePaint();
+  eOpenPanel(); eZoom(st); ePaint();
 }
 
 function eShowCo(co){
@@ -1971,7 +2128,7 @@ function eShowCo(co){
     `<h3>${ENAMES[s.st]||s.st} ${eBadge(s.status)}</h3>`+s.items.map(it=>eDeal(it,s.status)).join('')
   ).join('');
   pd.innerHTML=html;
-  eOpenPanel(); ePaint();
+  eOpenPanel(); eZoom(null); ePaint();
 }
 
 function eReset(){
@@ -1980,7 +2137,7 @@ function eReset(){
   document.querySelectorAll('#chips-energy .chip').forEach(c=>c.dataset.on="true");
   const s=document.getElementById('esearch'); if(s) s.value='';
   document.querySelectorAll('#eroster .ero').forEach(el=>el.style.display='');
-  eClosePanel(); ePaint();
+  eClosePanel(); eZoom(null); ePaint();
 }
 
 function initEnergyMap(){
@@ -1989,6 +2146,7 @@ function initEnergyMap(){
   const proj=d3.geoAlbersUsa().fitExtent([[8,8],[658,602]],geo);
   const path=d3.geoPath(proj);
   const g=svg.append('g');
+  eG=g; eProj=proj; ePathFn=path; eFeats=geo.features.filter(f=>path(f));
   const tip=eTip();
 
   ePaths=g.selectAll('path').data(geo.features.filter(f=>path(f))).join('path')
@@ -2006,12 +2164,20 @@ function initEnergyMap(){
       tip.style.left=x+'px'; tip.style.top=y+'px';
     })
     .on('mouseleave',()=>{ tip.style.opacity=0; })
-    .on('click',(ev,d)=>{ eShowState(d.id); });
+    .on('click',(ev,d)=>{ ev.stopPropagation(); eTip().style.opacity=0; eShowState(d.id); });
 
   eLabels=g.selectAll('text').data(geo.features.filter(f=>path(f)&&path.area(f)>620)).join('text')
     .attr('class','elbl').attr('text-anchor','middle')
     .attr('x',d=>path.centroid(d)[0]).attr('y',d=>path.centroid(d)[1]+3)
     .text(d=>d.id);
+  eSitesG=g.append('g');
+  svg.on('click',()=>{ if(eSelSt){ eSelSt=null; eZoom(null); eClosePanel(); ePaint(); } });
+  const stg=document.querySelector('#view-energy .stage');
+  const bk=document.createElement('div'); bk.id='eback'; bk.className='dcback'; bk.style.display='none'; bk.textContent='← Back to US map'; stg.appendChild(bk);
+  bk.addEventListener('click',e=>{ e.stopPropagation(); eSelSt=null; eZoom(null); eClosePanel(); ePaint(); });
+  const lg=document.createElement('div'); lg.id='eloclg'; lg.className='dcownleg'; lg.style.display='none';
+  lg.innerHTML='<u style="background:#34d399"></u>solid dot = known site (plant, factory, project)<br><u style="border:2px dashed #34d399;width:8px;height:8px"></u>hollow dot = approximate (territory / company-wide)<br><span style="color:var(--ink-faint)">color = operating · contracted · planned</span>';
+  stg.appendChild(lg);
 
   /* status filter chips */
   const chips=document.getElementById('chips-energy');
@@ -2068,7 +2234,7 @@ function initEnergyMap(){
   }));
 
   document.getElementById('reset-energy').addEventListener('click',eReset);
-  document.getElementById('epclose').addEventListener('click',()=>{ eClosePanel(); eSelSt=null; ePaint(); });
+  document.getElementById('epclose').addEventListener('click',()=>{ eClosePanel(); eSelSt=null; eZoom(null); ePaint(); });
 
   ePaint();
 }
