@@ -115,6 +115,9 @@ background:rgba(255,255,255,.03);border:1px solid var(--card-edge);border-radius
 padding:10px 17px;cursor:pointer;transition:.18s}
 .tab:hover{color:var(--ink);border-color:#3b4d72}
 .tab.active{color:#0c1322;background:var(--gold);border-color:var(--gold);font-weight:600}
+.subtabs{margin-top:-8px;padding:8px 0 8px 14px;border-left:2px solid var(--gold);gap:7px}
+.subtabs .tab{padding:7px 13px;font-size:11px}
+.subtabs .tab.active{background:rgba(231,178,74,.16);color:var(--gold);border-color:var(--gold)}
 /* clickable sector / role legends (all tabs) */
 .key span{cursor:pointer;transition:.15s;padding:3px 6px;border-radius:6px}
 .key span:hover{background:rgba(255,255,255,.07)}
@@ -137,8 +140,14 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <p style="font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink-faint);margin:10px 0 0">Not financial advice, investment advice, or legal advice — just opinions and thoughts.</p>
 </header>
 <div class="rule"></div>
-<div class="tabs">
-<button class="tab active" data-view="capital">◆ The Capital Web</button>
+<div class="tabs" id="maintabs">
+<button class="tab active" data-group="ai">◆ AI / Mag 7 Webs</button>
+<button class="tab" data-view="energy">⚡ Energy Map</button>
+<button class="tab" data-view="datacenter">▣ Data Center Map</button>
+<button class="tab" data-view="stocks">▤ Stock Research Data</button>
+</div>
+<div class="tabs subtabs" id="aitabs">
+<button class="tab active" data-view="capital">◆ AI Macro Web</button>
 <button class="tab" data-view="nvidia">▲ Nvidia Web</button>
 <button class="tab" data-view="apple">▲ Apple Web</button>
 <button class="tab" data-view="microsoft">▲ Microsoft Web</button>
@@ -146,7 +155,6 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <button class="tab" data-view="amazon">▲ Amazon Web</button>
 <button class="tab" data-view="meta">▲ Meta Web</button>
 <button class="tab" data-view="tesla">▲ Tesla Web</button>
-<button class="tab" data-view="energy">⚡ Energy Map</button>
 </div>
 <div id="view-capital" class="webview">
 <div class="controls">
@@ -269,6 +277,68 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 </div>
 <div id="epanel" class="panel"><button class="pclose" id="epclose">×</button><div class="ph" id="eph"></div><div class="pdeals" id="epdeals"></div></div>
 <footer><div><b>Curated snapshot, approx Oct 2026.</b> Operating footprints from company fleet disclosures (EIA-860 lineage); deals, dollar values &amp; financing structures from company IR, DOE, state PSC filings, Utility Dive, Data Center Dynamics, POWER, AJC &amp; trade press. TTM revenue per latest earnings summaries (stockanalysis.com, Q2 '26); backlog = company-reported order backlog / remaining performance obligations only (— where none is reported; regulated utilities grow rate base, not backlog — analyst contract estimates excluded); revenue share is of the 42-company tracked cohort, not any total market. Dollar values shown only where disclosed at state or project level — program-level totals are labeled as such, never split by guesswork. A map, not a balance sheet. Not financial advice, investment advice, or legal advice.</div></footer>
+</div>
+<div id="view-datacenter" class="webview" style="display:none">
+<p class="sub" style="margin:0 0 16px">Where the AI build-out is physically landing — tracked data-center campuses by state, split by <b style="color:#2dd4bf">publicly traded</b> vs <b style="color:#c4a7f0">private</b> owners. Click a state to zoom in and see each campus and what part of the state it sits in; pick a company to light up its footprint with counts of what's running vs being built vs permitted.</p>
+<div class="controls">
+<div class="legend-block"><div class="ltitle">Status — tap to filter</div><div class="chips" id="chips-dc"></div></div>
+<div class="legend-block"><div class="ltitle">Owner — tap to filter</div><div class="chips" id="chips-dcown"></div></div>
+<div class="legend-block"><div class="ltitle">State labels</div>
+<div class="key" style="cursor:default"><span style="cursor:default"><b style="color:#2dd4bf;font-weight:600">7</b>&nbsp;public · <b style="color:#c4a7f0;font-weight:600">3</b>&nbsp;private campuses</span></div>
+<div style="margin-top:12px"><button class="btn" id="reset-dc">⟲ Reset / zoom out</button></div></div>
+</div>
+<div class="stage" style="overflow:visible">
+<div class="netsearch"><input id="dcsearch" placeholder="Search company / ticker…" autocomplete="off"></div>
+<div id="dcroster"></div>
+<div id="dcback" class="dcback" style="display:none">← Back to US map</div>
+<svg id="dcmap" viewBox="0 0 975 610" preserveAspectRatio="xMidYMid meet"></svg>
+<div class="hint" id="dchint">Tap a state to zoom in · tap a company to light its footprint</div>
+</div>
+<div id="dcpanel" class="panel"><button class="pclose" id="dcpclose">×</button><div class="ph" id="dcph"></div><div class="pdeals" id="dcpdeals"></div></div>
+<footer><div><b>Curated snapshot, Nov 21, 2026</b> — <span id="dccount"></span>. Not a census of every US data center: it tracks the campuses that matter for the AI build-out plus each listed operator's flagship hubs. Locations are city / county level. <b>Status:</b> operating = running (incl. partially live) · under construction · approved / permitted = zoning, permits or utility approval in hand but no vertical build · announced = deal or plan signed, no permits or construction yet. <b>Public</b> = the owner / operator is listed (SoftBank-led sites count as public via SoftBank Group, Tokyo: 9984; JV sites count with their listed sponsor). Revenue = latest TTM on stockanalysis.com (mostly through Jun 30, 2026); backlog = company-reported RPO / contracted lease value (— where none is reported). Sources: company releases &amp; filings, Epoch AI, llmpulse &amp; ElectricChoice trackers, DCD, CoStar, state economic-development offices. Not financial advice, investment advice, or legal advice.</div></footer>
+</div>
+
+<div id="view-stocks" class="webview" style="display:none">
+<p class="sub" style="margin:0 0 16px">A crash-ready price sheet. Press <b>Run scan</b> to pull live prices for your list and see how far each name sits below last week's high, last month's high, where it started the year and where it first traded. Every scan is saved, so you can compare against the last run. Save your own watchlists to reuse on any device.</p>
+<div class="srcard">
+<div class="srrow">
+<div class="srfield"><label>Watchlist</label>
+<div class="srinline"><select id="srlist"><option value="">— Default (AI leaders + indexes) —</option></select>
+<button class="btn" id="srnew">+ New list</button><button class="btn" id="sredit">Edit</button><button class="btn srdel" id="srdelete">Delete</button></div></div>
+<div class="srfield"><label>Past scans</label><div class="srinline"><select id="srruns"><option value="">— latest live scan —</option></select></div></div>
+</div>
+<div class="srrow">
+<div class="srfield" style="flex:1"><label>Tickers <span class="srhint">(comma, space or new line; up to 60)</span></label>
+<textarea id="srsyms" rows="2" spellcheck="false"></textarea></div>
+</div>
+<div class="srrow" id="srnotesrow" style="display:none"><div class="srfield" style="flex:1"><label>List notes</label><div id="srnotes" class="srnotes"></div></div></div>
+<div class="srrow srbar">
+<button class="btn srrun" id="srrun">▶ Run scan</button>
+<button class="btn" id="srcsv">⤓ CSV</button>
+<span id="srstatus" class="srstatus"></span>
+</div>
+</div>
+<div id="srform" class="srcard" style="display:none">
+<div class="srrow"><div class="srfield"><label>List name</label><input id="srfname" maxlength="80" placeholder="e.g. Crash buys"></div></div>
+<div class="srrow"><div class="srfield" style="flex:1"><label>Tickers</label><textarea id="srfsyms" rows="3" spellcheck="false" placeholder="NVDA, AMD, AVGO…"></textarea></div></div>
+<div class="srrow"><div class="srfield" style="flex:1"><label>Notes <span class="srhint">(entry targets, thesis, reminders)</span></label><textarea id="srfnotes" rows="3"></textarea></div></div>
+<div class="srrow srbar"><button class="btn srrun" id="srfsave">Save list</button><button class="btn" id="srfcancel">Cancel</button><span id="srfstatus" class="srstatus"></span></div>
+</div>
+<div class="srtablewrap">
+<table class="srtable" id="srtable">
+<thead><tr>
+<th data-k="symbol">A · Ticker</th>
+<th data-k="price">B · Current price <span class="srsub" id="srasof">(vs last run)</span></th>
+<th data-k="prevWeekHigh">C · Prev week high</th>
+<th data-k="prevMonthHigh">D · Prev month high</th>
+<th data-k="ytdStart">E · YTD start</th>
+<th data-k="ipoPrice">F · IPO / first trade</th>
+<th data-k="category">G · Category</th>
+</tr></thead>
+<tbody id="srbody"><tr><td colspan="7" class="srempty">Press <b>Run scan</b> to load prices.</td></tr></tbody>
+</table>
+</div>
+<footer><div><b>Data:</b> one source for every number — Yahoo Finance's public chart data (split-adjusted daily bars and the live regular-market price), with Stooq's free daily history as a fallback (the row says when). <b>Prev week high</b> = highest high of the most recent completed Mon–Fri week; <b>prev month high</b> = highest high of the last completed calendar month; <b>YTD start</b> = first close of the year (with % change since); <b>IPO / first trade</b> = first traded price on record, split-adjusted (not the offer price). Red % = how far below that level the stock sits now. Scans and watchlists are stored in Supabase. Prices can be delayed ~15 min. Not financial advice, investment advice, or legal advice.</div></footer>
 </div>
 </div>
 <div class="tip" id="tip"></div>
@@ -671,18 +741,27 @@ sim.force("x",d3.forceX(W/2).strength(.045)).force("y",d3.forceY(H/2).strength(.
 });
 </script>
 <script>
-/* ===== Tab switching (isolated; does not touch the capital web) ===== */
+/* ===== Tab switching: main row (AI / Mag 7 group, Energy, Data Center, Stocks) + AI sub-row ===== */
 (function(){
+const AI=['capital','nvidia','apple','microsoft','alphabet','amazon','meta','tesla'];
+let lastAi='capital';
 function showView(v){
-document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.view===v));
-document.querySelectorAll('.webview').forEach(el=>el.style.display='none');
-const t=document.getElementById('view-'+v); if(t) t.style.display='';
-const p=document.getElementById('panel'); if(p) p.classList.remove('open');
-const tp=document.getElementById('tip'); if(tp) tp.style.opacity=0;
-if(v==='capital'){ window.dispatchEvent(new Event('resize')); }
-else if(window.__showWeb){ window.__showWeb(v); }
+  if(!document.getElementById('view-'+v)) v='capital';
+  if(AI.includes(v)) lastAi=v;
+  document.querySelectorAll('#aitabs .tab').forEach(x=>x.classList.toggle('active', x.dataset.view===v));
+  document.querySelectorAll('#maintabs .tab').forEach(x=>x.classList.toggle('active', x.dataset.group==='ai' ? AI.includes(v) : x.dataset.view===v));
+  const sub=document.getElementById('aitabs'); if(sub) sub.style.display=AI.includes(v)?'':'none';
+  document.querySelectorAll('.webview').forEach(el=>el.style.display='none');
+  const t=document.getElementById('view-'+v); if(t) t.style.display='';
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('.tip').forEach(tp=>tp.style.opacity=0);
+  if(v==='capital'){ window.dispatchEvent(new Event('resize')); }
+  else if(window.__showWeb){ window.__showWeb(v); }
+  try{ history.replaceState(null,'',v==='capital'?location.pathname+location.search:'#'+v); }catch(e){}
 }
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showView(t.dataset.view)));
+window.__showView=showView;
+document.querySelectorAll('.tab[data-view]').forEach(t=>t.addEventListener('click',()=>showView(t.dataset.view)));
+document.querySelectorAll('.tab[data-group="ai"]').forEach(t=>t.addEventListener('click',()=>showView(lastAi)));
 })();
 
 /* ===== Nvidia Web — self-contained, lazily initialised on first open ===== */
@@ -2002,6 +2081,692 @@ window.__showWeb=function(v){
   if(ePrevShow) ePrevShow(v);
 };
 })();
+</script>
+<script>
+/* ===== Data Center Map dataset — curated snapshot, Nov 21, 2026 =====
+   st=state, lat/lon=approx city-level location, own=owner/operator ticker (null if private),
+   pub=owner/operator is a listed company, ten=public tenants/anchors, s=status:
+   op=operating (incl. partially live), bld=under construction, prm=approved/permitted (zoning, permits or
+   utility approval in hand, no vertical construction yet), ann=announced / deal signed (no permits or construction yet). */
+const DC_SITES=[
+/* ---------------- Microsoft ---------------- */
+{n:"Fairwater Wisconsin",st:"WI",c:"Mount Pleasant",lat:42.70,lon:-87.90,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"op",mw:"~369 MW IT live (Epoch est.)",v:"$3.3B + $4B second site",note:"First Fairwater AI factory running; second identical building under construction.",d:"2026-06",src:"Microsoft; Epoch AI"},
+{n:"Fairwater Atlanta",st:"GA",c:"Fayetteville",lat:33.45,lon:-84.45,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"op",mw:"~636 MW IT (Epoch est.)",v:"not disclosed",note:"Fairwater 2 — online since Oct 2025, linked to Wisconsin over Microsoft's AI WAN.",d:"2025-11",src:"Microsoft"},
+{n:"Pecos AI campus",st:"TX",c:"Reeves County",lat:31.42,lon:-103.49,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"ann",mw:"~2 GW",v:"multibillion (not disclosed)",note:"Announced Jun 2026; on-site gas plant at launch.",d:"2026-06",src:"llmpulse tracker"},
+{n:"Quincy campus",st:"WA",c:"Quincy",lat:47.23,lon:-119.85,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Long-running Azure West campus on cheap Columbia River hydro.",d:"ongoing",src:"Microsoft"},
+{n:"West Des Moines campus",st:"IA",c:"West Des Moines",lat:41.57,lon:-93.80,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Azure Central US; trained early OpenAI models.",d:"ongoing",src:"Microsoft"},
+{n:"Boydton campus",st:"VA",c:"Boydton",lat:36.67,lon:-78.39,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Azure East US 2 anchor campus in Mecklenburg County.",d:"ongoing",src:"Microsoft"},
+{n:"San Antonio campus",st:"TX",c:"San Antonio",lat:29.42,lon:-98.49,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Azure South Central US.",d:"ongoing",src:"Microsoft"},
+{n:"Cheyenne campus",st:"WY",c:"Cheyenne",lat:41.14,lon:-104.82,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Azure West Central US.",d:"ongoing",src:"Microsoft"},
+{n:"Goodyear / El Mirage",st:"AZ",c:"Goodyear",lat:33.44,lon:-112.36,owner:"Microsoft",own:"MSFT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"West Phoenix Azure campuses.",d:"ongoing",src:"Microsoft"},
+/* ---------------- Amazon / AWS ---------------- */
+{n:"Project Rainier",st:"IN",c:"New Carlisle",lat:41.70,lon:-86.51,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"op",mw:"~1,037 MW IT live (Epoch est.)",v:"$13.8B spent",note:"Anthropic's Trainium cluster; ~18 of ~30 buildings running (Jul 2026).",d:"2026-07",src:"llmpulse; Epoch AI"},
+{n:"Wheatfield campus",st:"IN",c:"Jasper County",lat:41.19,lon:-87.05,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"bld",mw:"not disclosed",v:"$7B",note:"Groundbreaking Nov 2026.",d:"2026-11",src:"llmpulse tracker"},
+{n:"Project Atlas",st:"MS",c:"Madison County",lat:32.61,lon:-90.04,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"op",mw:"~284 MW IT live (Epoch est.)",v:"$10B + $11B expansion",note:"Running and expanding; Apr 2026 add-on lifts AWS Mississippi total to $25B.",d:"2026-04",src:"CoStar; llmpulse"},
+{n:"Clinton campus",st:"MS",c:"Clinton",lat:32.34,lon:-90.32,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"ann",mw:"not disclosed",v:"part of $12B Apr 2026 add-on",note:"New site named in the Apr 2026 Mississippi expansion.",d:"2026-04",src:"CoStar"},
+{n:"Vicksburg campus",st:"MS",c:"Warren County",lat:32.35,lon:-90.88,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"ann",mw:"not disclosed",v:"$3B",note:"Announced Nov 2025.",d:"2025-11",src:"llmpulse tracker"},
+{n:"Hamlet campus",st:"NC",c:"Richmond County",lat:34.88,lon:-79.69,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"bld",mw:"~1 GW",v:"$10B",note:"Air permits issued; under construction.",d:"2026-08",src:"llmpulse tracker"},
+{n:"Susquehanna campus",st:"PA",c:"Salem Township",lat:41.09,lon:-76.15,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"op",mw:"~108 MW IT live; nuclear PPA up to 1,920 MW",v:"part of $20B PA plan",note:"Bought from Talen; fed by Susquehanna nuclear, expanding.",d:"2026-08",src:"llmpulse; Talen"},
+{n:"New Florence campus",st:"MO",c:"Montgomery County",lat:38.92,lon:-91.47,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"ann",mw:"not disclosed",v:"$10B",note:"Announced Jun 15, 2026; completion ~2032; faces a transparency lawsuit.",d:"2026-06-15",src:"Amazon PR Newswire"},
+{n:"King George campus",st:"VA",c:"King George County",lat:38.27,lon:-77.18,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"ann",mw:"not disclosed",v:"$6B",note:"County agreement signed Sep 2026.",d:"2026-09",src:"llmpulse tracker"},
+{n:"Pecos County campus",st:"TX",c:"Fort Stockton",lat:30.89,lon:-102.88,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"prm",mw:"GW Ranch gas plant permitted for 7.65 GW",v:"not disclosed",note:"Construction permits filed; power from Pacifico's GW Ranch.",d:"2026-08",src:"llmpulse tracker"},
+{n:"NW Louisiana campuses (3)",st:"LA",c:"Caddo & Bossier parishes",lat:32.52,lon:-93.70,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"ann",mw:"not disclosed",v:"$18B",note:"$12B announced Feb 2026, raised to $18B Aug 18, 2026 with a third campus at Resilient Technology Park, Shreveport; SWEPCO power.",d:"2026-08-18",src:"Amazon; DCD"},
+{n:"Northern Virginia cluster",st:"VA",c:"Loudoun & Prince William",lat:38.95,lon:-77.50,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"op",mw:"multi-GW region",v:"—",note:"US-East-1 — the largest cloud region on earth.",d:"ongoing",src:"AWS"},
+{n:"Central Ohio cluster",st:"OH",c:"New Albany / Hilliard",lat:40.05,lon:-83.00,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"US-East-2 region.",d:"ongoing",src:"AWS"},
+{n:"Boardman cluster",st:"OR",c:"Boardman",lat:45.84,lon:-119.70,owner:"Amazon (AWS)",own:"AMZN",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"US-West-2 region.",d:"ongoing",src:"AWS"},
+/* ---------------- Alphabet / Google ---------------- */
+{n:"Council Bluffs campus",st:"IA",c:"Council Bluffs",lat:41.26,lon:-95.86,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"One of Google's largest US campuses.",d:"ongoing",src:"Google"},
+{n:"The Dalles campus",st:"OR",c:"The Dalles",lat:45.60,lon:-121.18,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Google's first owned data center (2006).",d:"ongoing",src:"Google"},
+{n:"Mayes County campus",st:"OK",c:"Pryor",lat:36.31,lon:-95.32,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"part of $9B OK plan",note:"Long-running Oklahoma campus.",d:"ongoing",src:"Google"},
+{n:"Stillwater campus",st:"OK",c:"Stillwater",lat:36.12,lon:-97.06,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"prm",mw:"not disclosed",v:"part of $9B OK plan",note:"Building permits issued.",d:"2025-11",src:"llmpulse tracker"},
+{n:"Berkeley County campus",st:"SC",c:"Moncks Corner",lat:33.20,lon:-80.01,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating South Carolina campus.",d:"ongoing",src:"Google"},
+{n:"Lenoir campus",st:"NC",c:"Lenoir",lat:35.91,lon:-81.54,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating NC campus.",d:"ongoing",src:"Google"},
+{n:"Jackson County campus",st:"AL",c:"Bridgeport",lat:34.95,lon:-85.71,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"+$1.5B (2026–27)",note:"Expansion announced Jun 15, 2026 with TVA energy fund.",d:"2026-06-15",src:"Google blog"},
+{n:"Clarksville campus",st:"TN",c:"Clarksville",lat:36.53,lon:-87.36,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating TVA-served campus.",d:"ongoing",src:"Google"},
+{n:"Midlothian campus",st:"TX",c:"Midlothian",lat:32.48,lon:-96.99,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"part of $40B TX plan",note:"Dallas-area campus.",d:"ongoing",src:"Google"},
+{n:"Armstrong County campus",st:"TX",c:"Claude",lat:35.11,lon:-101.36,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"bld",mw:"~1 GW IT (Epoch est.)",v:"part of $40B TX plan",note:"Crusoe-built Panhandle campus under construction.",d:"2026-09",src:"Google; llmpulse"},
+{n:"Haskell County campuses (2)",st:"TX",c:"Haskell County",lat:33.16,lon:-99.73,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"ann",mw:"not disclosed",v:"part of $40B TX plan",note:"One site co-located with new solar + storage.",d:"2025-11-14",src:"Google blog"},
+{n:"Meitner Energy Center",st:"TX",c:"Gray & Roberts counties",lat:35.54,lon:-100.96,owner:"Google / Intersect",own:"GOOGL",pub:1,ten:[],s:"bld",mw:"co-located generation",v:"not disclosed",note:"Construction announced Jun 4, 2026 — data center built beside its own power plant.",d:"2026-06-04",src:"Intersect"},
+{n:"West Memphis campus",st:"AR",c:"West Memphis",lat:35.15,lon:-90.18,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"bld",mw:"~400 MW",v:"$4B",note:"Under construction (reported).",d:"2026-10",src:"llmpulse tracker"},
+{n:"Project Spade",st:"MO",c:"New Florence",lat:38.90,lon:-91.43,owner:"Google (built by Related Digital)",own:"GOOGL",pub:1,ten:[],s:"bld",mw:"1 GW+ contracted power",v:"$15B",note:"Announced May 20, 2026 next to AWS New Florence; Ameren partnership.",d:"2026-05-20",src:"CoStar; Missouri Gov."},
+{n:"Kansas City (Northland)",st:"MO",c:"Kansas City",lat:39.27,lon:-94.55,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating; part of Missouri energy-impact fund area.",d:"ongoing",src:"Google"},
+{n:"Project Cannoli",st:"MI",c:"Van Buren Township",lat:42.22,lon:-83.49,owner:"Google (Panattoni dev.)",own:"GOOGL",pub:1,ten:[],s:"prm",mw:"1 GW",v:"not disclosed",note:"Site plan approved Oct 2026; tied to Google's 2.7 GW Michigan clean-energy buildout.",d:"2026-10",src:"llmpulse; Google"},
+{n:"Cheyenne campus",st:"WY",c:"Laramie County",lat:41.10,lon:-104.75,owner:"Google (with Related Digital)",own:"GOOGL",pub:1,ten:[],s:"ann",mw:"702 MW fuel-cell plant planned",v:"$17B",note:"Google's first Wyoming data center, announced Nov 5, 2026; air-cooled; Tallgrass CCS.",d:"2026-11-05",src:"Google blog"},
+{n:"Fort Wayne campus",st:"IN",c:"Fort Wayne",lat:41.08,lon:-85.14,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"bld",mw:"~863 MW IT (Epoch est.)",v:"not disclosed",note:"Under construction.",d:"2026-08",src:"llmpulse tracker"},
+{n:"Pine Island campus",st:"MN",c:"Pine Island",lat:44.20,lon:-92.65,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"prm",mw:"not disclosed",v:"not disclosed",note:"Xcel CEAC power contract (Feb 2026); faces local opposition and a lawsuit.",d:"2026-02-24",src:"Finviz/CNBC"},
+{n:"Chesterfield campus",st:"VA",c:"Chesterfield County",lat:37.38,lon:-77.50,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"bld",mw:"not disclosed",v:"part of $9B VA plan",note:"New campus from the Aug 2025 Virginia commitment.",d:"2025-08-27",src:"Virginia Gov."},
+{n:"Loudoun / Prince William",st:"VA",c:"Ashburn area",lat:39.00,lon:-77.55,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Expanding NoVA campuses.",d:"ongoing",src:"Google"},
+{n:"Papillion campus",st:"NE",c:"Papillion",lat:41.15,lon:-96.04,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Omaha-area campus.",d:"ongoing",src:"Google"},
+{n:"Storey County campus",st:"NV",c:"TRIC / McCarran",lat:39.53,lon:-119.47,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"NV Energy clean-transition tariff site.",d:"ongoing",src:"Google"},
+{n:"Mesa campus",st:"AZ",c:"Mesa",lat:33.32,lon:-111.66,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"East Valley campus.",d:"ongoing",src:"Google"},
+{n:"Douglas County campus",st:"GA",c:"Lithia Springs",lat:33.79,lon:-84.66,owner:"Google",own:"GOOGL",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Atlanta-west campus.",d:"ongoing",src:"Google"},
+/* ---------------- Meta ---------------- */
+{n:"Hyperion",st:"LA",c:"Richland Parish (Holly Ridge)",lat:32.46,lon:-91.67,owner:"Meta (Blue Owl JV owns 80%)",own:"META",pub:1,ten:[],s:"bld",mw:"5 GW at full build",v:"$50B+ (>$200B incl. chips, reported)",note:"Meta's largest campus; $27B Blue Owl JV financing (Oct 2025); power plants energised for 1.8 GW load.",d:"2026-07",src:"Louisiana Economic Dev.; Epoch AI"},
+{n:"Prometheus",st:"OH",c:"New Albany",lat:40.09,lon:-82.78,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"1 GW",v:"not disclosed",note:"First phase running (Oct 2026).",d:"2026-10",src:"llmpulse; Meta"},
+{n:"El Paso campus",st:"TX",c:"El Paso",lat:31.90,lon:-106.40,owner:"Meta (BlackRock JV owns 80%)",own:"META",pub:1,ten:[],s:"bld",mw:"1 GW",v:"$10B–$14B",note:"BlackRock JV formed Jul 28, 2026; online 2028.",d:"2026-07-28",src:"SiliconANGLE; Meta"},
+{n:"Lebanon campus",st:"IN",c:"Lebanon",lat:40.05,lon:-86.47,owner:"Meta",own:"META",pub:1,ten:[],s:"bld",mw:"1 GW",v:"$10B+",note:"Under construction.",d:"2026-02",src:"llmpulse tracker"},
+{n:"Bowling Green campus",st:"OH",c:"Wood County",lat:41.37,lon:-83.65,owner:"Meta",own:"META",pub:1,ten:[],s:"bld",mw:"~422 MW IT (Epoch est.)",v:"not disclosed",note:"Under construction.",d:"2026-07",src:"llmpulse tracker"},
+{n:"Prineville campus",st:"OR",c:"Prineville",lat:44.30,lon:-120.83,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Meta's first owned data center.",d:"ongoing",src:"Meta"},
+{n:"Altoona campus",st:"IA",c:"Altoona",lat:41.64,lon:-93.47,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Fort Worth campus",st:"TX",c:"Fort Worth (Alliance)",lat:32.95,lon:-97.32,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Los Lunas campus",st:"NM",c:"Los Lunas",lat:34.81,lon:-106.73,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Eagle Mountain campus",st:"UT",c:"Eagle Mountain",lat:40.31,lon:-112.01,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Henrico campus",st:"VA",c:"Sandston",lat:37.52,lon:-77.32,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Stanton Springs campus",st:"GA",c:"Newton County",lat:33.62,lon:-83.82,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating; local water complaints reported by NYT (2025).",d:"ongoing",src:"Meta; NYT"},
+{n:"Huntsville campus",st:"AL",c:"Huntsville",lat:34.73,lon:-86.59,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"DeKalb campus",st:"IL",c:"DeKalb",lat:41.93,lon:-88.75,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Gallatin campus",st:"TN",c:"Gallatin",lat:36.39,lon:-86.45,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Mesa campus",st:"AZ",c:"Mesa",lat:33.30,lon:-111.62,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Kansas City campus",st:"MO",c:"Kansas City",lat:39.20,lon:-94.50,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Sarpy County campus",st:"NE",c:"Sarpy County",lat:41.08,lon:-96.12,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+{n:"Forest City campus",st:"NC",c:"Forest City",lat:35.33,lon:-81.87,owner:"Meta",own:"META",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Meta"},
+/* ---------------- SpaceX / SpaceXAI (SPCX, listed Jun 12, 2026) ---------------- */
+{n:"Colossus 1",st:"TN",c:"Memphis (SW)",lat:35.06,lon:-90.07,owner:"SpaceXAI",own:"SPCX",pub:1,ten:[],s:"op",mw:"300 MW+",v:"not disclosed",note:"Operating since Sep 2024; leased to Anthropic for inference (May 2026, reported).",d:"2026-05",src:"Cleanview; llmpulse"},
+{n:"Colossus 2 (Macrohard)",st:"TN",c:"Memphis (Whitehaven)",lat:35.00,lon:-90.01,owner:"SpaceXAI",own:"SPCX",pub:1,ten:[],s:"op",mw:"~946 MW IT live (Epoch est.)",v:"not disclosed",note:"First GW-class AI cluster; users include SpaceXAI, Anthropic and Cursor; gas turbines across the line in Southaven.",d:"2026-07",src:"Epoch AI; Cleanview"},
+{n:"MACROHARDRR",st:"MS",c:"Southaven",lat:34.99,lon:-89.99,owner:"SpaceXAI",own:"SPCX",pub:1,ten:[],s:"op",mw:"~100 MW live (Baxtel)",v:"$20B+",note:"810K sq ft warehouse conversion; part of ~2 GW Colossus cluster; turbine-permit lawsuit (NAACP) proceeding.",d:"2026-11-03",src:"Baxtel; Mississippi officials"},
+{n:"Southaven 'Gun Range' & 'Spam'",st:"MS",c:"Southaven",lat:34.95,lon:-89.96,owner:"SpaceXAI",own:"SPCX",pub:1,ten:[],s:"bld",mw:"~420K GB300 GPUs planned",v:"not disclosed",note:"Two more Colossus 2 sites; Musk targets operation by end-2026.",d:"2026-11-03",src:"Baxtel; DCD"},
+/* ---------------- Neoclouds & AI hosts (public) ---------------- */
+{n:"Lancaster campus",st:"PA",c:"Lancaster",lat:40.04,lon:-76.31,owner:"CoreWeave",own:"CRWV",pub:1,ten:[],s:"bld",mw:"100 MW (to 300 MW)",v:"up to $6B",note:"Under construction.",d:"2026-07",src:"llmpulse tracker"},
+{n:"Kenilworth campus",st:"NJ",c:"Kenilworth",lat:40.68,lon:-74.29,owner:"CoreWeave",own:"CRWV",pub:1,ten:[],s:"op",mw:"not disclosed",v:"—",note:"Operating NJ site.",d:"ongoing",src:"CoreWeave"},
+{n:"Denton campus",st:"TX",c:"Denton",lat:33.21,lon:-97.13,owner:"Core Scientific",own:"CORZ",pub:1,ten:["CRWV"],s:"op",mw:"~260 MW",v:"not disclosed",note:"Converted miner site leased to CoreWeave.",d:"2026-07",src:"llmpulse tracker"},
+{n:"Vineland campus",st:"NJ",c:"Vineland",lat:39.49,lon:-75.03,owner:"Nebius",own:"NBIS",pub:1,ten:["MSFT"],s:"op",mw:"up to 300 MW (~50 MW live)",v:"multibillion MSFT contract",note:"Serves Microsoft's ~$17–19B GPU-capacity deal.",d:"2026-04",src:"llmpulse tracker"},
+{n:"Kansas City campus",st:"MO",c:"Kansas City",lat:39.05,lon:-94.62,owner:"Nebius",own:"NBIS",pub:1,ten:[],s:"op",mw:"not disclosed",v:"—",note:"Nebius' first US site.",d:"ongoing",src:"Nebius"},
+{n:"Polaris Forge 1",st:"ND",c:"Ellendale",lat:46.00,lon:-98.53,owner:"Applied Digital",own:"APLD",pub:1,ten:["CRWV"],s:"op",mw:"400 MW IT (250 MW live)",v:"~$7B+ lease",note:"CoreWeave anchor; ~$11B total CoreWeave contracted revenue.",d:"2026-10",src:"llmpulse; Zacks"},
+{n:"Polaris Forge 2",st:"ND",c:"Harwood",lat:46.98,lon:-96.88,owner:"Applied Digital",own:"APLD",pub:1,ten:[],s:"bld",mw:"200 MW IT",v:"$2.15B notes",note:"Investment-grade hyperscaler tenant (unnamed).",d:"2026-03",src:"llmpulse tracker"},
+{n:"Horizon (Childress)",st:"TX",c:"Childress",lat:34.43,lon:-100.20,owner:"IREN",own:"IREN",pub:1,ten:["MSFT"],s:"op",mw:"750 MW site",v:"$9.7B MSFT contract",note:"Horizon 1 accepted (reported Aug 2026); ramping.",d:"2026-08",src:"llmpulse tracker"},
+{n:"Sweetwater campus",st:"TX",c:"Nolan County",lat:32.47,lon:-100.41,owner:"IREN",own:"IREN",pub:1,ten:[],s:"bld",mw:"2 GW",v:"not disclosed",note:"1.4 GW substation energised; no tenant named.",d:"2026-05",src:"llmpulse tracker"},
+{n:"Barber Lake",st:"TX",c:"Colorado City",lat:32.39,lon:-100.86,owner:"Cipher Digital",own:"CIFR",pub:1,ten:["GOOGL"],s:"bld",mw:"300 MW",v:"part of $16.6B contracted",note:"Fluidstack lease (Google backstop) extended to the full site, Sep 2026.",d:"2026-09-25",src:"24/7 Wall St; Zacks"},
+{n:"Lake Mariner",st:"NY",c:"Barker",lat:43.33,lon:-78.55,owner:"TeraWulf",own:"WULF",pub:1,ten:["GOOGL"],s:"op",mw:"440 MW IT contracted",v:"not disclosed",note:"Fluidstack & Core42 leases; running in part. Google credit backstop.",d:"2026-10",src:"llmpulse; Futurum"},
+{n:"Hawesville campus",st:"KY",c:"Hawesville",lat:37.90,lon:-86.75,owner:"TeraWulf",own:"WULF",pub:1,ten:[],s:"bld",mw:"401 MW",v:"~$19B 20-yr Anthropic lease",note:"Anthropic anchor; first capacity 2H 2027.",d:"2026-11-06",src:"Futurum; llmpulse"},
+{n:"Helios",st:"TX",c:"Dickens County",lat:33.62,lon:-100.84,owner:"Galaxy Digital",own:"GLXY",pub:1,ten:["CRWV"],s:"op",mw:"133 MW IT live; 800 MW leased",v:">$1B/yr avg rent (15-yr)",note:"Phase I delivered Q2 2026; Phase II halls from Q2 2027 ($3.5B notes).",d:"2026-10-27",src:"Galaxy Q3; SEC"},
+{n:"River Bend",st:"LA",c:"West Feliciana Parish",lat:30.78,lon:-91.38,owner:"Hut 8",own:"HUT",pub:1,ten:[],s:"bld",mw:"245 MW IT",v:"~$7B lease",note:"Fluidstack/Anthropic; early 2027.",d:"2026-04",src:"llmpulse tracker"},
+{n:"Project Matador",st:"TX",c:"Carson County (Amarillo)",lat:35.33,lon:-101.55,owner:"Fermi America",own:"FRMI",pub:1,ten:[],s:"bld",mw:"permits for 6 GW generation (11–17 GW plan)",v:"not disclosed",note:"Turbines arriving; no tenant named.",d:"2026-10",src:"llmpulse; Brightlio"},
+/* ---------------- Data center REITs (public) ---------------- */
+{n:"Ashburn campus (DC1–DC21)",st:"VA",c:"Ashburn",lat:39.02,lon:-77.46,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"World's densest interconnection hub.",d:"ongoing",src:"Equinix"},
+{n:"Silicon Valley (SV)",st:"CA",c:"San Jose",lat:37.37,lon:-121.92,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Bay Area interconnection hub.",d:"ongoing",src:"Equinix"},
+{n:"Chicago (CH)",st:"IL",c:"Elk Grove Village",lat:42.00,lon:-87.97,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Chicago metro campus.",d:"ongoing",src:"Equinix"},
+{n:"Dallas (DA)",st:"TX",c:"Dallas",lat:32.80,lon:-96.82,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Infomart interconnection hub.",d:"ongoing",src:"Equinix"},
+{n:"New York (NY)",st:"NJ",c:"Secaucus",lat:40.79,lon:-74.06,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Financial-exchange hub.",d:"ongoing",src:"Equinix"},
+{n:"Atlanta (AT)",st:"GA",c:"Atlanta",lat:33.76,lon:-84.39,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Southeast hub.",d:"ongoing",src:"Equinix"},
+{n:"Miami (MI)",st:"FL",c:"Miami",lat:25.78,lon:-80.19,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Latin America gateway (NAP of the Americas).",d:"ongoing",src:"Equinix"},
+{n:"Los Angeles (LA)",st:"CA",c:"El Segundo",lat:33.92,lon:-118.40,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Trans-Pacific hub.",d:"ongoing",src:"Equinix"},
+{n:"Seattle (SE)",st:"WA",c:"Seattle",lat:47.61,lon:-122.34,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Westin Building hub.",d:"ongoing",src:"Equinix"},
+{n:"Denver (DE)",st:"CO",c:"Denver",lat:39.74,lon:-104.99,owner:"Equinix",own:"EQIX",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Mountain region hub.",d:"ongoing",src:"Equinix"},
+{n:"Northern Virginia campuses",st:"VA",c:"Ashburn / Manassas",lat:39.00,lon:-77.49,owner:"Digital Realty",own:"DLR",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Includes 64% stake in three fully leased NoVA centers (2Q26).",d:"2026-07-23",src:"DLR 2Q26"},
+{n:"Dallas campus",st:"TX",c:"Richardson",lat:32.97,lon:-96.73,owner:"Digital Realty",own:"DLR",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Digital Realty"},
+{n:"Chicago campus",st:"IL",c:"Franklin Park",lat:41.93,lon:-87.87,owner:"Digital Realty",own:"DLR",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Digital Realty"},
+{n:"Santa Clara campus",st:"CA",c:"Santa Clara",lat:37.39,lon:-121.96,owner:"Digital Realty",own:"DLR",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Digital Realty"},
+{n:"New Jersey campus",st:"NJ",c:"Piscataway",lat:40.55,lon:-74.46,owner:"Digital Realty",own:"DLR",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Digital Realty"},
+{n:"Atlanta campus",st:"GA",c:"Atlanta",lat:33.78,lon:-84.41,owner:"Digital Realty",own:"DLR",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Digital Realty"},
+{n:"Phoenix campus",st:"AZ",c:"Phoenix",lat:33.45,lon:-112.07,owner:"Digital Realty",own:"DLR",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Digital Realty"},
+{n:"Manassas campus",st:"VA",c:"Manassas",lat:38.77,lon:-77.50,owner:"Iron Mountain",own:"IRM",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Iron Mountain"},
+{n:"Phoenix campus",st:"AZ",c:"Phoenix",lat:33.40,lon:-111.97,owner:"Iron Mountain",own:"IRM",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Iron Mountain"},
+{n:"Edison campus",st:"NJ",c:"Edison",lat:40.52,lon:-74.41,owner:"Iron Mountain",own:"IRM",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Iron Mountain"},
+{n:"Northlake campus",st:"IL",c:"Northlake",lat:41.92,lon:-87.90,owner:"Iron Mountain",own:"IRM",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"Iron Mountain"},
+{n:"CoreSite Reston (VA)",st:"VA",c:"Reston",lat:38.96,lon:-77.36,owner:"American Tower (CoreSite)",own:"AMT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"CoreSite"},
+{n:"CoreSite Santa Clara (SV)",st:"CA",c:"Santa Clara",lat:37.38,lon:-121.98,owner:"American Tower (CoreSite)",own:"AMT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"CoreSite"},
+{n:"CoreSite Denver (DE)",st:"CO",c:"Denver",lat:39.75,lon:-104.98,owner:"American Tower (CoreSite)",own:"AMT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"CoreSite"},
+{n:"CoreSite Chicago (CH)",st:"IL",c:"Chicago",lat:41.85,lon:-87.62,owner:"American Tower (CoreSite)",own:"AMT",pub:1,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"CoreSite"},
+{n:"Project Sail",st:"GA",c:"Coweta County",lat:33.38,lon:-84.80,owner:"Prologis (Atlas Development)",own:"PLD",pub:1,ten:[],s:"prm",mw:"~900 MW",v:"$17B (AJC)",note:"Rezoned 3-2 (Apr 2026); no tenant named.",d:"2026-04",src:"llmpulse tracker"},
+/* ---------------- SoftBank-led (SoftBank Group is listed in Tokyo, 9984) ---------------- */
+{n:"Stargate Milam County",st:"TX",c:"Burlington (Milam Co.)",lat:30.97,lon:-96.95,owner:"SB Energy (SoftBank)",own:null,pub:1,listed:"SoftBank Group (Tokyo: 9984)",ten:[],s:"bld",mw:"1.2 GW",v:"not disclosed",note:"OpenAI 1.2 GW lease; first facilities due from 2026.",d:"2026-01",src:"llmpulse"},
+{n:"Stargate Lordstown",st:"OH",c:"Lordstown",lat:41.17,lon:-80.86,owner:"SoftBank",own:null,pub:1,listed:"SoftBank Group (Tokyo: 9984)",ten:[],s:"bld",mw:"~214 MW IT (Epoch est.)",v:"not disclosed",note:"OpenAI site; Lordstown adopted a moratorium on further projects (Jan 2026).",d:"2026-07",src:"llmpulse"},
+{n:"PORTS-Pike Technology Campus",st:"OH",c:"Piketon",lat:39.07,lon:-83.01,owner:"SB Energy (SoftBank)",own:null,pub:1,listed:"SoftBank Group (Tokyo: 9984)",ten:["NVDA"],s:"ann",mw:"8 GW IT (4.25 GW initial)",v:"payment obligation capped at $105B (Nvidia SEC filing)",note:"OpenAI anchor; Nvidia exclusive compute provider ($1.5B into SB Energy, Aug 2026); phases from 2028 on DOE land.",d:"2026-08",src:"llmpulse; SEC"},
+/* ---------------- Private developers & operators ---------------- */
+{n:"Stargate Abilene",st:"TX",c:"Abilene",lat:32.53,lon:-99.76,owner:"Crusoe / Lancium (Blue Owl-backed)",own:null,pub:0,ten:["ORCL"],s:"op",mw:"1.2 GW (618 MW, 6 of 8 bldgs live)",v:"$15B financing (reported)",note:"Oracle runs it for OpenAI; 600 MW expansion scrapped Mar 2026.",d:"2026-09-10",src:"llmpulse; Inside DeepTech"},
+{n:"Abilene expansion (Microsoft)",st:"TX",c:"Abilene",lat:32.49,lon:-99.70,owner:"Crusoe",own:null,pub:0,ten:["MSFT"],s:"bld",mw:"900 MW on-site power",v:"not disclosed",note:"Site prep; first hall mid-2027.",d:"2026-03",src:"llmpulse"},
+{n:"Frontier (Stargate)",st:"TX",c:"Shackelford County",lat:32.72,lon:-99.30,owner:"Vantage Data Centers",own:null,pub:0,ten:["ORCL"],s:"bld",mw:"1.4 GW, 10 bldgs",v:"$25B+",note:"Oracle/OpenAI; first building targeted 2H 2026.",d:"2026-09",src:"llmpulse"},
+{n:"Lighthouse (Stargate)",st:"WI",c:"Port Washington",lat:43.39,lon:-87.88,owner:"Vantage Data Centers",own:null,pub:0,ten:["ORCL"],s:"bld",mw:"~1 GW IT",v:"$15B",note:"First steel Mar 2026; opening 2028.",d:"2026-03",src:"llmpulse; MeasuredAI"},
+{n:"Stargate Michigan ('The Barn')",st:"MI",c:"Saline Township",lat:42.17,lon:-83.78,owner:"Related Digital / Blackstone",own:null,pub:0,ten:["ORCL"],s:"bld",mw:"~1.4 GW",v:"$16B",note:"EGLE permits Jan 2026; active construction.",d:"2026-04",src:"llmpulse; MeasuredAI"},
+{n:"Project Jupiter (Stargate)",st:"NM",c:"Doña Ana County (Santa Teresa)",lat:31.86,lon:-106.65,owner:"BorderPlex Digital Assets / STACK",own:null,pub:0,ten:["ORCL"],s:"bld",mw:"~2.2 GW (Epoch est.)",v:"$165B bond authorization",note:"Air-permit hearing Dec 7, 2026.",d:"2026-10",src:"llmpulse"},
+{n:"Project Camellia",st:"GA",c:"Effingham County",lat:32.37,lon:-81.32,owner:"OpenAI",own:null,pub:0,ten:[],s:"prm",mw:"3.2 GW utility supply",v:"$20B (county)",note:"Power contract approved; site plan pending.",d:"2026-08",src:"llmpulse"},
+{n:"QTS Cedar Rapids",st:"IA",c:"Cedar Rapids",lat:41.98,lon:-91.67,owner:"QTS (Blackstone)",own:null,pub:0,ten:[],s:"op",mw:"616 MW load request (ph. 1)",v:"not disclosed",note:"Commissioning first buildings.",d:"2026-10",src:"llmpulse"},
+{n:"QTS Atlanta campuses",st:"GA",c:"Atlanta / Fayetteville",lat:33.70,lon:-84.50,owner:"QTS (Blackstone)",own:null,pub:0,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"QTS"},
+{n:"QTS Richmond",st:"VA",c:"Henrico",lat:37.50,lon:-77.42,owner:"QTS (Blackstone)",own:null,pub:0,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating.",d:"ongoing",src:"QTS"},
+{n:"Project Phoenix",st:"PA",c:"Shippingport",lat:40.62,lon:-80.42,owner:"Aligned Data Centers",own:null,pub:0,ten:[],s:"bld",mw:"2 GW",v:"not disclosed",note:"Under construction.",d:"2026-11",src:"ElectricChoice tracker"},
+{n:"Homer City Energy Campus",st:"PA",c:"Indiana County",lat:40.54,lon:-79.16,owner:"Homer City Redevelopment",own:null,pub:0,ten:["AMZN"],s:"bld",mw:"gas plant permitted up to 4.4 GW",v:"$10B energy campus",note:"AWS plan for 36 buildings filed (reported).",d:"2026-08",src:"llmpulse"},
+{n:"Tract TRIC park",st:"NV",c:"Sparks",lat:39.55,lon:-119.43,owner:"Tract",own:null,pub:0,ten:[],s:"bld",mw:"2 GW",v:"not disclosed",note:"Master-planned park under construction.",d:"2026-11",src:"ElectricChoice tracker"},
+{n:"Switch Citadel / The Core",st:"NV",c:"Reno & Las Vegas",lat:39.52,lon:-119.45,owner:"Switch",own:null,pub:0,ten:[],s:"op",mw:"multi-building",v:"—",note:"Operating campuses.",d:"ongoing",src:"Switch"},
+{n:"Delta Gigasite",st:"UT",c:"Millard County",lat:39.35,lon:-112.58,owner:"Creekstone Energy",own:null,pub:0,ten:[],s:"bld",mw:"10 GW",v:"not disclosed",note:"Under construction.",d:"2026-10-12",src:"Spezia tracker"},
+{n:"Joule campus",st:"UT",c:"Millard County",lat:38.98,lon:-112.35,owner:"Joule Capital Partners",own:null,pub:0,ten:[],s:"bld",mw:"4 GW",v:"not disclosed",note:"Under construction.",d:"2026-11",src:"MoreThanJustParks tracker"},
+{n:"GW Ranch",st:"TX",c:"Fort Stockton",lat:30.95,lon:-102.98,owner:"Pacifico Energy",own:null,pub:0,ten:[],s:"bld",mw:"5 GW",v:"not disclosed",note:"Power hub also feeding AWS Pecos County.",d:"2026-11",src:"ElectricChoice tracker"},
+{n:"PowerHouse Grand Prairie",st:"TX",c:"Grand Prairie",lat:32.75,lon:-97.00,owner:"PowerHouse Data Centers",own:null,pub:0,ten:[],s:"bld",mw:"1.8 GW",v:"not disclosed",note:"Under construction.",d:"2026-11",src:"ElectricChoice tracker"},
+{n:"Red Clay",st:"AL",c:"Lowndes County",lat:32.18,lon:-86.58,owner:"Lambda",own:null,pub:0,ten:[],s:"ann",mw:"not disclosed",v:"$33.1B",note:"Proposed; construction from Q1 2027.",d:"2026-11",src:"llmpulse"},
+{n:"Project Blue",st:"AZ",c:"Pima County",lat:32.22,lon:-110.97,owner:"Beale Infrastructure",own:null,pub:0,ten:[],s:"bld",mw:"286 MW by 2028",v:"not disclosed",note:"Site work under way; no tenant named.",d:"2026-04",src:"llmpulse"},
+{n:"Monarch Compute Campus",st:"WV",c:"Point Pleasant",lat:38.84,lon:-82.14,owner:"Nscale",own:null,pub:0,ten:[],s:"bld",mw:"1.3 GW",v:"not disclosed",note:"Under construction.",d:"2026-11",src:"ElectricChoice tracker"},
+{n:"Jackson-area campus",st:"MS",c:"near Jackson",lat:32.30,lon:-90.18,owner:"Compass Datacenters",own:null,pub:0,ten:[],s:"ann",mw:"not disclosed",v:"$10B",note:"Announced.",d:"2026-04",src:"CoStar"}
+];
+/* public companies for the roster (US-listed). rev = latest TTM revenue $M (stockanalysis.com), bk = backlog $M */
+const DC_COS=[
+{t:"MSFT",n:"Microsoft",g:"Hyperscalers & AI clouds",rev:331840,bk:677000,bkn:"commercial RPO, Sep 30 2026"},
+{t:"AMZN",n:"Amazon",g:"Hyperscalers & AI clouds",rev:775680,bk:578000,bkn:"performance obligations (mostly AWS), Sep 30 2026"},
+{t:"GOOGL",n:"Alphabet",g:"Hyperscalers & AI clouds",rev:445870,bk:560800,bkn:"Google Cloud backlog, Sep 30 2026"},
+{t:"META",n:"Meta",g:"Hyperscalers & AI clouds",rev:241610,bk:null},
+{t:"ORCL",n:"Oracle",g:"Hyperscalers & AI clouds",rev:71780,bk:664000,bkn:"RPO, Aug 31 2026"},
+{t:"SPCX",n:"SpaceX (SpaceXAI)",g:"Hyperscalers & AI clouds",rev:23040,bk:null},
+{t:"EQIX",n:"Equinix",g:"Data center REITs",rev:9810,bk:null},
+{t:"DLR",n:"Digital Realty",g:"Data center REITs",rev:6770,bk:2500,bkn:"signed-not-commenced annual rent, 100% share, Sep 30 2026"},
+{t:"IRM",n:"Iron Mountain",g:"Data center REITs",rev:7560,bk:null},
+{t:"AMT",n:"American Tower (CoreSite)",g:"Data center REITs",rev:10940,bk:null},
+{t:"PLD",n:"Prologis",g:"Data center REITs",rev:null,bk:null},
+{t:"CRWV",n:"CoreWeave",g:"Neoclouds & AI hosts",rev:7590,bk:132500,bkn:"revenue backlog, Sep 30 2026"},
+{t:"NBIS",n:"Nebius",g:"Neoclouds & AI hosts",rev:1360,bk:null},
+{t:"APLD",n:"Applied Digital",g:"Neoclouds & AI hosts",rev:611,bk:35700,bkn:"minimum contracted lease payments, Aug 31 2026"},
+{t:"IREN",n:"IREN",g:"Neoclouds & AI hosts",rev:695,bk:13957,bkn:"remaining contracted lease value, Sep 30 2026"},
+{t:"CORZ",n:"Core Scientific",g:"Neoclouds & AI hosts",rev:440,bk:null},
+{t:"CIFR",n:"Cipher Digital",g:"Neoclouds & AI hosts",rev:191,bk:16600,bkn:"base-term contracted HPC revenue, Nov 2026"},
+{t:"WULF",n:"TeraWulf",g:"Neoclouds & AI hosts",rev:165,bk:19000,bkn:"Anthropic 20-yr Hawesville lease alone"},
+{t:"GLXY",n:"Galaxy Digital",g:"Neoclouds & AI hosts",rev:58370,revn:"gross — includes digital-asset trading sales",bk:15000,bkn:"Helios: >$1B/yr avg over 15-yr CoreWeave leases (company est.)"},
+{t:"HUT",n:"Hut 8",g:"Neoclouds & AI hosts",rev:318,bk:7000,bkn:"River Bend lease (reported)"},
+{t:"FRMI",n:"Fermi America",g:"Developers",rev:null,bk:null}
+];
+
+/* ===== Data Center Map — self-contained, lazily initialised ===== */
+(function(){
+const DC_COL={op:"#34d399",bld:"#fbbf24",prm:"#5b9dff",ann:"#e879f9"};
+const DC_LBL={op:"Operating",bld:"Under construction",prm:"Approved / permitted",ann:"Announced / deal signed"};
+const DC_ABBR={op:"op",bld:"bld",prm:"prm",ann:"ann"};
+const DC_RANK={op:0,bld:1,prm:2,ann:3};
+const PUBC="#2dd4bf", PRIVC="#c4a7f0";
+const ENAMES={AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",US:"Multi-state / national"}
+const css=document.createElement('style');
+css.textContent=`
+#dcroster{position:absolute;top:12px;right:14px;z-index:5;width:300px;max-height:calc(100% - 56px);overflow-y:auto;
+background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;padding:8px 6px;font-family:var(--mono);font-size:11px}
+#dcroster .rg{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:9px 7px 3px}
+#dcroster .rhead{display:grid;grid-template-columns:42px minmax(0,1fr) 54px 58px;column-gap:6px;padding:2px 7px 4px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line)}
+#dcroster .rhead i{font-style:normal;grid-column:1/3} #dcroster .rhead em{font-style:normal;text-align:right}
+#dcroster .dro{display:grid;grid-template-columns:42px minmax(0,1fr) 54px 58px;column-gap:6px;align-items:baseline;padding:4px 7px;border-radius:7px;cursor:pointer;color:var(--ink-dim);border:1px solid transparent}
+#dcroster .dro b{color:var(--gold);font-weight:600} #dcroster .dro span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#dcroster .dro em{font-style:normal;text-align:right;color:var(--ink-faint)} #dcroster .dro em.bk{color:var(--gold)}
+#dcroster .dro:hover{background:rgba(255,255,255,.04);color:var(--ink)}
+#dcroster .dro.on{border-color:var(--gold);background:rgba(231,178,74,.08);color:var(--ink)}
+#dcmap{display:block;width:100%;height:74vh;min-height:540px}
+#dcmap .dst{stroke:#26344f;stroke-width:.8;cursor:pointer;vector-effect:non-scaling-stroke;transition:fill .18s,opacity .25s}
+#dcmap .dst:hover{stroke:var(--gold);stroke-width:1.4}
+#dcmap .dst.sel{stroke:var(--gold);stroke-width:1.8}
+#dcmap .dlbl{font-family:var(--mono);fill:var(--ink-dim);paint-order:stroke;stroke:#070a11;stroke-width:2px;pointer-events:none;text-anchor:middle}
+#dcmap .dlbl .cnt{font-size:7.5px;font-weight:600}
+#dcmap .dsite{cursor:pointer;vector-effect:non-scaling-stroke}
+#dcmap .dsl{font-family:var(--mono);fill:var(--ink);paint-order:stroke;stroke:#070a11;pointer-events:none}
+.dcback{position:absolute;top:12px;left:220px;z-index:6;font-family:var(--mono);font-size:11px;color:var(--ink);background:rgba(10,16,28,.9);border:1px solid var(--gold);border-radius:9px;padding:6px 11px;cursor:pointer}
+.deal.dcop{border-left-color:#34d399}.deal.dcbld{border-left-color:#fbbf24}.deal.dcprm{border-left-color:#5b9dff}.deal.dcann{border-left-color:#e879f9}
+.dcown{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:1px 6px;border-radius:5px;margin-left:6px;vertical-align:1px}
+.dcstat{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.dcstat span{font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:6px;border:1px solid}
+@media (max-width:680px){#dcroster{position:static;width:auto;max-height:140px;margin:10px 10px 0}#dcmap{height:52vh;min-height:340px}.dcback{left:auto;right:12px;top:auto;bottom:34px}}
+`;
+document.head.appendChild(css);
+
+const F={op:true,bld:true,prm:true,ann:true}, O={pub:true,priv:true};
+let inited=false, selCo=null, selSt=null, proj, path, svg, root, gStates, gLbl, gSites, feats, curK=1;
+const vis=s=>F[s.s]&&(s.pub?O.pub:O.priv);
+const roleOf=(s,t)=>s.own===t?'owner':((s.ten||[]).includes(t)?'tenant':null);
+const coSites=t=>DC_SITES.filter(s=>roleOf(s,t)&&vis(s));
+const stSites=st=>DC_SITES.filter(s=>s.st===st&&vis(s));
+const fmt=m=>m==null?"—":(m>=1000?"$"+(m>=100000?Math.round(m/1000):(m/1000).toFixed(1).replace(/\.0$/,""))+"B":"$"+Math.round(m)+"M");
+const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function tipEl(){let t=document.getElementById('dctip');if(!t){t=document.createElement('div');t.id='dctip';t.className='tip';document.body.appendChild(t);}return t;}
+function showTip(ev,html){const t=tipEl();t.innerHTML=html;t.style.opacity=1;const x=Math.min(ev.clientX+14,innerWidth-320),y=Math.min(ev.clientY+12,innerHeight-110);t.style.left=x+'px';t.style.top=y+'px';}
+function hideTip(){const t=document.getElementById('dctip');if(t)t.style.opacity=0;}
+
+/* which part of the state a campus sits in */
+function region(s){
+  const f=feats.find(f=>f.id===s.st); const p=proj([s.lon,s.lat]); if(!f||!p) return ENAMES[s.st]||s.st;
+  const b=path.bounds(f), w=b[1][0]-b[0][0], h=b[1][1]-b[0][1];
+  const cx=b[0][0]+w/2, cy=b[0][1]+h/2, dx=(p[0]-cx)/w, dy=(p[1]-cy)/h;
+  let ns=dy<-0.17?"North":dy>0.17?"South":"", ew=dx<-0.17?"West":dx>0.17?"East":"";
+  let dir=ns&&ew?ns+(ew.toLowerCase()):(ns||ew);
+  if(!dir) dir="Central";
+  return dir+" "+(ENAMES[s.st]||s.st);
+}
+
+function counts(){ const m={}; DC_SITES.forEach(s=>{ if(!vis(s))return; const c=m[s.st]||(m[s.st]={pub:0,priv:0,op:0,bld:0,prm:0,ann:0,n:0}); c[s.pub?'pub':'priv']++; c[s.s]++; c.n++; }); return m; }
+function coCounts(t){ const m={}; coSites(t).forEach(s=>{ const c=m[s.st]||(m[s.st]={op:0,bld:0,prm:0,ann:0,n:0}); c[s.s]++; c.n++; }); return m; }
+
+function paint(){
+  const C=counts(); const max=Math.max(1,...Object.values(C).map(c=>c.n));
+  const base=d3.interpolateRgb("#16233a","#2a8f86");
+  const cc=selCo?coCounts(selCo.t):null;
+  gStates.selectAll('path').attr('fill',d=>{
+    if(cc){ const c=cc[d.id]; if(!c) return "#121a2a"; return c.op?"#2b5a63":"#3a3f5c"; }
+    const c=C[d.id]; return c?base(0.15+0.85*Math.sqrt(c.n/max)):"#121a2a";
+  }).attr('opacity',d=>{
+    if(selSt) return d.id===selSt?1:.18;
+    if(cc) return cc[d.id]?1:.4; return 1;
+  }).classed('sel',d=>d.id===selSt);
+  /* state labels */
+  gLbl.selectAll('text').each(function(d){
+    const el=d3.select(this); el.selectAll('tspan').remove();
+    const c=C[d.id], area=path.area(d), big=area>620;
+    el.attr('opacity',selSt?0:1);
+    if(big) el.append('tspan').attr('x',el.attr('x')).attr('dy',0).style('font-size','9px').text(d.id);
+    if(cc){
+      const k=cc[d.id]; if(!k) return;
+      const parts=['op','bld','prm','ann'].filter(x=>k[x]);
+      const t=el.append('tspan').attr('x',el.attr('x')).attr('dy',big?'1.15em':0).attr('class','cnt');
+      parts.forEach((x,i)=>{ t.append('tspan').attr('fill',DC_COL[x]).text((i?' ':'')+k[x]+DC_ABBR[x]); });
+    } else if(c){
+      const t=el.append('tspan').attr('x',el.attr('x')).attr('dy',big?'1.15em':0).attr('class','cnt');
+      if(c.pub) t.append('tspan').attr('fill',PUBC).text(c.pub);
+      if(c.pub&&c.priv) t.append('tspan').attr('fill','#9aa6bd').text(' · ');
+      if(c.priv) t.append('tspan').attr('fill',PRIVC).text(c.priv);
+    }
+  });
+  drawSites();
+  document.querySelectorAll('#dcroster .dro').forEach(el=>el.classList.toggle('on',!!selCo&&el.dataset.t===selCo.t));
+  const n=DC_SITES.filter(vis).length;
+  document.getElementById('dccount').textContent=`${n} campuses shown of ${DC_SITES.length} tracked (${DC_SITES.filter(s=>s.pub).length} public-owned, ${DC_SITES.filter(s=>!s.pub).length} private)`;
+}
+
+/* campus dots — only while zoomed into a state */
+function drawSites(){
+  const data=selSt?stSites(selSt):[];
+  const seen={};
+  data.forEach(s=>{ const p=proj([s.lon,s.lat])||[0,0]; const key=Math.round(p[0]/3)+'_'+Math.round(p[1]/3); const i=seen[key]=(seen[key]||0)+1; const a=i*2.4, r=(i-1)*1.1/curK*3; s._x=p[0]+Math.cos(a)*r; s._y=p[1]+Math.sin(a)*r; });
+  const R=7/curK, fs=8.5/curK;
+  const g=gSites.selectAll('g.ds').data(data,d=>d.n+d.st+d.c);
+  g.exit().remove();
+  const ge=g.enter().append('g').attr('class','ds');
+  ge.append('circle').attr('class','dsite');
+  ge.append('text').attr('class','dsl');
+  const all=ge.merge(g);
+  all.attr('transform',d=>`translate(${d._x},${d._y})`)
+    .attr('opacity',d=>selCo&&!roleOf(d,selCo.t)?.25:1);
+  all.select('circle').attr('r',R).attr('fill',d=>DC_COL[d.s]).attr('stroke',d=>d.pub?PUBC:PRIVC).attr('stroke-width',2.2)
+    .on('mousemove',(ev,d)=>showTip(ev,`<div class="t-route">${esc(d.n)}</div><span class="t-cat" style="color:${DC_COL[d.s]};background:${DC_COL[d.s]}1f">${DC_LBL[d.s]}</span><div class="t-body"><b>${esc(d.owner)}</b>${d.own?' ('+d.own+')':''} · ${d.pub?'public':'private'}<br>${esc(region(d))} — ${esc(d.c)}<br>${esc(d.mw)}${d.v&&d.v!=='—'?' · '+esc(d.v):''}</div>`))
+    .on('mouseleave',hideTip)
+    .on('click',(ev,d)=>{ev.stopPropagation(); const el=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(d.n+'|'+d.c)}"]`); openPanel(); if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.boxShadow='0 0 0 1px var(--gold)'; setTimeout(()=>el.style.boxShadow='',1600);} });
+  all.select('text').attr('x',R+2/curK).attr('y',fs*0.35).style('font-size',fs+'px').style('stroke-width',(2.2/curK)+'px')
+    .text(d=>d.n.length>24?d.n.slice(0,23)+'…':d.n);
+  /* greedy label collision: bigger / company-relevant campuses first, skip labels that would overlap */
+  const placed=[]; const order=data.slice().sort((a,b)=>(selCo?(roleOf(b,selCo.t)?1:0)-(roleOf(a,selCo.t)?1:0):0)||DC_RANK[a.s]-DC_RANK[b.s]);
+  const show=new Set();
+  order.forEach(d=>{ const w=(Math.min(d.n.length,24)*fs*0.62)+R+2/curK, h=fs*1.25; const box=[d._x-R,d._y-h/2,d._x+w,d._y+h/2];
+    if(!placed.some(b=>!(box[2]<b[0]||box[0]>b[2]||box[3]<b[1]||box[1]>b[3]))){ placed.push(box); show.add(d); } });
+  all.select('text').attr('display',d=>show.has(d)?null:'none');
+}
+
+function zoomTo(st){
+  const f=feats.find(f=>f.id===st);
+  let t=d3.zoomIdentity;
+  if(f){ const b=path.bounds(f), dx=b[1][0]-b[0][0], dy=b[1][1]-b[0][1], x=(b[0][0]+b[1][0])/2, y=(b[0][1]+b[1][1])/2;
+    const k=Math.max(1,Math.min(14,0.82/Math.max(dx/975,dy/610))); t=d3.zoomIdentity.translate(975/2-k*x,610/2-k*y).scale(k); }
+  curK=t.k;
+  root.transition().duration(650).attr('transform',t.toString());
+  document.getElementById('dcback').style.display=st?'':'none';
+  const ro=document.getElementById('dcroster'); if(ro) ro.style.display=st?'none':'';
+  document.getElementById('dchint').textContent=st?'Hover a campus for detail · tap it to jump to its card · ← Back to zoom out':'Tap a state to zoom in · tap a company to light its footprint';
+}
+
+function dealHTML(s,ctx){
+  const role=selCo?roleOf(s,selCo.t):null;
+  const ownBadge=`<span class="dcown" style="color:${s.pub?PUBC:PRIVC};border:1px solid ${s.pub?PUBC:PRIVC}55">${s.pub?'public':'private'}</span>`;
+  const tenants=(s.ten||[]).length?`<div><b>anchor / tenant</b> ${s.ten.join(' · ')}</div>`:'';
+  return `<div class="deal dc${s.s}" data-key="${esc(s.n+'|'+s.c)}" data-date="${s.d}"><div class="dr">${esc(s.n)}${ctx==='state'?'':' · '+s.st}${role==='tenant'?' <span class="dcown" style="color:#fbbf24;border:1px solid #fbbf2455">tenant</span>':''}</div>
+  <div class="db">${esc(region(s))} — ${esc(s.c)}. ${esc(s.note)}</div>
+  <div class="dmeta"><div><b>owner</b> ${esc(s.owner)}${s.own?' ('+s.own+')':s.listed?' — '+esc(s.listed):''} ${ownBadge}</div>${tenants}<div><b>size</b> ${esc(s.mw)}</div><div><b>$</b> ${esc(s.v)}</div><div><b>status</b> ${DC_LBL[s.s]}</div></div><div class="dsrc">${esc(s.src)}</div></div>`;
+}
+function statChips(list){ return `<div class="dcstat">`+['op','bld','prm','ann'].map(k=>{const n=list.filter(s=>s.s===k).length;return n?`<span style="color:${DC_COL[k]};border-color:${DC_COL[k]}55">${n} ${DC_LBL[k].toLowerCase()}</span>`:'';}).join('')+`</div>`; }
+function openPanel(){ document.getElementById('dcpanel').classList.add('open'); }
+function closePanel(){ document.getElementById('dcpanel').classList.remove('open'); }
+
+function showState(st){
+  selSt=st; zoomTo(st); paint();
+  const list=stSites(st).sort((a,b)=>DC_RANK[a.s]-DC_RANK[b.s]);
+  const pub=list.filter(s=>s.pub).length;
+  document.getElementById('dcph').innerHTML=`<div class="ptype">State · ${list.length} tracked campus${list.length===1?'':'es'}</div><h2>${ENAMES[st]||st}</h2>
+  <div class="pval"><span style="color:${PUBC}">${pub} public-owned</span> · <span style="color:${PRIVC}">${list.length-pub} private</span>${selCo?` · highlighting ${selCo.t}`:''}</div>${statChips(list)}`;
+  const pd=document.getElementById('dcpdeals');
+  if(!list.length){ pd.innerHTML=`<h3>No tracked campuses</h3><div class="deal"><div class="db">Nothing in the current filter is tracked here yet — this is a curated snapshot, not a census.</div></div>`; }
+  else pd.innerHTML=['op','bld','prm','ann'].map(k=>{const g=list.filter(s=>s.s===k); return g.length?`<h3>${DC_LBL[k]}</h3>`+g.map(s=>dealHTML(s,'state')).join(''):'';}).join('');
+  openPanel();
+}
+function showCo(co){
+  selCo=co; selSt=null; zoomTo(null);
+  const list=coSites(co.t); const cc=coCounts(co.t); const sts=Object.keys(cc).sort((a,b)=>cc[b].n-cc[a].n);
+  const owned=list.filter(s=>s.own===co.t).length;
+  document.getElementById('dcph').innerHTML=`<div class="ptype">${co.g}</div><h2>${co.n}</h2>
+  <div class="pval">${co.t} · ${fmt(co.rev)} TTM revenue${co.revn?` (${co.revn})`:''}${co.bk?` · ${fmt(co.bk)} backlog (${co.bkn})`:''}</div>
+  <div class="pval">${list.length} tracked campus${list.length===1?'':'es'} in ${sts.length} state${sts.length===1?'':'s'} · ${owned} owned${list.length-owned?` · ${list.length-owned} as tenant / anchor`:''}</div>${statChips(list)}`;
+  const pd=document.getElementById('dcpdeals');
+  pd.innerHTML=list.length?sts.map(st=>{const c=cc[st];return `<h3>${ENAMES[st]||st} — ${['op','bld','prm','ann'].filter(k=>c[k]).map(k=>c[k]+' '+DC_ABBR[k]).join(' · ')}</h3>`+list.filter(s=>s.st===st).sort((a,b)=>DC_RANK[a.s]-DC_RANK[b.s]).map(s=>dealHTML(s,'co')).join('');}).join(''):`<div class="deal"><div class="db">No tracked campuses in the current filter.</div></div>`;
+  openPanel(); paint();
+}
+function reset(){
+  selCo=null; selSt=null; Object.keys(F).forEach(k=>F[k]=true); O.pub=O.priv=true;
+  document.querySelectorAll('#chips-dc .chip,#chips-dcown .chip').forEach(c=>c.dataset.on="true");
+  const s=document.getElementById('dcsearch'); if(s){s.value=''; s.dispatchEvent(new Event('input'));}
+  closePanel(); zoomTo(null); paint();
+}
+
+function init(){
+  svg=d3.select('#dcmap');
+  const geo=US_STATES_GEO;
+  proj=d3.geoAlbersUsa().fitExtent([[8,8],[658,602]],geo);
+  path=d3.geoPath(proj);
+  feats=geo.features.filter(f=>path(f));
+  root=svg.append('g'); gStates=root.append('g'); gLbl=root.append('g'); gSites=root.append('g');
+  gStates.selectAll('path').data(feats).join('path').attr('class','dst').attr('d',path)
+    .on('mousemove',(ev,d)=>{ const c=counts()[d.id]; let body;
+      if(selCo){ const k=coCounts(selCo.t)[d.id]; body=k?`${selCo.t}: `+['op','bld','prm','ann'].filter(x=>k[x]).map(x=>k[x]+' '+DC_LBL[x].toLowerCase()).join(' · '):`No tracked ${selCo.t} campus`; }
+      else body=c?`<span style="color:${PUBC}">${c.pub} public</span> · <span style="color:${PRIVC}">${c.priv} private</span> — ${c.op} operating, ${c.bld} building, ${c.prm} permitted, ${c.ann} announced`:'No tracked campuses';
+      showTip(ev,`<div class="t-route">${ENAMES[d.id]||d.id}</div><div class="t-body">${body}${selSt===d.id?'':' — tap to zoom in'}</div>`); })
+    .on('mouseleave',hideTip)
+    .on('click',(ev,d)=>{ ev.stopPropagation(); hideTip(); if(selSt===d.id) return; showState(d.id); });
+  gLbl.selectAll('text').data(feats).join('text').attr('class','dlbl')
+    .attr('x',d=>path.centroid(d)[0]).attr('y',d=>path.centroid(d)[1]+3);
+  svg.on('click',()=>{ if(selSt){ selSt=null; zoomTo(null); closePanel(); paint(); } });
+
+  const chips=document.getElementById('chips-dc');
+  chips.innerHTML=Object.keys(DC_COL).map(k=>`<span class="chip" data-on="true" data-k="${k}"><span class="dot" style="background:${DC_COL[k]}"></span>${DC_LBL[k]}</span>`).join('');
+  chips.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{ const k=ch.dataset.k; F[k]=!F[k]; ch.dataset.on=String(F[k]); refresh(); }));
+  const oc=document.getElementById('chips-dcown');
+  oc.innerHTML=`<span class="chip" data-on="true" data-k="pub"><span class="dot" style="background:${PUBC}"></span>Publicly traded</span><span class="chip" data-on="true" data-k="priv"><span class="dot" style="background:${PRIVC}"></span>Private</span>`;
+  oc.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{ const k=ch.dataset.k; O[k]=!O[k]; ch.dataset.on=String(O[k]); refresh(); }));
+
+  const roster=document.getElementById('dcroster');
+  const groups=[...new Set(DC_COS.map(c=>c.g))];
+  roster.innerHTML='<div class="rhead"><i>company</i><em>TTM rev</em><em>backlog</em></div>'+groups.map(g=>`<div class="rg">${g}</div>`+DC_COS.filter(c=>c.g===g).map(c=>{
+    const n=DC_SITES.filter(s=>roleOf(s,c.t)).length;
+    return `<div class="dro" data-t="${c.t}" title="${esc(c.n)} — ${n} tracked campus${n===1?'':'es'}${c.bk?' · backlog: '+esc(c.bkn):''}${c.revn?' · revenue '+esc(c.revn):''}"><b>${c.t}</b><span>${esc(c.n)}</span><em>${fmt(c.rev)}</em><em class="bk">${fmt(c.bk)}</em></div>`;}).join('')).join('');
+  roster.querySelectorAll('.dro').forEach(el=>el.addEventListener('click',()=>{ const co=DC_COS.find(c=>c.t===el.dataset.t); if(selCo===co) reset(); else showCo(co); }));
+  const search=document.getElementById('dcsearch');
+  search.addEventListener('input',()=>{ const q=search.value.trim().toLowerCase();
+    roster.querySelectorAll('.dro').forEach(el=>{ const c=DC_COS.find(x=>x.t===el.dataset.t); el.style.display=(!q||c.t.toLowerCase().includes(q)||c.n.toLowerCase().includes(q))?'':'none'; });
+    roster.querySelectorAll('.rg').forEach(h=>{ let s=h.nextElementSibling,any=false; while(s&&!s.classList.contains('rg')){ if(s.style.display!=='none')any=true; s=s.nextElementSibling;} h.style.display=any?'':'none'; }); });
+  search.addEventListener('keydown',ev=>{ if(ev.key==='Enter'){ const f=[...roster.querySelectorAll('.dro')].find(el=>el.style.display!=='none'); if(f) showCo(DC_COS.find(c=>c.t===f.dataset.t)); } });
+  document.getElementById('reset-dc').addEventListener('click',reset);
+  document.getElementById('dcback').addEventListener('click',e=>{ e.stopPropagation(); selSt=null; zoomTo(null); if(selCo) showCo(selCo); else { closePanel(); paint(); } });
+  document.getElementById('dcpclose').addEventListener('click',()=>{ closePanel(); });
+  document.getElementById('dcpanel').addEventListener('click',e=>e.stopPropagation());
+  paint();
+}
+function refresh(){ if(selSt) showState(selSt); else if(selCo) showCo(selCo); else paint(); }
+
+const prev=window.__showWeb;
+window.__showWeb=function(v){
+  if(v==='datacenter'){ if(!inited){ inited=true; init(); } return; }
+  hideTip(); const p=document.getElementById('dcpanel'); if(p) p.classList.remove('open');
+  if(prev) prev(v);
+};
+})();
+
+</script>
+<script>
+/* ===== Stock Research Data tab ===== */
+(function(){
+const DEFAULT_SYMS="SPY QQQ NVDA MSFT AAPL AMZN GOOGL META TSLA AVGO AMD ORCL TSM PLTR CRWV VST CEG";
+const css=document.createElement('style');
+css.textContent=`
+.srcard{border:1px solid var(--line);border-radius:14px;background:rgba(10,16,28,.55);padding:14px 16px;margin-bottom:14px}
+.srrow{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:10px}
+.srrow:last-child{margin-bottom:0}
+.srfield{display:flex;flex-direction:column;gap:6px;min-width:220px}
+.srfield label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+.srhint{letter-spacing:.02em;text-transform:none;color:var(--ink-faint);opacity:.8}
+.srinline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.srcard select,.srcard input,.srcard textarea{background:#0a101c;border:1px solid var(--card-edge);border-radius:9px;color:var(--ink);font-family:var(--mono);font-size:12.5px;padding:8px 11px;outline:none}
+.srcard select{min-width:240px}
+.srcard textarea{width:100%;resize:vertical}
+.srcard select:focus,.srcard input:focus,.srcard textarea:focus{border-color:#5b9dff}
+.btn.srrun{background:var(--gold);color:#0c1322;border-color:var(--gold);font-weight:600}
+.btn.srrun:hover{filter:brightness(1.08);color:#0c1322}
+.btn.srdel{color:#f87171}
+.srstatus{font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
+.srstatus.err{color:#f87171}.srstatus.ok{color:#34d399}
+.srnotes{font-size:13px;color:var(--ink-dim);white-space:pre-wrap;line-height:1.5}
+.srtablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:rgba(7,10,17,.55)}
+.srtable{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;min-width:860px}
+.srtable th{position:sticky;top:0;background:#0f1626;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;padding:10px 12px;border-bottom:1px solid var(--card-edge);cursor:pointer;white-space:nowrap}
+.srtable th:hover{color:var(--ink)} .srtable th.on{color:var(--gold)}
+.srtable th .srsub{text-transform:none;letter-spacing:0;opacity:.8}
+.srtable td{padding:9px 12px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:top;white-space:nowrap}
+.srtable tr:hover td{background:rgba(255,255,255,.025)}
+.srtable td.tk b{color:var(--gold);font-weight:600;font-size:13px}
+.srtable td.tk span{display:block;font-size:10.5px;color:var(--ink-faint);max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.srtable .px{font-size:13.5px;font-weight:600}
+.srtable .pp{font-size:10.5px;color:var(--ink-faint);margin-left:5px}
+.srtable .sm{display:block;font-size:10.5px;color:var(--ink-faint);margin-top:2px}
+.srtable .dn{color:#f87171}.srtable .up{color:#34d399}
+.srtable .cat{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--card-edge);color:var(--ink-dim)}
+.srtable td.err{color:#f87171;white-space:normal}
+.srempty{text-align:center;color:var(--ink-faint);padding:26px !important}
+`;
+document.head.appendChild(css);
+
+let inited=false, lists=[], rows=[], lastResp=null, sortK=null, sortDir=1, configured=null;
+const $=id=>document.getElementById(id);
+const money=v=>v==null?'—':'$'+Number(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=v=>v==null?'':`<span class="${v<0?'dn':'up'}">${v>0?'+':''}${v.toFixed(1)}%</span>`;
+const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function status(msg,cls,el){ const s=$(el||'srstatus'); s.textContent=msg; s.className='srstatus'+(cls?' '+cls:''); }
+function curListName(){ return $('srlist').value||'Default'; }
+
+async function loadLists(){
+  try{
+    const r=await fetch('/api/watchlists'); const j=await r.json(); configured=j.configured; lists=j.lists||[];
+    const sel=$('srlist'), keep=sel.value;
+    sel.innerHTML='<option value="">— Default (AI leaders + indexes) —</option>'+lists.map(l=>`<option value="${esc(l.name)}">${esc(l.name)} (${(l.symbols||[]).length})</option>`).join('');
+    if(keep&&lists.some(l=>l.name===keep)) sel.value=keep;
+    if(!j.configured) status('Saving is off until SUPABASE_ANON_KEY is set in Vercel — scans still work.','');
+  }catch(e){ status('Could not reach /api/watchlists — '+e.message,'err'); }
+}
+async function loadRuns(){
+  if(configured===false) return;
+  try{
+    const r=await fetch('/api/watchlists?runs=1&list='+encodeURIComponent(curListName())); const j=await r.json();
+    const sel=$('srruns');
+    sel.innerHTML='<option value="">— latest live scan —</option>'+(j.runs||[]).map(x=>`<option value="${x.id}">${new Date(x.run_at).toLocaleString()} · ${esc(x.list_name)} (${(x.symbols||[]).length})</option>`).join('');
+  }catch(e){}
+}
+function pickList(){
+  const l=lists.find(x=>x.name===$('srlist').value);
+  $('srsyms').value=l?(l.symbols||[]).join(', '):DEFAULT_SYMS.split(' ').join(', ');
+  $('srnotesrow').style.display=l&&l.notes?'':'none'; $('srnotes').textContent=l?l.notes:'';
+  loadRuns();
+}
+function sorted(){
+  if(!sortK) return rows;
+  return rows.slice().sort((a,b)=>{ const x=a[sortK],y=b[sortK]; if(x==null&&y==null)return 0; if(x==null)return 1; if(y==null)return -1; return (typeof x==='string'?x.localeCompare(y):x-y)*sortDir; });
+}
+function render(){
+  const body=$('srbody'); const prev=(lastResp&&lastResp.previous&&lastResp.previous.prices)||{};
+  if(!rows.length){ body.innerHTML='<tr><td colspan="7" class="srempty">Press <b>Run scan</b> to load prices.</td></tr>'; return; }
+  body.innerHTML=sorted().map(r=>{
+    if(r.error) return `<tr><td class="tk"><b>${esc(r.symbol)}</b></td><td colspan="6" class="err">${esc(r.error)}</td></tr>`;
+    const p=prev[r.symbol]; const chg=p&&r.price!=null?(r.price/p-1)*100:null;
+    const paren=p!=null?`<span class="pp">(last run ${money(p)}${chg!=null?' · '+pct(chg):''})</span>`:(lastResp&&lastResp.historic?'':`<span class="pp">(first run)</span>`);
+    return `<tr>
+<td class="tk"><b>${esc(r.symbol)}</b><span title="${esc(r.name||'')}">${esc(r.name||'')}</span></td>
+<td><span class="px">${money(r.price)}</span>${paren}<span class="sm">${r.source&&r.source!=='Yahoo Finance'?esc(r.source):''}</span></td>
+<td>${money(r.prevWeekHigh)}<span class="sm">${pct(r.offWeekPct)}${r.prevWeekOf?' · wk of '+r.prevWeekOf.slice(5):''}</span></td>
+<td>${money(r.prevMonthHigh)}<span class="sm">${pct(r.offMonthPct)}${r.prevMonth?' · '+r.prevMonth:''}</span></td>
+<td>${money(r.ytdStart)}<span class="sm">${pct(r.ytdPct)} YTD</span></td>
+<td>${money(r.ipoPrice)}<span class="sm">${r.firstTradeDate?esc(r.firstTradeDate):''}${r.vsIpoPct!=null?' · '+pct(r.vsIpoPct):''}</span></td>
+<td><span class="cat" title="${esc(r.industry||'')}">${esc(r.category||'—')}</span>${r.industry?`<span class="sm">${esc(r.industry)}</span>`:''}</td></tr>`;
+  }).join('');
+}
+async function runScan(){
+  const syms=$('srsyms').value.trim(); if(!syms){ status('Add at least one ticker.','err'); return; }
+  $('srrun').disabled=true; status('Scanning… (about 1–2s per 6 tickers)');
+  try{
+    const r=await fetch('/api/stocks?save=1&list='+encodeURIComponent(curListName())+'&symbols='+encodeURIComponent(syms));
+    const j=await r.json(); if(!j.ok) throw new Error(j.error||'scan failed');
+    lastResp=j; rows=j.rows||[]; $('srruns').value='';
+    $('srasof').textContent=`(as of ${new Date(j.runAt).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}${j.previous?' · vs run of '+new Date(j.previous.runAt).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):''})`;
+    render();
+    const bad=rows.filter(x=>x.error).length;
+    status(`${rows.length-bad} of ${rows.length} loaded${j.saved?' · saved to Supabase':j.configured?'':' · not saved (Supabase key not set)'}${j.storageError?' · storage error: '+j.storageError:''}`, j.storageError?'err':'ok');
+    loadRuns();
+  }catch(e){ status('Scan failed — '+e.message,'err'); }
+  finally{ $('srrun').disabled=false; }
+}
+async function loadRun(id){
+  if(!id){ return; }
+  try{ const r=await fetch('/api/watchlists?runs=1&id='+encodeURIComponent(id)); const j=await r.json(); const run=j.run; if(!run) return;
+    rows=(run.rows||[]).map(x=>Object.assign({},x,{offWeekPct:x.price&&x.prevWeekHigh?(x.price/x.prevWeekHigh-1)*100:null,offMonthPct:x.price&&x.prevMonthHigh?(x.price/x.prevMonthHigh-1)*100:null,vsIpoPct:x.price&&x.ipoPrice?(x.price/x.ipoPrice-1)*100:null}));
+    lastResp={historic:true,previous:null}; $('srasof').textContent='(stored run of '+new Date(run.run_at).toLocaleString()+')'; render(); status('Showing a stored scan — press Run scan for live prices.','');
+  }catch(e){ status('Could not load that run — '+e.message,'err'); }
+}
+function csv(){
+  if(!rows.length){ status('Run a scan first.','err'); return; }
+  const H=['Ticker','Name','Current price','Prev week high','Prev month high','YTD start','YTD %','IPO / first trade','First trade date','Category','Industry','Source'];
+  const L=[H].concat(rows.map(r=>[r.symbol,r.name,r.price,r.prevWeekHigh,r.prevMonthHigh,r.ytdStart,r.ytdPct,r.ipoPrice,r.firstTradeDate,r.category,r.industry,r.source]));
+  const txt=L.map(a=>a.map(v=>{v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/csv'})); a.download='stock-research-'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+function openForm(l){ $('srform').style.display=''; $('srfname').value=l?l.name:''; $('srfsyms').value=l?(l.symbols||[]).join(', '):$('srsyms').value; $('srfnotes').value=l?l.notes||'':''; status('', '', 'srfstatus'); $('srfname').focus(); }
+async function saveForm(){
+  const name=$('srfname').value.trim(), symbols=$('srfsyms').value, notes=$('srfnotes').value;
+  if(!name){ status('Give the list a name.','err','srfstatus'); return; }
+  try{ const r=await fetch('/api/watchlists',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,symbols,notes})}); const j=await r.json();
+    if(j.configured===false){ status('Saving is off until SUPABASE_ANON_KEY is set in Vercel.','err','srfstatus'); return; }
+    if(!j.ok) throw new Error(j.error||'save failed');
+    await loadLists(); $('srlist').value=name; pickList(); $('srform').style.display='none'; status('Saved “'+name+'”.','ok');
+  }catch(e){ status('Save failed — '+e.message,'err','srfstatus'); }
+}
+async function delList(){
+  const name=$('srlist').value; if(!name){ status('Pick one of your saved lists to delete.','err'); return; }
+  const btn=$('srdelete');
+  if(btn.dataset.confirm!==name){ btn.dataset.confirm=name; btn.textContent='Confirm delete'; status('Press “Confirm delete” to remove “'+name+'”.',''); setTimeout(()=>{ if(btn.dataset.confirm===name){ btn.dataset.confirm=''; btn.textContent='Delete'; } },5000); return; }
+  btn.dataset.confirm=''; btn.textContent='Delete';
+  try{ const r=await fetch('/api/watchlists?name='+encodeURIComponent(name),{method:'DELETE'}); const j=await r.json(); if(!j.ok) throw new Error(j.error||'delete failed');
+    await loadLists(); $('srlist').value=''; pickList(); status('Deleted “'+name+'”.','ok'); }catch(e){ status('Delete failed — '+e.message,'err'); }
+}
+function init(){
+  $('srsyms').value=DEFAULT_SYMS.split(' ').join(', ');
+  $('srlist').addEventListener('change',pickList);
+  $('srruns').addEventListener('change',e=>loadRun(e.target.value));
+  $('srrun').addEventListener('click',runScan);
+  $('srcsv').addEventListener('click',csv);
+  $('srnew').addEventListener('click',()=>openForm(null));
+  $('sredit').addEventListener('click',()=>{ const l=lists.find(x=>x.name===$('srlist').value); if(!l){ status('Pick a saved list to edit (or press + New list).','err'); return; } openForm(l); });
+  $('srdelete').addEventListener('click',delList);
+  $('srfsave').addEventListener('click',saveForm);
+  $('srfcancel').addEventListener('click',()=>{ $('srform').style.display='none'; });
+  $('srsyms').addEventListener('keydown',e=>{ if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)) runScan(); });
+  document.querySelectorAll('#srtable th').forEach(th=>th.addEventListener('click',()=>{ const k=th.dataset.k; if(sortK===k) sortDir=-sortDir; else { sortK=k; sortDir=k==='symbol'||k==='category'?1:-1; } document.querySelectorAll('#srtable th').forEach(x=>x.classList.toggle('on',x===th)); render(); }));
+  loadLists().then(loadRuns);
+}
+const prev=window.__showWeb;
+window.__showWeb=function(v){
+  if(v==='stocks'){ if(!inited){ inited=true; init(); } return; }
+  if(prev) prev(v);
+};
+})();
+
+</script>
+<script>
+/* ===== Panel enhancer: compact notes, date-stamped deals sorted newest → oldest, collapsible groups ===== */
+(function(){
+const DEAL_DATES={"27% stake (~$135B); rights t": "2025-10-28", "$250B Azure compute commitme": "2025-10-28", "$50B — led the ~$110B round ": "2026-02", "$38B AWS deal + $100B more o": "2026-02", "~40% owner & chair; committe": "2025-01-21", "~$7B founding equity partner": "2025-01-21", "~40% owner & operational lea": "2025-01-21", "~$7B equity funder + primary": "2025-01-21", "Named technology partner. It": "2025-01-21", "~$40B for ~400K GB200 GPUs f": "2025-05", "Deploying 6GW of AMD Instinc": "2025-10-06", "Warrant: OpenAI may buy up t": "2025-10-06", "Multi-year GPU cloud capacit": "2025-09-25", ">5% equity stake + a $6.3B t": "2025-09-15", "Leases 900MW at the Abilene,": "2026-03", "Builds the Abilene, TX 'AI f": "2025-01-21", "OpenAI-backed (Cursor).": "2023-10", "OpenAI-backed (legal AI).": "2022-11", "OpenAI-backed (healthcare AI": "2023", "Trainium compute (Project Ra": "2025-10-29", "Up to $5B.": "2025-11-18", "$30B of Azure compute; up to": "2025-11-18", "Up to $10B; Grace Blackwell ": "2025-11-18", "~$10B Google Cloud deal + TP": "2025-08-21", "Up to $50B of Nvidia systems": "2026-02-17", "~$27B private credit (PIMCO ": "2025-10-21", "~$20B of Oracle cloud (repor": "2025-09", "Nvidia GPUs powering the Col": "2024-09", "Anchor customer — very large": "ongoing", "~$17–19B GPU-capacity deal.": "2025-09-08", "GPU-capacity contract.": "2025-10-15", "Backer (Series C, ~€1.7B / $": "2025-09-09", "Backer (humanoid robots).": "2024-02-29", "Backer.": "2024-02-29", "Up to $100B LOI (~$30B in) —": "2025-09-22", "Backer of the European front": "2025-09-09", ">5% stake + a $6.3B take-or-": "2025-09-15", "Backer; sovereign-AI neoclou": "2025-09", "Backer of the enterprise LLM": "2024-07", "Backer of Mira Murati's Thin": "2025-07", "Backer of foundation-model s": "2025-10", "Backer of the UK autonomous-": "2024-05", "Largest GPU buyer — Azure fl": "ongoing", "Buys Nvidia despite its own ": "ongoing", "~$40B for ~400K GB200 GPUs (": "2025-05", "Buys Nvidia after shelving D": "ongoing", "Fabricates every Nvidia GPU;": "ongoing", "Lead HBM4 supplier for Vera ": "ongoing", "HBM4 + next-gen foundry talk": "ongoing", "Builds Nvidia's AI servers &": "ongoing", "$1B 5-yr AI drug-discovery l": "2026-01", "Operational & sovereign-AI s": "2025-10-28", "Robotaxi platform — 28 citie": "2025-10-28", "DRIVE AV powers the new CLA.": "ongoing", "DRIVE Hyperion robotaxi init": "2025-01", "DRIVE Hyperion + L4 robotaxi": "ongoing", "Saudi AI factories — several": "2025-05-13", "Stargate UAE — 5GW Abu Dhabi": "2025-05-15", "260k+ GPUs across Samsung, H": "2025-10-31", "2,000MW of AI data centers i": "2024-10", "~$1B/yr for a custom 1.2T-pa": "2026-01-12", "Google pays Apple ~$20B/yr t": "ongoing", "ChatGPT integrated into Appl": "2024-06-10", "Claude powers AI coding in X": "2025-09", "Fabricates all Apple Silicon": "ongoing", "Assembles iPhones & most dev": "ongoing", "5G modems (phasing toward in": "ongoing", "OLED displays + memory.": "ongoing", "Camera image sensors.": "ongoing", "Cover glass ($2.5B US commit": "2025-08-06", "Runs services on AWS + uses ": "2024-12", "~27% stake (~$135B); rev-sha": "2025-10-28", "OpenAI's ~$250B Azure comput": "2025-10-28", "$30B of Azure compute; Maia-": "2025-11-18", "Investor + Azure model partn": "2024-02-26", "Largest buyer of Nvidia GPUs": "ongoing", "Deploys AMD Instinct GPUs.": "ongoing", "Anchor customer — huge GPU c": "ongoing", "Multi-$B GPU-capacity deal.": "2025-11-03", "Leases 900MW at Abilene, TX.": "2026-03", "$1.5B strategic investment (": "2024-04-16", "Fabricates its TPUs.": "ongoing", "Also buys Nvidia GPUs for Cl": "ongoing", "~$1B/yr — custom Gemini powe": "2026-01-12", "$10B+ Google Cloud + TPU pur": "2025-08-21", "Google Cloud customer (part ": "2025-06", "$50B; 2GW Trainium for GPT-5": "2026-02", "AWS = exclusive cloud distri": "2026-02", "In-house Trainium2/3 silicon": "ongoing", "Co-designs Trainium networki": "2024-12", "Investor + deep AWS partners": "ongoing", "Uses AWS Trainium for its AI": "2024-12", "$14.3B for 49%; Wang now lea": "2025-06-12", "Co-designs MTIA accelerators": "ongoing", "Up to $27B of GPU capacity.": "2026-03-16", "$27–30B private credit for H": "2025-10-21", "Part of up to 6.6GW of nucle": "2026-01-09", "20-yr nuclear PPA (Clinton).": "2025-06-03", "$16.5B to fabricate the AI6 ": "2025-07-28", "Fabricates the AI5 chip (Tai": "ongoing", "Buys Nvidia GPUs for trainin": "ongoing", "AMD Ryzen runs in-car Grok; ": "ongoing", "Grok is the 'brain'; joint '": "ongoing", "In-house AI5/AI6 program (Do": "2025-08", "Battery cell supply.": "ongoing", "LFP battery cells.": "ongoing", "Battery cells.": "ongoing"};
+const MON={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,sept:8,oct:9,nov:10,dec:11};
+const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const NOW=new Date(); const NOWV=NOW.getFullYear()*10000+(NOW.getMonth()+1)*100+NOW.getDate();
+function val(o){ return o.y*10000+((o.mo==null?0:o.mo)+1)*100+(o.d||0); }
+function datesIn(s){
+  const out=[]; let x;
+  const r=/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)[a-z]*\.?\s*(\d{1,2}(?!\d))?(?:\s*[–-]\s*\d{1,2})?(?:,)?\s*(?:'(\d{2})|(20\d{2}))?/g;
+  while((x=r.exec(s))){ const mo=MON[x[1].toLowerCase()]; if(mo===undefined) continue;
+    let y=x[3]?2000+ +x[3]:x[4]?+x[4]:null; const d=x[2]?+x[2]:null; if(!y&&!d) continue;
+    if(!y) y=(mo<=NOW.getMonth())?NOW.getFullYear():NOW.getFullYear()-1;
+    out.push({y,mo,d}); }
+  const r2=/\b(?:Q([1-4])|([12])H)\s*'?(\d{2}|20\d{2})\b/g;
+  while((x=r2.exec(s))){ let y=+x[3]; if(y<100) y+=2000; out.push({y,mo:x[1]?(x[1]-1)*3+2:(x[2]==='1'?5:11),d:null,q:x[0]}); }
+  if(!out.length){ const r3=/\b(20[12]\d)\b/g; while((x=r3.exec(s))) out.push({y:+x[1],mo:null,d:null}); }
+  return out.filter(o=>val(o)<=NOWV+1);
+}
+function parseIso(s){ const m=/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?$/.exec(s||''); if(!m) return null; return {y:+m[1],mo:m[2]?+m[2]-1:null,d:m[3]?+m[3]:null}; }
+function label(o){ if(!o) return ''; const yy="'"+String(o.y).slice(2); if(o.mo==null) return String(o.y); return MN[o.mo]+(o.d?' '+o.d:'')+' '+yy; }
+function dateOf(dealEl){
+  const db=dealEl.querySelector('.db'); const txt=db?db.textContent:'';
+  if(dealEl.dataset.date){ if(dealEl.dataset.date==='ongoing') return {kind:'ongoing'}; const o=parseIso(dealEl.dataset.date); if(o) return {kind:'date',o}; }
+  const ds=datesIn(txt);
+  if(ds.length){ const best=ds.reduce((a,b)=>val(b)>val(a)?b:a); return {kind:'date',o:best}; }
+  const k=DEAL_DATES[txt.slice(0,28)];
+  if(k==='ongoing') return {kind:'ongoing'};
+  if(k){ const o=parseIso(k); if(o) return {kind:'date',o}; }
+  return {kind:'none'};
+}
+function enhance(pd){
+  if(!pd||pd.dataset.enhBusy) return;
+  const deals=pd.querySelectorAll(':scope > .deal');
+  if(!deals.length||[...deals].every(d=>d.dataset.enh)) return;
+  pd.dataset.enhBusy='1';
+  /* split into groups by h3 */
+  const kids=[...pd.children]; const groups=[]; let cur={h:null,items:[]};
+  kids.forEach(el=>{ if(el.tagName==='H3'){ if(cur.h||cur.items.length) groups.push(cur); cur={h:el,items:[]}; } else cur.items.push(el); });
+  groups.push(cur);
+  groups.forEach(g=>{
+    const ds=g.items.filter(e=>e.classList&&e.classList.contains('deal'));
+    ds.forEach(d=>{
+      if(d.dataset.enh) return; d.dataset.enh='1';
+      const info=dateOf(d); d._sort=info.kind==='date'?val(info.o):info.kind==='ongoing'?1:0;
+      const dr=d.querySelector('.dr');
+      if(dr){ const s=document.createElement('span'); s.className='ddate'+(info.kind==='date'?'':' dim');
+        s.textContent=info.kind==='date'?label(info.o):info.kind==='ongoing'?'Ongoing':'Undated';
+        s.title=info.kind==='date'?'Latest date in this entry (deal date or last update)':info.kind==='ongoing'?'Ongoing relationship — no single deal date':'No date given in the source entry';
+        dr.appendChild(s); }
+      const hasMore=d.querySelector('.dmeta,.dsrc'); if(d.querySelector('.db')) d.classList.add('clip');
+      if(hasMore) d.classList.add('hasmore');
+    });
+    const others=g.items.filter(e=>!ds.includes(e));
+    const sorted=ds.slice().sort((a,b)=>b._sort-a._sort);
+    const anchor=g.h;
+    let after=anchor; const frag=document.createDocumentFragment();
+    others.concat(sorted).forEach(e=>frag.appendChild(e));
+    if(anchor) anchor.after(frag); else pd.prepend(frag);
+    if(anchor&&!anchor.dataset.enh&&ds.length){
+      anchor.dataset.enh='1'; anchor.classList.add('grp');
+      const c=document.createElement('span'); c.className='gcount'; c.textContent=ds.length; anchor.appendChild(c);
+      anchor.addEventListener('click',()=>{ anchor.classList.toggle('shut'); let n=anchor.nextElementSibling; while(n&&n.tagName!=='H3'){ n.classList.toggle('gshut',anchor.classList.contains('shut')); n=n.nextElementSibling; } });
+    }
+  });
+  /* compact header note */
+  const ph=pd.parentElement&&pd.parentElement.querySelector('.ph');
+  const note=ph&&ph.querySelector('.pnote');
+  if(note){ note.classList.add('clamp'); note.classList.remove('open');
+    let btn=ph.querySelector('.pmore'); if(!btn){ btn=document.createElement('button'); btn.className='pmore'; note.after(btn);
+      btn.addEventListener('click',e=>{ e.stopPropagation(); const o=note.classList.toggle('open'); btn.textContent=o?'Show less ▴':'Show more ▾'; }); }
+    btn.textContent='Show more ▾';
+    requestAnimationFrame(()=>{ btn.style.display=(note.scrollHeight>note.clientHeight+4)?'':'none'; });
+  }
+  delete pd.dataset.enhBusy;
+}
+document.addEventListener('click',e=>{
+  const d=e.target.closest&&e.target.closest('.pdeals .deal.clip');
+  if(d&&!e.target.closest('a')) d.classList.toggle('open');
+});
+const css=document.createElement('style');
+css.textContent=`
+.panel .ph .pnote.clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.panel .ph .pnote.clamp.open{display:block;-webkit-line-clamp:unset;max-height:38vh;overflow-y:auto}
+.pmore{margin-top:6px;background:none;border:none;padding:0;cursor:pointer;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--gold)}
+.pmore:hover{text-decoration:underline}
+.deal.clip{cursor:pointer}
+.deal.clip .db{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.deal.clip.open .db{display:block}
+.deal.clip:not(.open) .dmeta,.deal.clip:not(.open) .dsrc{display:none}
+.deal.clip.hasmore:not(.open) .db::after{content:''}
+.deal .dr{display:flex;gap:8px;align-items:baseline}
+.deal .ddate{margin-left:auto;flex:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;color:var(--gold);background:rgba(231,178,74,.1);border:1px solid rgba(231,178,74,.28);border-radius:5px;padding:0 6px;white-space:nowrap}
+.deal .ddate.dim{color:var(--ink-faint);background:transparent;border-color:var(--line)}
+.pdeals h3.grp{cursor:pointer;display:flex;align-items:center;gap:7px;user-select:none}
+.pdeals h3.grp::before{content:'▾';font-size:10px;color:var(--ink-faint);transition:transform .15s}
+.pdeals h3.grp.shut::before{transform:rotate(-90deg)}
+.pdeals h3.grp .gcount{margin-left:auto;font-size:9.5px;color:var(--ink-faint);border:1px solid var(--line);border-radius:999px;padding:0 7px}
+.pdeals .gshut{display:none !important}
+.deal{padding:7px 10px;margin-bottom:6px}
+`;
+document.head.appendChild(css);
+const obs=new MutationObserver(muts=>{ const set=new Set(); muts.forEach(m=>{ const pd=m.target.closest?m.target.closest('.pdeals'):null; if(pd) set.add(pd); else if(m.target.classList&&m.target.classList.contains('pdeals')) set.add(m.target); }); set.forEach(enhance); });
+function watch(){ document.querySelectorAll('.pdeals').forEach(pd=>{ if(!pd.dataset.watch){ pd.dataset.watch='1'; obs.observe(pd,{childList:true}); enhance(pd);} }); }
+watch(); setInterval(watch,1500);
+})();
+
+/* deep link: #energy, #datacenter, #stocks … */
+(function(){ const h=(location.hash||'').slice(1); if(h&&window.__showView&&document.getElementById('view-'+h)) window.__showView(h); })();
 </script>
 </body>
 </html>

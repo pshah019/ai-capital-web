@@ -1,0 +1,7 @@
+{
+  "name": "ai-capital-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The AI Insights and Options — static site plus /api functions for the Stock Research Data tab"
+}
