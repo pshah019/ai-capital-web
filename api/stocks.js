@@ -74,11 +74,15 @@ function computeFromBars(rows, todayStr) {
   const yr = todayStr.slice(0, 4);
   const firstY = rows.find((b) => b.d.slice(0, 4) === yr);
   const ytdStart = firstY ? firstY.c : null;
+  // 52-week high = highest daily high in the 365 days up to the latest bar.
+  const cut52 = ymd(new Date(new Date(last.d + 'T12:00:00Z').getTime() - 365 * 864e5));
+  const hi52 = rows.filter((b) => b.d >= cut52).reduce((m, b) => (!m || b.h > m.h ? b : m), null);
   return {
     lastClose: last.c, lastBar: last.d,
     prevWeekHigh: r2(prevWeekHigh), prevWeekOf: wkBars.length ? targetWk : null,
     prevMonthHigh: r2(prevMonthHigh), prevMonth: mBars.length ? pmKey : null,
     ytdStart: r2(ytdStart),
+    high52: r2(hi52 ? hi52.h : null), high52Date: hi52 ? hi52.d : null,
   };
 }
 
@@ -144,6 +148,7 @@ async function scanOne(sym, todayStr) {
   out.offWeekPct = out.price != null && out.prevWeekHigh ? r2((out.price / out.prevWeekHigh - 1) * 100) : null;
   out.offMonthPct = out.price != null && out.prevMonthHigh ? r2((out.price / out.prevMonthHigh - 1) * 100) : null;
   out.vsIpoPct = out.price != null && out.ipoPrice ? r2((out.price / out.ipoPrice - 1) * 100) : null;
+  out.offHigh52Pct = out.price != null && out.high52 ? r2((out.price / out.high52 - 1) * 100) : null;
   delete out.lastClose;
   return out;
 }
@@ -177,7 +182,7 @@ export default async function handler(req, res) {
         body.previous = { runAt: prev[0].run_at, prices: map };
       }
       if (q.save === '1') {
-        const slim = rows.map((r) => ({ symbol: r.symbol, price: r.price, prevWeekHigh: r.prevWeekHigh, prevMonthHigh: r.prevMonthHigh, ytdStart: r.ytdStart, ytdPct: r.ytdPct, ipoPrice: r.ipoPrice, firstTradeDate: r.firstTradeDate, category: r.category, industry: r.industry, name: r.name, source: r.source, error: r.error || null }));
+        const slim = rows.map((r) => ({ symbol: r.symbol, price: r.price, prevWeekHigh: r.prevWeekHigh, prevMonthHigh: r.prevMonthHigh, ytdStart: r.ytdStart, ytdPct: r.ytdPct, high52: r.high52, high52Date: r.high52Date, ipoPrice: r.ipoPrice, firstTradeDate: r.firstTradeDate, category: r.category, industry: r.industry, name: r.name, source: r.source, error: r.error || null }));
         await sb('stock_research_runs', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ run_at: runAt, list_name: listName, symbols, rows: slim }) });
         body.saved = true;
       }
