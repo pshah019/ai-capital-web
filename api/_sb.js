@@ -7,7 +7,11 @@ export const SB_KEY = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY 
 export const storageReady = () => !!(SB_URL && SB_KEY);
 
 export function sbHeaders(extra) {
-  return { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, ...(extra || {}) };
+  // New sb_publishable_ keys are not JWTs: send them only as `apikey`.
+  // Legacy anon keys (JWTs starting "eyJ") also go in the Authorization header.
+  const h = { apikey: SB_KEY };
+  if (SB_KEY.startsWith('eyJ')) h.Authorization = 'Bearer ' + SB_KEY;
+  return { ...h, ...(extra || {}) };
 }
 
 export async function sb(path, opts = {}) {
