@@ -2301,6 +2301,8 @@ document.head.appendChild(css);
 const F={op:true,bld:true,prm:true,ann:true}, O={pub:true,priv:true};
 let inited=false, selCo=null, selSt=null, proj, path, svg, root, gStates, gLbl, gSites, feats, curK=1;
 const vis=s=>F[s.s]&&(s.pub?O.pub:O.priv);
+const ownTag=s=>s.own||String(s.owner).split(/ \(| \/|,/)[0].replace(/ Data Centers$/,'').trim();
+const siteLabel=s=>{ const t=ownTag(s)+' · '+s.n; return t.length>34?t.slice(0,33)+'…':t; };
 const roleOf=(s,t)=>s.own===t?'owner':((s.ten||[]).includes(t)?'tenant':null);
 const coSites=t=>DC_SITES.filter(s=>roleOf(s,t)&&vis(s));
 const stSites=st=>DC_SITES.filter(s=>s.st===st&&vis(s));
@@ -2374,15 +2376,15 @@ function drawSites(){
   all.attr('transform',d=>`translate(${d._x},${d._y})`)
     .attr('opacity',d=>selCo&&!roleOf(d,selCo.t)?.25:1);
   all.select('circle').attr('r',R).attr('fill',d=>DC_COL[d.s]).attr('stroke',d=>d.pub?PUBC:PRIVC).attr('stroke-width',2.2)
-    .on('mousemove',(ev,d)=>showTip(ev,`<div class="t-route">${esc(d.n)}</div><span class="t-cat" style="color:${DC_COL[d.s]};background:${DC_COL[d.s]}1f">${DC_LBL[d.s]}</span><div class="t-body"><b>${esc(d.owner)}</b>${d.own?' ('+d.own+')':''} · ${d.pub?'public':'private'}<br>${esc(region(d))} — ${esc(d.c)}<br>${esc(d.mw)}${d.v&&d.v!=='—'?' · '+esc(d.v):''}</div>`))
+    .on('mousemove',(ev,d)=>showTip(ev,`<div class="t-route">${esc(ownTag(d))} · ${esc(d.n)}</div><span class="t-cat" style="color:${DC_COL[d.s]};background:${DC_COL[d.s]}1f">${DC_LBL[d.s]}</span><div class="t-body"><b>${esc(d.owner)}</b>${d.own?' ('+d.own+')':''} · ${d.pub?'public':'private'}<br>${esc(region(d))} — ${esc(d.c)}<br>${esc(d.mw)}${d.v&&d.v!=='—'?' · '+esc(d.v):''}</div>`))
     .on('mouseleave',hideTip)
     .on('click',(ev,d)=>{ev.stopPropagation(); const el=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(d.n+'|'+d.c)}"]`); openPanel(); if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.boxShadow='0 0 0 1px var(--gold)'; setTimeout(()=>el.style.boxShadow='',1600);} });
   all.select('text').attr('x',R+2/curK).attr('y',fs*0.35).style('font-size',fs+'px').style('stroke-width',(2.2/curK)+'px')
-    .text(d=>d.n.length>24?d.n.slice(0,23)+'…':d.n);
+    .text(siteLabel);
   /* greedy label collision: bigger / company-relevant campuses first, skip labels that would overlap */
   const placed=[]; const order=data.slice().sort((a,b)=>(selCo?(roleOf(b,selCo.t)?1:0)-(roleOf(a,selCo.t)?1:0):0)||DC_RANK[a.s]-DC_RANK[b.s]);
   const show=new Set();
-  order.forEach(d=>{ const w=(Math.min(d.n.length,24)*fs*0.62)+R+2/curK, h=fs*1.25; const box=[d._x-R,d._y-h/2,d._x+w,d._y+h/2];
+  order.forEach(d=>{ const w=(siteLabel(d).length*fs*0.62)+R+2/curK, h=fs*1.25; const box=[d._x-R,d._y-h/2,d._x+w,d._y+h/2];
     if(!placed.some(b=>!(box[2]<b[0]||box[0]>b[2]||box[3]<b[1]||box[1]>b[3]))){ placed.push(box); show.add(d); } });
   all.select('text').attr('display',d=>show.has(d)?null:'none');
 }
@@ -2403,7 +2405,7 @@ function dealHTML(s,ctx){
   const role=selCo?roleOf(s,selCo.t):null;
   const ownBadge=`<span class="dcown" style="color:${s.pub?PUBC:PRIVC};border:1px solid ${s.pub?PUBC:PRIVC}55">${s.pub?'public':'private'}</span>`;
   const tenants=(s.ten||[]).length?`<div><b>anchor / tenant</b> ${s.ten.join(' · ')}</div>`:'';
-  return `<div class="deal dc${s.s}" data-key="${esc(s.n+'|'+s.c)}" data-date="${s.d}"><div class="dr">${esc(s.n)}${ctx==='state'?'':' · '+s.st}${role==='tenant'?' <span class="dcown" style="color:#fbbf24;border:1px solid #fbbf2455">tenant</span>':''}</div>
+  return `<div class="deal dc${s.s}" data-key="${esc(s.n+'|'+s.c)}" data-date="${s.d}"><div class="dr"><span><span style="color:${s.pub?PUBC:PRIVC}">${esc(ownTag(s))}</span> · ${esc(s.n)}${ctx==='state'?'':' · '+s.st}</span>${role==='tenant'?' <span class="dcown" style="color:#fbbf24;border:1px solid #fbbf2455">tenant</span>':''}</div>
   <div class="db">${esc(region(s))} — ${esc(s.c)}. ${esc(s.note)}</div>
   <div class="dmeta"><div><b>owner</b> ${esc(s.owner)}${s.own?' ('+s.own+')':s.listed?' — '+esc(s.listed):''} ${ownBadge}</div>${tenants}<div><b>size</b> ${esc(s.mw)}</div><div><b>$</b> ${esc(s.v)}</div><div><b>status</b> ${DC_LBL[s.s]}</div></div><div class="dsrc">${esc(s.src)}</div></div>`;
 }
