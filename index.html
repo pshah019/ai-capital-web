@@ -2526,7 +2526,7 @@ const PUBC="#2dd4bf", PRIVC="#c4a7f0";
 const ENAMES={AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",US:"Multi-state / national"}
 const css=document.createElement('style');
 css.textContent=`
-#dcroster{position:absolute;top:12px;right:14px;z-index:5;width:470px;max-height:calc(100% - 56px);overflow-y:auto;
+#dcroster{position:absolute;top:12px;right:14px;z-index:5;width:580px;max-height:calc(100% - 56px);overflow-y:auto;
 background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;padding:8px 6px;font-family:var(--mono);font-size:11px}
 #dcroster .rg{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:9px 7px 3px}
 #dcroster .rhead{display:grid;grid-template-columns:40px minmax(0,1fr) 46px 46px 76px 28px 50px;column-gap:6px;padding:2px 7px 4px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line)}
@@ -2573,7 +2573,23 @@ background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;pa
 .dcownleg i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:6px}
 .dcownleg u{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:6px}
 .dcback{position:absolute;top:12px;left:220px;z-index:6;font-family:var(--mono);font-size:11px;color:var(--ink);background:rgba(10,16,28,.9);border:1px solid var(--gold);border-radius:9px;padding:6px 11px;cursor:pointer}
-.deal.dcg{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:10px;align-items:start}
+.deal.dcg{display:grid;grid-template-columns:minmax(0,1fr) 118px 132px;gap:10px;align-items:start}
+.dccp{border-left:1px dashed var(--card-edge);padding-left:9px;font-family:var(--mono);font-size:10px;color:var(--ink-faint)}
+.dccph{color:#7dd3fc!important}
+.dccpv{font-size:17px;color:var(--ink);font-weight:600;line-height:1.1;margin:2px 0 5px}
+.dccpv i{font-style:normal;font-size:9px;color:var(--ink-faint);margin-left:4px;font-weight:400}
+.dccpv.soon{font-size:11px;color:#a78bfa;font-weight:500}
+.dccpbar{position:relative;height:5px;border-radius:3px;background:rgba(148,163,184,.18);margin-bottom:5px}
+.dccpbar b{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:#7dd3fc}
+.dccpbar u{position:absolute;top:-3px;bottom:-3px;width:1.5px;background:#fbbf24}
+.dccpvs{line-height:1.4;margin-bottom:7px}.dccpvs b.up{color:#34d399}.dccpvs b.dn{color:#f87171}
+.dccpmix{display:flex;height:7px;border-radius:4px;overflow:hidden;margin:2px 0 5px;background:rgba(148,163,184,.15)}
+.dccpchip{display:flex;align-items:center;gap:5px;line-height:1.5}.dccpchip i{width:7px;height:7px;border-radius:2px;flex:none}.dccpchip span{margin-left:auto;color:var(--ink-dim)}
+.dccpvend{margin:5px 0 6px;color:var(--ink-dim)}.dccpvend b{color:#7dd3fc;font-weight:600}
+.dccpnext{line-height:1.4;margin-bottom:5px;color:var(--ink-dim)}.dccpnext b{color:#a78bfa}.dccpnext span{color:var(--ink-faint)}
+.dccpmeta{line-height:1.4;color:var(--ink-faint)}
+.dccpsrc{margin-top:6px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:#64748b}
+.dcstcomp{margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--ink-dim)}.dcstcomp b{color:#7dd3fc}
 .dcpw{border-left:1px dashed var(--card-edge);padding-left:9px;font-family:var(--mono)}
 .dcpwh{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#fbbf24;margin-bottom:4px}
 .dcpwi{font-size:10px;line-height:1.35;margin-bottom:5px;color:var(--ink-faint)}
@@ -2581,17 +2597,17 @@ background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;pa
 .dcpwi.dim span{opacity:.7}
 .dcpwv{font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;margin-top:2px;line-height:1.3}
 .dcpwv.ok{color:#34d399}.dcpwv.terr{color:#7b8496}.dcpwv.ann{color:#93c5fd}
-#dcpanel{width:480px}
-@media (max-width:620px){.deal.dcg{grid-template-columns:minmax(0,1fr) 96px;gap:7px}#dcpanel{width:100%}}
+#dcpanel{width:590px}
+@media (max-width:620px){.deal.dcg{grid-template-columns:minmax(0,1fr) 96px;gap:7px}.deal.dcg .dccp{grid-column:1/-1;border-left:0;border-top:1px dashed var(--card-edge);padding:8px 0 0}#dcpanel{width:100%}}
 .deal.dcop{border-left-color:#34d399}.deal.dcbld{border-left-color:#fbbf24}.deal.dcprm{border-left-color:#5b9dff}.deal.dcann{border-left-color:#e879f9}
 .dcown{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:1px 6px;border-radius:5px;margin-left:6px;vertical-align:1px}
 .dcstat{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .dcstat span{font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:6px;border:1px solid}
-.dcstage{display:grid;grid-template-columns:minmax(0,1fr) 470px;align-items:start}
+.dcstage{display:grid;grid-template-columns:minmax(0,1fr) 580px;align-items:start}
 .dcstage #dcmap{grid-column:1;grid-row:1;height:auto;aspect-ratio:975/610;min-height:0;max-height:78vh;align-self:center;margin-top:44px}
 .dcstage #dcroster{position:static;grid-column:2;grid-row:1;margin:12px 12px 12px 0;max-height:calc(74vh - 24px);min-height:0}
 .dcstage.zoomed{grid-template-columns:minmax(0,1fr)}
-@media (max-width:1180px){.dcstage{grid-template-columns:minmax(0,1fr)}.dcstage #dcmap{grid-row:1}.dcstage #dcroster{grid-column:1;grid-row:2;width:auto;margin:0 12px 12px;max-height:420px}}
+@media (max-width:1300px){.dcstage{grid-template-columns:minmax(0,1fr)}.dcstage #dcmap{grid-row:1}.dcstage #dcroster{grid-column:1;grid-row:2;width:auto;margin:0 12px 12px;max-height:420px}}
 @media (max-width:680px){#dcroster{position:static;width:auto;max-height:170px;margin:10px 10px 0;font-size:10px}#dcmap{height:52vh;min-height:340px}.dcback{left:auto;right:12px;top:auto;bottom:34px}}
 `;
 document.head.appendChild(css);
@@ -2704,13 +2720,62 @@ function zoomTo(st){
   { const ro0=document.getElementById('dcroster'); if(ro0) ro0.style.display=st?'none':''; const stg=document.querySelector('.dcstage'); if(stg) stg.classList.toggle('zoomed',!!st); }
   let t=d3.zoomIdentity;
   if(f){ const b=path.bounds(f), dx=b[1][0]-b[0][0], dy=b[1][1]-b[0][1], x=(b[0][0]+b[1][0])/2, y=(b[0][1]+b[1][1])/2;
-    let vw=975; try{ const r=document.getElementById('dcmap').getBoundingClientRect(); if(r.width>0&&window.innerWidth>620){ const vis=Math.min(r.right,window.innerWidth-490)-r.left; if(vis>200&&vis<r.width) vw=975*vis/r.width; } }catch(e){}
+    let vw=975; try{ const r=document.getElementById('dcmap').getBoundingClientRect(); if(r.width>0&&window.innerWidth>620){ const vis=Math.min(r.right,window.innerWidth-600)-r.left; if(vis>200&&vis<r.width) vw=975*vis/r.width; } }catch(e){}
     const k=Math.max(1,Math.min(14,0.82/Math.max(dx/vw,dy/610))); t=d3.zoomIdentity.translate(vw/2-k*x,610/2-k*y).scale(k); }
   curK=t.k;
   root.transition().duration(650).attr('transform',t.toString());
   document.getElementById('dcback').style.display=st?'':'none';
   const ro=document.getElementById('dcroster'); if(ro) ro.style.display=st?'none':'';
   document.getElementById('dchint').textContent=st?'Pins show the owner\'s ticker, colored by status · hover a pin or a card to link them · hover a name under Who\'s here to isolate it · ← Back':'Tap a state to zoom in · tap a company to light its footprint';
+}
+
+
+/* ===== Compute per campus — Epoch AI "Frontier Data Centers" (CC-BY 4.0), US sites, pulled Nov 23, 2026 =====
+   [epoch name, H100e now, IT MW now, capex $B, chips "type:units,…", peak H100e, peak date, users, our row key] */
+const EPOCH_ASOF='Nov 23, 2026';
+const EPOCH=[["Colossus 2",1111673,946,35.8,"B200:110000,B300:440000",1824154,"2027-02-25","Anthropic, Cursor, SpaceXAI, Reflection","Colossus 2 (Macrohard)|TN"],["OpenAI Stargate Abilene",1018696,824,31.2,"B200:151200,B300:604800",1018696,"2026-11-01","OpenAI","Stargate Abilene|TX"],["Anthropic-Amazon New Carlisle",818428,1037,39.3,"Trainium2:3265560",1746038,"2028-03-17","Anthropic","Project Rainier|IN"],["Microsoft Fairwater Atlanta",768769,636,24.1,"B200:457842",768769,"2026-06-14","OpenAI, Microsoft","Fairwater Atlanta|GA"],["Google Pryor (North)",636685,368,13.9,"TPU v5p:23466,TPU v5e:77886",636685,"2026-09-06","Google DeepMind","Mayes County campus|OK"],["Meta Prometheus",536343,471,17.8,"B300:366316",1164337,"2028-07-01","Meta","Prometheus|OH"],["Microsoft Fairwater Wisconsin",445680,369,14.0,"B200:176391",4527539,"2028-05-13","OpenAI, Microsoft","Fairwater Wisconsin|WI"],["Google Columbus",331986,303,11.5,"TPU v5e:341827,TPU v5p:35671,TPU v6e:417943,TPU v7:38886",576049,"2027-07-01","Google DeepMind",""],["Google New Albany",323901,333,12.6,"TPU v5e:398870,TPU v5p:124889,TPU v6e:357574",323901,"2025-10-14","Google DeepMind",""],["Anthropic Lake Mariner",292830,210,8.0,"TPU v7:150718",527084,"2027-03-31","Anthropic","Lake Mariner|NY"],["Google Mesa",289540,183,6.9,"TPU v6e:109631,TPU v5p:18447",289540,"2026-08-15","Google","Mesa campus|AZ|GOOGL"],["Colossus 1",275796,340,12.9,"H100:425000,H200:100000,B200:60000",275796,"2025-07-22","Anthropic","Colossus 1|TN"],["Google Council Bluffs (East)",255685,237,9.0,"TPU v5e:84203,TPU v6e:252339,TPU v5p:92314,TPU v7:41923",255685,"2026-07-07","Google DeepMind","Council Bluffs campus|IA"],["CoreWeave Denton TX",252653,262,9.9,"B200:166000",271854,"2027-05-31","OpenAI","Denton campus|TX"],["QTS Richmond 1",242547,238,9.0,"",242547,"2025-11-19","","QTS Richmond|VA"],["Meta Rosemount",215675,178,6.7,"B200:85364",215675,"2026-06-19","Meta",""],["Amazon Madison Mega Site",214348,284,10.8,"Trainium2:326555",514436,"2028-03-15","Anthropic","Project Atlas|MS"],["Google Bristow",209861,238,9.0,"TPU v5e:457310,TPU v5p:47723,TPU v6e:121287,TPU v7:34087",209861,"2026-05-20","Google DeepMind","Loudoun / Prince William|VA"],["Microsoft Goodyear",205154,202,7.7,"H100:87453,B200:58121",205154,"2025-09-01","OpenAI, Microsoft","Goodyear / El Mirage|AZ"],["Meta Jeffersonville",203133,178,6.7,"B300:80486",203133,"2026-06-04","Meta","Jeffersonville campus|IN"],["Google Kansas City East",202628,105,4.0,"",202628,"2026-08-01","Google",""],["Meta Temple",202473,178,6.7,"B300:148710",202473,"2026-09-30","Meta","Temple campus|TX"],["AWS New Albany",201112,213,8.1,"Trainium2:45416,H100:64944,H200:45251,B200:81764",351693,"2027-07-01","Amazon","Central Ohio cluster|OH"],["Google Omaha",198585,237,9.0,"TPU v5e:443755,TPU v5p:56089,TPU v6e:44257,TPU v7:41901",904497,"2028-07-23","Google DeepMind",""],["Google Lincoln",197575,141,5.3,"TPU v6e:24067,TPU v7:75060",672057,"2027-10-01","Google",""],["QTS Richmond 2",182921,180,6.8,"",182921,"2026-05-14","","QTS Richmond|VA"],["Google The Dalles",175341,154,5.8,"TPU v6e:127028,TPU v5p:49472,TPU v5e:109468,TPU v7:34648",175341,"2026-04-29","Google","The Dalles campus|OR"],["QTS Richmond 3",174836,144,5.5,"",291056,"2027-02-13","","QTS Richmond|VA"],["Meta Montgomery",174517,153,5.8,"B300:69074",407486,"2027-02-23","Meta",""],["Meta Kuna",173248,152,5.8,"B300:68571",173248,"2026-06-01","Meta",""],["Meta Cheyenne",172815,152,5.8,"B300:68367",235978,"2027-02-15","Meta",""],["Amazon Ridgeland",171299,228,8.6,"Trainium2:261244",788277,"2028-09-29","Anthropic",""],["Meta Huntsville",166761,146,5.5,"B300:101006",166761,"2026-06-02","Meta","Huntsville campus|AL"],["Coreweave Helios",159552,132,5.0,"B200:63151",638207,"2029-01-01","OpenAI","Helios|TX"],["Microsoft Project Osmium",155634,190,7.2,"A100:25000,H100:32680,B200:45455",155634,"2025-03-01","OpenAI","West Des Moines campus|IA"],["Meta Eagle Mountain",151354,133,5.0,"B300:59906",151354,"2025-12-07","Meta","Eagle Mountain campus|UT"],["Meta Aiken",147044,129,4.9,"B300:89349",147044,"2026-11-05","Meta",""],["Google Midlothian",143581,103,3.9,"TPU v7:79792,TPU v6e:57438",143581,"2026-07-01","Google","Midlothian campus|TX"],["Google Storey County",133906,161,6.1,"TPU v5e:153165,TPU v4:34609,TPU v6e:98179,TPU v5p:16521",540677,"2027-06-30","Google DeepMind","Storey County campus|NV"],["Meta Los Lunas",133906,118,4.5,"B300:92514",869126,"2028-01-01","Meta","Los Lunas campus|NM"],["Google Lancaster",130369,137,5.2,"TPU v5e:174561,TPU v6e:103359",130369,"2025-10-31","Google",""],["Meta-QTS Hillsboro 2",123839,180,6.8,"H100:123839",123839,"2024-11-08","Meta",""],["Google Arcola",108135,77,2.9,"TPU v6e:13171,TPU v7:41079",108135,"2026-06-16","Google","Loudoun / Prince William|VA"],["Google Red Oak",108135,77,2.9,"TPU v6e:116560",279434,"2026-12-01","Google",""],["Google Papillion",100556,237,9.0,"TPU v4:115242,TPU v5e:288488,TPU v5p:70453",100556,"2024-08-03","Google DeepMind","Papillion campus|NE"],["Meta Gallatin",99545,87,3.3,"B300:39453",99545,"2026-08-24","Meta","Gallatin campus|TN"],["CoreWeave Ellendale ND",93482,68,2.6,"B200:64200",505306,"2027-06-01","OpenAI","Polaris Forge 1|ND"],["Meta Sarpy",91966,80,3.0,"B300:36300",91966,"2026-08-02","Meta","Sarpy County campus|NE"],["CoreWeave Chester VA",88428,82,3.1,"H100:36900,B200:26162",125821,"2027-06-30","OpenAI",""],["AWS Berwick",81354,108,4.1,"Trainium2:266397",145023,"2027-08-01","Anthropic","Susquehanna campus|PA"],["CoreWeave Marble NC",78828,65,2.5,"B200:48300",78828,"2026-05-06","OpenAI",""],["Core42 Lake Mariner",71753,58,2.2,"B200:36315",71753,"2026-03-31","G42","Lake Mariner|NY"],["Microsoft SAT40",64679,75,2.8,"H100:32407,B300:12750",64679,"2025-12-01","Microsoft","San Antonio campus|TX"],["STACK Infrastructure NVA02",61142,85,3.2,"H100:60911",250632,"2028-01-01","",""],["Microsoft-Nebius New Jersey",56847,50,1.9,"B300:22500",56847,"2026-04-15","Microsoft","Vineland AI factory|NJ"],["Stream Phoenix",46134,64,2.4,"H100:46112",160182,"2030-01-01","",""],["Microsoft SAT14",45174,47,1.8,"H100:12963,B300:12750",45174,"2026-03-31","Microsoft","San Antonio campus|TX"],["Vantage TX1",38706,32,1.2,"B200:15311",154624,"2027-08-31","",""],["CoreWeave Dalton 1 & 2",32239,28,1.1,"B300:12750",32239,"2026-02-20","OpenAI",""],["xAI QTS Atlanta",11470,17,0.7,"H100:11000,A100:1448",11470,"2025-02-20","SpaceXAI",""],["Anthropic Barber Lake",0,0,0,"",288530,"2027-04-30","Anthropic","Barber Lake|TX"],["CoreWeave Lancaster Greenfield site",0,0,0,"",232946,"2027-06-30","OpenAI","Lancaster campus|PA"],["CoreWeave Muskogee OK",0,0,0,"",198080,"2027-12-31","OpenAI",""],["Crusoe Abilene Expansion",0,0,0,"",1707933,"2027-11-11","Microsoft","Abilene expansion (Microsoft)|TX"],["Goodnight",0,0,0,"",2278929,"2027-10-01","Google DeepMind","Armstrong County campus|TX"],["Google Cedar Rapids",0,0,0,"",670136,"2027-05-23","Google DeepMind","Cedar Rapids campus (Big Cedar)|IA"],["Google Fort Wayne",0,0,0,"",2940879,"2028-06-23","Google DeepMind","Fort Wayne campus|IN"],["Meta Bowling Green",0,0,0,"",855159,"2028-01-01","Meta","Bowling Green campus|OH"],["Meta Hyperion",0,0,0,"",4142944,"2028-01-01","Meta","Hyperion|LA"],["OpenAI Stargate Lordstown",0,0,0,"",545730,"2027-03-01","OpenAI","Stargate Lordstown|OH"],["OpenAI Stargate Michigan",0,0,0,"",2880243,"2028-12-31","OpenAI","Stargate Michigan ('The Barn')|MI"],["OpenAI Stargate Milam",0,0,0,"",2496210,"2028-12-31","OpenAI","Stargate Milam County|TX"],["OpenAI Stargate New Mexico",0,0,0,"",5103588,"2028-12-31","OpenAI","Project Jupiter (Stargate)|NM"],["OpenAI Stargate Shackelford",0,0,0,"",4562911,"2028-11-11","OpenAI","Frontier (Stargate)|TX"],["OpenAI Stargate Wisconsin",0,0,0,"",2627590,"2028-12-31","OpenAI","Lighthouse (Stargate)|WI"],["QTS Cedar Rapids",0,0,0,"",2250549,"2027-11-15","Meta","QTS Cedar Rapids|IA"],["QTS Eagle Mountain",0,0,0,"",346968,"2027-07-01","Meta",""]];
+const EP_BY=(()=>{ const m={}; EPOCH.forEach(r=>{ if(!r[8]) return; const k=r[8]; const o=m[k]||(m[k]={names:[],h:0,mw:0,cap:0,chips:{},pk:0,pkd:'',users:new Set()});
+  o.names.push(r[0]); o.h+=r[1]; o.mw+=r[2]; o.cap+=r[3]; o.pk+=Math.max(r[5],r[1]); if(r[6]>o.pkd) o.pkd=r[6];
+  (r[4]||'').split(',').filter(Boolean).forEach(x=>{ const [c,u]=x.split(':'); o.chips[c]=(o.chips[c]||0)+(+u); }); (r[7]||'').split(', ').filter(Boolean).forEach(u=>o.users.add(u)); }); return m; })();
+const EP_LIVE=EPOCH.filter(r=>r[1]>0), EP_AVG=EP_LIVE.reduce((a,r)=>a+r[1],0)/EP_LIVE.length;
+const EP_RANKED=EP_LIVE.map(r=>r[1]).sort((a,b)=>b-a);
+function epFor(s){ return EP_BY[s.n+'|'+s.st+'|'+s.own]||EP_BY[s.n+'|'+s.st]||null; }
+const fmtH=h=>h>=1e6?(h/1e6).toFixed(h>=1e7?1:2).replace(/\.?0+$/,'')+'M':h>=1e3?Math.round(h/1e3)+'k':String(Math.round(h));
+const epMon=d=>{ const [y,m]=d.split('-'); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+" '"+y.slice(2); };
+function chipVendor(c){ return /^TPU/.test(c)?'GOOGL':/^Trainium/.test(c)?'AMZN':/^(A|H|B|GB)\d/.test(c)?'NVDA':'—'; }
+const CHIP_COL={B300:'#76b900',B200:'#a3d94a',GB300:'#5c9400',GB200:'#8cc63f',H200:'#2dd4bf',H100:'#5eead4',A100:'#94a3b8','TPU v7':'#1d4ed8','TPU v6e':'#3b82f6','TPU v5p':'#60a5fa','TPU v5e':'#93c5fd','TPU v4':'#bfdbfe',Trainium2:'#f97316',Trainium3:'#fb923c'};
+function computeBox(s){
+  const e=epFor(s);
+  if(!e) return `<div class="dccp"><div class="dcpwh dccph">⚙ Compute</div><div class="dcpwi dim"><span>not yet tracked by Epoch AI</span></div></div>`;
+  const vsAvg=x=>{ const r=x/EP_AVG; return (r>=10?Math.round(r):r.toFixed(1))+'×'; };
+  let h='';
+  if(e.h>0){
+    const rank=EP_RANKED.findIndex(v=>v<=e.h)+1;
+    const w=Math.min(100,e.h/EP_RANKED[0]*100), a=EP_AVG/EP_RANKED[0]*100;
+    h+=`<div class="dccpv">${fmtH(e.h)}<i>H100e</i></div>
+    <div class="dccpbar" title="This campus vs the largest US AI site (${fmtH(EP_RANKED[0])}); tick = US average (${fmtH(EP_AVG)})"><b style="width:${w}%"></b><u style="left:${a}%"></u></div>
+    <div class="dccpvs"><b class="${e.h>=EP_AVG?'up':'dn'}">${vsAvg(e.h)}</b> the avg US AI site${e.names.length>1?` · ${e.names.length} sites`:''}<br>#${rank} of ${EP_LIVE.length} online</div>`;
+  } else h+=`<div class="dccpv soon">not online yet</div>`;
+  const tot=Object.values(e.chips).reduce((a,b)=>a+b,0);
+  if(tot){ const list=Object.entries(e.chips).sort((a,b)=>b[1]-a[1]);
+    h+=`<div class="dccpmix" title="Share of chips by count">${list.map(([c,u])=>`<b style="width:${u/tot*100}%;background:${CHIP_COL[c]||'#64748b'}"></b>`).join('')}</div>`+
+      list.slice(0,4).map(([c,u])=>`<div class="dccpchip"><i style="background:${CHIP_COL[c]||'#64748b'}"></i>${esc(c)}<span>${Math.round(u/tot*100)}%</span></div>`).join('');
+    const v={}; list.forEach(([c,u])=>{ const k=chipVendor(c); v[k]=(v[k]||0)+u; });
+    h+=`<div class="dccpvend" title="Who makes the chips (NVDA = Nvidia GPUs; GOOGL = Google TPUs, co-designed with Broadcom/AVGO; AMZN = Amazon Trainium)">${Object.entries(v).sort((a,b)=>b[1]-a[1]).map(([k,u])=>`<b>${k}</b> ${Math.round(u/tot*100)}%`).join(' · ')}</div>`;
+  } else h+=`<div class="dcpwi dim"><span>chip mix not disclosed</span></div>`;
+  if(e.pk>e.h*1.05&&e.pkd) h+=`<div class="dccpnext">→ <b>${fmtH(e.pk)}</b> by ${epMon(e.pkd)}<br><span>${vsAvg(e.pk)} today's avg</span></div>`;
+  if(e.mw) h+=`<div class="dccpmeta">${e.mw.toLocaleString()} MW IT · ~$${e.cap.toFixed(1)}B</div>`;
+  if(e.users.size) h+=`<div class="dccpmeta">used by ${esc([...e.users].slice(0,3).join(', '))}</div>`;
+  h+=`<div class="dccpsrc" title="Epoch AI, Frontier Data Centers dataset (CC-BY 4.0), estimates from satellite imagery and filings: ${esc(e.names.join(' + '))}">Epoch AI est. · ${EPOCH_ASOF}</div>`;
+  return `<div class="dccp"><div class="dcpwh dccph">⚙ Compute</div>${h}</div>`;
+}
+function stateCompute(list){
+  const seen=new Set(); let now=0, plan=0, n=0, cv={}, tot=0;
+  list.forEach(s=>{ const e=epFor(s); if(!e) return; const k=e.names.join('+'); if(seen.has(k)) return; seen.add(k); n++; now+=e.h; plan+=e.pk;
+    Object.entries(e.chips).forEach(([c,u])=>{ const v=chipVendor(c); cv[v]=(cv[v]||0)+u; tot+=u; }); });
+  if(!n) return '';
+  const vend=tot?' · chips '+Object.entries(cv).sort((a,b)=>b[1]-a[1]).map(([k,u])=>`<b>${k}</b> ${Math.round(u/tot*100)}%`).join(' '):'';
+  return `<div class="dcstcomp">⚙ <b>${fmtH(now)}</b> H100e online across ${n} Epoch-tracked site${n>1?'s':''}${plan>now*1.05?` → <b>${fmtH(plan)}</b> planned`:''}${vend}</div>`;
 }
 
 function dealHTML(s,ctx){
@@ -2721,7 +2786,7 @@ function dealHTML(s,ctx){
   const pwBox=`<div class="dcpw"><div class="dcpwh">⚡ Power</div>${(s.pw&&s.pw.length)?s.pw.map(([t,r])=>`<div class="dcpwi" title="${esc(t==='—'?r:pwName(t)+' — '+r)}"><b>${esc(t)}</b><span>${esc(r)}</span></div>`).join(''):'<div class="dcpwi dim"><span>not disclosed</span></div>'}${pwTag(s)}</div>`;
   return `<div class="deal dcg dc${s.s}" data-key="${esc(s.n+'|'+s.c)}" data-date="${s.d}"><div class="dcl"><div class="dr"><span><span style="color:${s.pub?PUBC:PRIVC}">${esc(ownTag(s))}</span> · ${esc(s.n)}${ctx==='state'?'':' · '+s.st}</span>${role==='tenant'?' <span class="dcown" style="color:#fbbf24;border:1px solid #fbbf2455">tenant</span>':''}</div>
   <div class="db">${esc(region(s))} — ${esc(s.c)}. ${esc(s.note)}</div>
-  <div class="dmeta"><div><b>owner</b> ${esc(s.owner)}${s.own?' ('+s.own+')':s.listed?' — '+esc(s.listed):''} ${ownBadge}</div>${tenants}<div><b>size</b> ${esc(s.mw)}</div><div><b>$</b> ${esc(s.v)}</div><div><b>status</b> ${DC_LBL[s.s]}</div></div><div class="dsrc">${esc(s.src)}</div></div>${pwBox}</div>`;
+  <div class="dmeta"><div><b>owner</b> ${esc(s.owner)}${s.own?' ('+s.own+')':s.listed?' — '+esc(s.listed):''} ${ownBadge}</div>${tenants}<div><b>size</b> ${esc(s.mw)}</div><div><b>$</b> ${esc(s.v)}</div><div><b>status</b> ${DC_LBL[s.s]}</div></div><div class="dsrc">${esc(s.src)}</div></div>${pwBox}${computeBox(s)}</div>`;
 }
 function statChips(list){ return `<div class="dcstat">`+['op','bld','prm','ann'].map(k=>{const n=list.filter(s=>s.s===k).length;return n?`<span style="color:${DC_COL[k]};border-color:${DC_COL[k]}55">${n} ${DC_LBL[k].toLowerCase()}</span>`:'';}).join('')+`</div>`; }
 function openPanel(){ document.getElementById('dcpanel').classList.add('open'); }
@@ -2732,7 +2797,7 @@ function showState(st){
   const list=stSites(st).sort((a,b)=>DC_RANK[a.s]-DC_RANK[b.s]);
   const pub=list.filter(s=>s.pub).length;
   document.getElementById('dcph').innerHTML=`<div class="ptype">State · ${list.length} tracked campus${list.length===1?'':'es'}</div><h2>${ENAMES[st]||st}</h2>
-  <div class="pval"><span style="color:${PUBC}">${pub} public-owned</span> · <span style="color:${PRIVC}">${list.length-pub} private</span>${selCo?` · highlighting ${selCo.t}`:''}</div>${statChips(list)}${list.length?mixChips(list.map(s=>({t:dcPin(s),col:s.pub?PUBC:PRIVC})),'data-co'):''}`;
+  <div class="pval"><span style="color:${PUBC}">${pub} public-owned</span> · <span style="color:${PRIVC}">${list.length-pub} private</span>${selCo?` · highlighting ${selCo.t}`:''}</div>${statChips(list)}${stateCompute(list)}${list.length?mixChips(list.map(s=>({t:dcPin(s),col:s.pub?PUBC:PRIVC})),'data-co'):''}`;
   document.querySelectorAll('#dcph .mixc').forEach(ch=>{ ch.addEventListener('mouseenter',()=>{ dcFocusCo=ch.dataset.co; drawSites(); }); ch.addEventListener('mouseleave',()=>{ dcFocusCo=null; drawSites(); }); });
   const pd=document.getElementById('dcpdeals');
   if(!list.length){ pd.innerHTML=`<h3>No tracked campuses</h3><div class="deal"><div class="db">Nothing in the current filter is tracked here yet — this is a curated snapshot, not a census.</div></div>`; }
