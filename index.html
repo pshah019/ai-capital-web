@@ -2588,6 +2588,7 @@ background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;pa
 .dccpvend{margin:5px 0 6px;color:var(--ink-dim)}.dccpvend b{color:#7dd3fc;font-weight:600}
 .dccpnext{line-height:1.4;margin-bottom:5px;color:var(--ink-dim)}.dccpnext b{color:#a78bfa}.dccpnext span{color:var(--ink-faint)}
 .dccppow{line-height:1.4;margin-bottom:3px;color:var(--ink-dim)}.dccppow b{color:#fbbf24;font-weight:600}.dccppow b.pk{color:#f59e0b}
+.dccpcmp{font-size:9px;color:var(--ink-faint);margin:-1px 0 4px 12px;line-height:1.35}.dccpcmp b.up{color:#34d399}.dccpcmp b.dn{color:#f87171}
 .dccpmeta{line-height:1.4;color:var(--ink-faint)}
 .dccpsrc{margin-top:6px;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:#64748b}
 .cvchip{border-color:#7dd3fc66!important;color:#7dd3fc!important}
@@ -2764,6 +2765,10 @@ const EP_BY=(()=>{ const m={}; EPOCH.forEach(r=>{ if(!r[8]) return; const k=r[8]
   (r[4]||'').split(',').filter(Boolean).forEach(x=>{ const [c,u]=x.split(':'); o.chips[c]=(o.chips[c]||0)+(+u); }); (r[7]||'').split(', ').filter(Boolean).forEach(u=>o.users.add(u)); }); return m; })();
 const EP_LIVE=EPOCH.filter(r=>r[1]>0), EP_AVG=EP_LIVE.reduce((a,r)=>a+r[1],0)/EP_LIVE.length;
 const EP_RANKED=EP_LIVE.map(r=>r[1]).sort((a,b)=>b-a);
+/* per chip type: how each site's count compares with every other US site that has that chip */
+const CHIP_STATS=(()=>{ const m={}; EPOCH.forEach(r=>(r[4]||'').split(',').filter(Boolean).forEach(x=>{ const [c,u]=x.split(':'); (m[c]=m[c]||[]).push(+u); }));
+  Object.keys(m).forEach(c=>{ const a=m[c].sort((x,y)=>y-x); m[c]={sites:a.length,tot:a.reduce((p,q)=>p+q,0),avg:a.reduce((p,q)=>p+q,0)/a.length,list:a}; }); return m; })();
+function chipCmp(c,u){ const st=CHIP_STATS[c]; if(!st) return null; const rank=st.list.filter(v=>v>u).length+1; const r=u/st.avg; return {rank,sites:st.sites,x:(r>=10?Math.round(r):r.toFixed(1))+'×',up:r>=1,share:Math.round(u/st.tot*100)}; }
 function epFor(s){ return EP_BY[s.n+'|'+s.st+'|'+s.own]||EP_BY[s.n+'|'+s.st]||null; }
 const fmtH=h=>h>=1e6?(h/1e6).toFixed(h>=1e7?1:2).replace(/\.?0+$/,'')+'M':h>=1e3?Math.round(h/1e3)+'k':String(Math.round(h));
 const epMon=d=>{ const [y,m]=d.split('-'); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+" '"+y.slice(2); };
@@ -2784,11 +2789,11 @@ function computeBox(s){
   const tot=Object.values(e.chips).reduce((a,b)=>a+b,0);
   if(tot){ const list=Object.entries(e.chips).sort((a,b)=>b[1]-a[1]);
     h+=`<div class="dccpmix" title="Share of chips by count">${list.map(([c,u])=>`<b style="width:${u/tot*100}%;background:${CHIP_COL[c]||'#64748b'}"></b>`).join('')}</div>`+
-      list.slice(0,4).map(([c,u])=>`<div class="dccpchip"><i style="background:${CHIP_COL[c]||'#64748b'}"></i>${esc(c)}<span>${Math.round(u/tot*100)}%</span></div>`).join('');
+      list.slice(0,4).map(([c,u])=>{ const k=chipCmp(c,u); return `<div class="dccpchip"><i style="background:${CHIP_COL[c]||'#64748b'}"></i>${esc(c)}<span>${Math.round(u/tot*100)}%</span></div>`+(k?`<div class="dccpcmp" title="${u.toLocaleString()} ${esc(c)} chips — rank among the ${k.sites} US sites with ${esc(c)}; × = vs the average ${esc(c)} site; share of all tracked US ${esc(c)} chips">${fmtH(u)} · #${k.rank}/${k.sites} · <b class="${k.up?'up':'dn'}">${k.x}</b> avg · ${k.share}% of US</div>`:''); }).join('');
     const v={}; list.forEach(([c,u])=>{ const k=chipVendor(c); v[k]=(v[k]||0)+u; });
     h+=`<div class="dccpvend" title="Who makes the chips (NVDA = Nvidia GPUs; GOOGL = Google TPUs, co-designed with Broadcom/AVGO; AMZN = Amazon Trainium)">${Object.entries(v).sort((a,b)=>b[1]-a[1]).map(([k,u])=>`<b>${k}</b> ${Math.round(u/tot*100)}%`).join(' · ')}</div>`;
   } else h+=`<div class="dcpwi dim"><span>chip mix not disclosed</span></div>`;
-  if(e.pk>e.h*1.05&&e.pkd) h+=`<div class="dccpnext">→ <b>${fmtH(e.pk)}</b> by ${epMon(e.pkd)}<br><span>${vsAvg(e.pk)} today's avg</span></div>`;
+  if(e.pk>e.h*1.05&&e.pkd) h+=`<div class="dccpnext">→ <b>${fmtH(e.pk)}</b> H100e at full capacity (${epMon(e.pkd)})<br><span>${vsAvg(e.pk)} today's avg</span></div>`;
   if(e.mw||e.pmw) h+=`<div class="dccppow" title="IT power (the chips' draw, before cooling overhead). Full capacity = the most IT power the site is planned to reach.">⚡ ${e.pmw>e.mw*1.05?`<b>${(e.mw||0).toLocaleString()} MW</b> now → <b class="pk">${e.pmw.toLocaleString()} MW</b> at full capacity`:`<b>${e.mw.toLocaleString()} MW</b> · already at full capacity`}</div>`;
   if(e.cap) h+=`<div class="dccpmeta">~$${e.cap.toFixed(1)}B est. cost so far</div>`;
   if(e.users.size) h+=`<div class="dccpmeta">used by ${esc([...e.users].slice(0,3).join(', '))}</div>`;
@@ -2801,7 +2806,7 @@ function stateCompute(list){
     Object.entries(e.chips).forEach(([c,u])=>{ const v=chipVendor(c); cv[v]=(cv[v]||0)+u; tot+=u; }); });
   if(!n) return '';
   const vend=tot?' · chips '+Object.entries(cv).sort((a,b)=>b[1]-a[1]).map(([k,u])=>`<b>${k}</b> ${Math.round(u/tot*100)}%`).join(' '):'';
-  return `<div class="dcstcomp">⚙ <b>${fmtH(now)}</b> H100e online across ${n} tracked site${n>1?'s':''}${plan>now*1.05?` → <b>${fmtH(plan)}</b> planned`:''}${vend}<br>⚡ <b style="color:#fbbf24">${mw.toLocaleString()} MW</b> IT power now${pmw>mw*1.05?` → <b style="color:#f59e0b">${pmw.toLocaleString()} MW</b> at full capacity`:''}</div>`;
+  return `<div class="dcstcomp">⚙ <b>${fmtH(now)}</b> H100e online across ${n} tracked site${n>1?'s':''}${plan>now*1.05?` → <b>${fmtH(plan)}</b> at full capacity`:''}${vend}<br>⚡ <b style="color:#fbbf24">${mw.toLocaleString()} MW</b> IT power now${pmw>mw*1.05?` → <b style="color:#f59e0b">${pmw.toLocaleString()} MW</b> at full capacity`:''}</div>`;
 }
 
 function dealHTML(s,ctx){
@@ -2842,11 +2847,11 @@ function showCompute(){
   const vend=ct?Object.entries(cv).sort((a,b)=>b[1]-a[1]).map(([k,u])=>`<b>${k}</b> ${Math.round(u/ct*100)}%`).join(' · '):'';
   const st={}; live.forEach(x=>{ st[x.s.st]=(st[x.s.st]||0)+x.e.h; }); const topSt=Object.entries(st).sort((a,b)=>b[1]-a[1]).slice(0,3);
   document.getElementById('dcph').innerHTML=`<div class="ptype">Compute · estimates as of ${EPOCH_ASOF}</div><h2>AI compute by campus</h2>
-  <div class="pval"><span style="color:#7dd3fc">${fmtH(totNow)} H100e</span> online across ${live.length} campuses · <span style="color:#a78bfa">${fmtH(totPk)}</span> planned incl. ${soon.length} still building</div>
+  <div class="pval"><span style="color:#7dd3fc">${fmtH(totNow)} H100e</span> online across ${live.length} campuses · <span style="color:#a78bfa">${fmtH(totPk)}</span> H100e at full capacity incl. ${soon.length} still building</div>
   <div class="pval">⚡ <span style="color:#fbbf24">${(mwNow/1000).toFixed(1)} GW</span> IT power now → <span style="color:#f59e0b">${(mwPk/1000).toFixed(1)} GW</span> at full capacity</div>
   <div class="pval">Avg US AI site ${fmtH(EP_AVG)} H100e · chips by count ${vend}</div>
   <div class="pval">Top states now: ${topSt.map(([k,v])=>`<b style="color:var(--ink)">${k}</b> ${fmtH(v)}`).join(' · ')}</div>
-  <div class="cvsort"><span data-k="now" class="${cvSort==='now'?'on':''}">Online now</span><span data-k="pk" class="${cvSort==='pk'?'on':''}">Planned peak</span><span data-k="x" class="${cvSort==='x'?'on':''}">Biggest growth</span></div>`;
+  <div class="cvsort"><span data-k="now" class="${cvSort==='now'?'on':''}">Online now</span><span data-k="pk" class="${cvSort==='pk'?'on':''}">At full capacity</span><span data-k="x" class="${cvSort==='x'?'on':''}">Biggest growth</span></div>`;
   document.querySelectorAll('#dcph .cvsort span').forEach(b=>b.addEventListener('click',()=>{ cvSort=b.dataset.k; showCompute(); }));
   const key={now:x=>x.e.h,pk:x=>x.e.pk,x:x=>x.e.pk-x.e.h}[cvSort];
   const list=(cvSort==='now'?live:rows).slice().sort((a,b)=>key(b)-key(a));
@@ -2861,8 +2866,8 @@ function showCompute(){
       <div class="cvm"><div class="cvn"><span style="color:${s.pub?PUBC:PRIVC}">${esc(dcPin(s))}</span> · ${esc(s.n)} <i>${s.st}</i></div>
         <div class="cvbar"><b style="width:${v/max*100}%;background:${cvSort==='now'?'#7dd3fc':'#a78bfa'}"></b></div>
         <div class="cvsub">${e.h>0?`<em class="${ratio>=1?'up':'dn'}">${ratio>=10?Math.round(ratio):ratio.toFixed(1)}× avg</em>`:'<em class="soon">building</em>'}${tot?`<span class="cvmix">${mix}</span>`:''}<span class="cvv">${vtx}</span><span class="cvpw">⚡ ${e.pmw>e.mw*1.05?(e.mw||0).toLocaleString()+'→'+e.pmw.toLocaleString():e.mw.toLocaleString()} MW</span></div></div>
-      <div class="cvval">${fmtH(v)}<i>${cvSort==='now'?'H100e now':cvSort==='pk'?'peak '+epMon(e.pkd):'added by '+epMon(e.pkd)}</i>${cvSort==='now'&&e.pk>e.h*1.05?`<span>→ ${fmtH(e.pk)}</span>`:''}</div>${cvDetail(s,e)}</div>`; };
-  document.getElementById('dcpdeals').innerHTML=`<div class="cvtools"><span id="cvall">Expand all</span></div><h3>${cvSort==='now'?'Online now · '+list.length:cvSort==='pk'?'Planned peak (incl. building) · '+list.length:'Biggest growth ahead · '+list.length}</h3>`+list.map(row).join('')+
+      <div class="cvval">${fmtH(v)}<i>${cvSort==='now'?'H100e now':cvSort==='pk'?'full cap. '+epMon(e.pkd):'added by '+epMon(e.pkd)}</i>${cvSort==='now'&&e.pk>e.h*1.05?`<span>→ ${fmtH(e.pk)}</span>`:''}</div>${cvDetail(s,e)}</div>`; };
+  document.getElementById('dcpdeals').innerHTML=`<div class="cvtools"><span id="cvall">Expand all</span></div><h3>${cvSort==='now'?'Online now · '+list.length:cvSort==='pk'?'Compute at full capacity (incl. building) · '+list.length:'Biggest growth ahead · '+list.length}</h3>`+list.map(row).join('')+
     `<div class="cvfoot">${rows.length} of ${DC_SITES.length} tracked campuses have compute estimates (satellite imagery + filings). Chip share is by chip count. NVDA = Nvidia GPUs · GOOGL = Google TPUs (Broadcom co-designed) · AMZN = Trainium. Tap a row for its full detail; "Open on map" jumps to the campus card.</div>`;
   const ca=document.getElementById('cvall'); if(ca) ca.addEventListener('click',()=>{ const rs=document.querySelectorAll('#dcpdeals .cvrow'); const open=![...rs].every(x=>x.classList.contains('open')); rs.forEach(x=>x.classList.toggle('open',open)); ca.textContent=open?'Collapse all':'Expand all'; });
   document.querySelectorAll('#dcpdeals .cvrow').forEach(r=>r.addEventListener('click',ev=>{ if(ev.target.closest('.cvdet')&&!ev.target.closest('.cvopen')) return; if(!ev.target.closest('.cvopen')){ r.classList.toggle('open'); return; } const k=r.dataset.key; setCompute(false); showState(r.dataset.st);
@@ -2873,10 +2878,10 @@ function cvDetail(s,e){
   const tot=Object.values(e.chips).reduce((a,b)=>a+b,0), list=Object.entries(e.chips).sort((a,b)=>b[1]-a[1]);
   const vv={}; list.forEach(([c,u])=>{ const k=chipVendor(c); vv[k]=(vv[k]||0)+u; });
   const rank=e.h>0?EP_RANKED.findIndex(v=>v<=e.h)+1:0, r=x=>{ const q=x/EP_AVG; return (q>=10?Math.round(q):q.toFixed(1))+'×'; };
-  const chips=tot?list.map(([c,u])=>`<div class="dccpchip"><i style="background:${CHIP_COL[c]||'#64748b'}"></i>${esc(c)}<span>${u.toLocaleString()} · ${Math.round(u/tot*100)}%</span></div>`).join('')+`<div class="dccpvend">${Object.entries(vv).sort((a,b)=>b[1]-a[1]).map(([k,u])=>`<b>${k}</b> ${Math.round(u/tot*100)}%`).join(' · ')}</div>`:'<div class="cvdim">chip mix not disclosed</div>';
+  const chips=tot?list.map(([c,u])=>{ const k=chipCmp(c,u); return `<div class="dccpchip"><i style="background:${CHIP_COL[c]||'#64748b'}"></i>${esc(c)}<span>${u.toLocaleString()} · ${Math.round(u/tot*100)}%</span></div>`+(k?`<div class="dccpcmp">#${k.rank} of ${k.sites} ${esc(c)} sites · <b class="${k.up?'up':'dn'}">${k.x}</b> the avg ${esc(c)} site · ${k.share}% of all US ${esc(c)}</div>`:''); }).join('')+`<div class="dccpvend">${Object.entries(vv).sort((a,b)=>b[1]-a[1]).map(([k,u])=>`<b>${k}</b> ${Math.round(u/tot*100)}%`).join(' · ')}</div>`:'<div class="cvdim">chip mix not disclosed</div>';
   return `<div class="cvdet">
    <div><h5>Compute</h5><div class="cvk"><b>${e.h>0?fmtH(e.h):'0'}</b> H100e now</div>${e.h>0?`<div class="cvk">${r(e.h)} the avg US AI site · #${rank} of ${EP_LIVE.length}</div>`:'<div class="cvk soon">not online yet</div>'}
-     ${e.pk>e.h*1.05?`<div class="cvk">→ <b class="pk">${fmtH(e.pk)}</b> by ${epMon(e.pkd)} (${r(e.pk)} today's avg)</div><div class="cvk">+${fmtH(e.pk-e.h)} still to come</div>`:'<div class="cvk">at planned peak</div>'}</div>
+     ${e.pk>e.h*1.05?`<div class="cvk">→ <b class="pk">${fmtH(e.pk)}</b> H100e at full capacity (${epMon(e.pkd)}) · ${r(e.pk)} today's avg</div><div class="cvk">+${fmtH(e.pk-e.h)} still to come</div>`:'<div class="cvk">already at full capacity</div>'}</div>
    <div><h5>Power (IT)</h5><div class="cvk"><b class="pw">${(e.mw||0).toLocaleString()} MW</b> now</div><div class="cvk">${e.pmw>e.mw*1.05?`→ <b class="pw">${e.pmw.toLocaleString()} MW</b> at full capacity`:'already at full capacity'}</div>${e.mw?`<div class="cvk">${Math.round(e.h/e.mw).toLocaleString()} H100e per MW</div>`:''}</div>
    <div><h5>Chips · ${tot?tot.toLocaleString()+' units':'n/d'}</h5>${chips}</div>
    <div><h5>Money & users</h5>${e.cap?`<div class="cvk"><b>~$${e.cap.toFixed(1)}B</b> est. cost so far</div>`:'<div class="cvdim">cost n/d</div>'}${e.users.size?`<div class="cvk">used by ${esc([...e.users].join(', '))}</div>`:''}${e.names.length>1?`<div class="cvk cvdim">combines ${e.names.length} sites: ${esc(e.names.join(' · '))}</div>`:''}
