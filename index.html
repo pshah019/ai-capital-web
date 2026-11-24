@@ -2605,6 +2605,14 @@ background:rgba(10,16,28,.88);border:1px solid var(--line);border-radius:12px;pa
 .cvmix{display:flex;width:56px;height:6px;border-radius:3px;overflow:hidden;flex:none}.cvv{color:#7dd3fc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cvval{font-family:var(--mono);text-align:right;font-size:15px;font-weight:600;color:var(--ink);line-height:1.15}.cvval i{display:block;font-style:normal;font-size:8.5px;font-weight:400;color:var(--ink-faint);letter-spacing:.04em}.cvval span{display:block;font-size:9.5px;font-weight:400;color:#a78bfa}
 .cvpw{margin-left:auto;color:#fbbf24;white-space:nowrap}
+.cvrow .cvdet{display:none;grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:8px;padding-top:9px;border-top:1px dashed var(--card-edge);font-family:var(--mono);font-size:10px;color:var(--ink-faint);cursor:default}
+.cvrow.open .cvdet{display:grid}.cvrow.open{border-color:#7dd3fc66;background:rgba(125,211,252,.05)}
+.cvdet h5{margin:0 0 5px;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:#7dd3fc;font-weight:500}
+.cvk{line-height:1.45;color:var(--ink-dim)}.cvk b{color:var(--ink)}.cvk b.pk{color:#a78bfa}.cvk b.pw{color:#fbbf24}.cvk.soon{color:#a78bfa}.cvdim{color:var(--ink-faint);opacity:.8}
+.cvdet .dccpchip span{white-space:nowrap}
+.cvopen{margin-top:7px;font-family:var(--mono);font-size:10px;padding:4px 9px;border-radius:7px;border:1px solid #7dd3fc88;background:transparent;color:#bae6fd;cursor:pointer}.cvopen:hover{background:rgba(125,211,252,.14)}
+.cvtools{display:flex;justify-content:flex-end;margin:-2px 0 4px}.cvtools span{font-family:var(--mono);font-size:10px;color:#7dd3fc;cursor:pointer}
+@media (max-width:620px){.cvrow .cvdet{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cvfoot{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);line-height:1.5;margin:10px 2px 4px}
 .dcstcomp{margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--ink-dim)}.dcstcomp b{color:#7dd3fc}
 .dcpw{border-left:1px dashed var(--card-edge);padding-left:9px;font-family:var(--mono)}
@@ -2852,13 +2860,28 @@ function showCompute(){
       <div class="cvr">${i+1}</div>
       <div class="cvm"><div class="cvn"><span style="color:${s.pub?PUBC:PRIVC}">${esc(dcPin(s))}</span> · ${esc(s.n)} <i>${s.st}</i></div>
         <div class="cvbar"><b style="width:${v/max*100}%;background:${cvSort==='now'?'#7dd3fc':'#a78bfa'}"></b></div>
-        <div class="cvsub">${e.h>0?`<em class="${ratio>=1?'up':'dn'}">${ratio>=10?Math.round(ratio):ratio.toFixed(1)}× avg</em>`:'<em class="soon">building</em>'}${tot?`<span class="cvmix">${mix}</span>`:''}<span class="cvv">${vtx}</span><span class="cvpw">⚡ ${e.mw?e.mw+'→':''}${e.pmw} MW</span></div></div>
-      <div class="cvval">${fmtH(v)}<i>${cvSort==='now'?'H100e now':cvSort==='pk'?'peak '+epMon(e.pkd):'added by '+epMon(e.pkd)}</i>${cvSort==='now'&&e.pk>e.h*1.05?`<span>→ ${fmtH(e.pk)}</span>`:''}</div></div>`; };
-  document.getElementById('dcpdeals').innerHTML=`<h3>${cvSort==='now'?'Online now · '+list.length:cvSort==='pk'?'Planned peak (incl. building) · '+list.length:'Biggest growth ahead · '+list.length}</h3>`+list.map(row).join('')+
-    `<div class="cvfoot">${rows.length} of ${DC_SITES.length} tracked campuses have compute estimates (satellite imagery + filings). Chip share is by chip count. NVDA = Nvidia GPUs · GOOGL = Google TPUs (Broadcom co-designed) · AMZN = Trainium. Tap a row to open that campus.</div>`;
-  document.querySelectorAll('#dcpdeals .cvrow').forEach(r=>r.addEventListener('click',()=>{ const k=r.dataset.key; setCompute(false); showState(r.dataset.st);
+        <div class="cvsub">${e.h>0?`<em class="${ratio>=1?'up':'dn'}">${ratio>=10?Math.round(ratio):ratio.toFixed(1)}× avg</em>`:'<em class="soon">building</em>'}${tot?`<span class="cvmix">${mix}</span>`:''}<span class="cvv">${vtx}</span><span class="cvpw">⚡ ${e.pmw>e.mw*1.05?(e.mw||0).toLocaleString()+'→'+e.pmw.toLocaleString():e.mw.toLocaleString()} MW</span></div></div>
+      <div class="cvval">${fmtH(v)}<i>${cvSort==='now'?'H100e now':cvSort==='pk'?'peak '+epMon(e.pkd):'added by '+epMon(e.pkd)}</i>${cvSort==='now'&&e.pk>e.h*1.05?`<span>→ ${fmtH(e.pk)}</span>`:''}</div>${cvDetail(s,e)}</div>`; };
+  document.getElementById('dcpdeals').innerHTML=`<div class="cvtools"><span id="cvall">Expand all</span></div><h3>${cvSort==='now'?'Online now · '+list.length:cvSort==='pk'?'Planned peak (incl. building) · '+list.length:'Biggest growth ahead · '+list.length}</h3>`+list.map(row).join('')+
+    `<div class="cvfoot">${rows.length} of ${DC_SITES.length} tracked campuses have compute estimates (satellite imagery + filings). Chip share is by chip count. NVDA = Nvidia GPUs · GOOGL = Google TPUs (Broadcom co-designed) · AMZN = Trainium. Tap a row for its full detail; "Open on map" jumps to the campus card.</div>`;
+  const ca=document.getElementById('cvall'); if(ca) ca.addEventListener('click',()=>{ const rs=document.querySelectorAll('#dcpdeals .cvrow'); const open=![...rs].every(x=>x.classList.contains('open')); rs.forEach(x=>x.classList.toggle('open',open)); ca.textContent=open?'Collapse all':'Expand all'; });
+  document.querySelectorAll('#dcpdeals .cvrow').forEach(r=>r.addEventListener('click',ev=>{ if(ev.target.closest('.cvdet')&&!ev.target.closest('.cvopen')) return; if(!ev.target.closest('.cvopen')){ r.classList.toggle('open'); return; } const k=r.dataset.key; setCompute(false); showState(r.dataset.st);
     setTimeout(()=>{ const el=document.querySelector(`#dcpdeals .deal[data-key="${CSS.escape(k)}"]`); if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('dchl'); setTimeout(()=>el.classList.remove('dchl'),1800);} },450); }));
   openPanel();
+}
+function cvDetail(s,e){
+  const tot=Object.values(e.chips).reduce((a,b)=>a+b,0), list=Object.entries(e.chips).sort((a,b)=>b[1]-a[1]);
+  const vv={}; list.forEach(([c,u])=>{ const k=chipVendor(c); vv[k]=(vv[k]||0)+u; });
+  const rank=e.h>0?EP_RANKED.findIndex(v=>v<=e.h)+1:0, r=x=>{ const q=x/EP_AVG; return (q>=10?Math.round(q):q.toFixed(1))+'×'; };
+  const chips=tot?list.map(([c,u])=>`<div class="dccpchip"><i style="background:${CHIP_COL[c]||'#64748b'}"></i>${esc(c)}<span>${u.toLocaleString()} · ${Math.round(u/tot*100)}%</span></div>`).join('')+`<div class="dccpvend">${Object.entries(vv).sort((a,b)=>b[1]-a[1]).map(([k,u])=>`<b>${k}</b> ${Math.round(u/tot*100)}%`).join(' · ')}</div>`:'<div class="cvdim">chip mix not disclosed</div>';
+  return `<div class="cvdet">
+   <div><h5>Compute</h5><div class="cvk"><b>${e.h>0?fmtH(e.h):'0'}</b> H100e now</div>${e.h>0?`<div class="cvk">${r(e.h)} the avg US AI site · #${rank} of ${EP_LIVE.length}</div>`:'<div class="cvk soon">not online yet</div>'}
+     ${e.pk>e.h*1.05?`<div class="cvk">→ <b class="pk">${fmtH(e.pk)}</b> by ${epMon(e.pkd)} (${r(e.pk)} today's avg)</div><div class="cvk">+${fmtH(e.pk-e.h)} still to come</div>`:'<div class="cvk">at planned peak</div>'}</div>
+   <div><h5>Power (IT)</h5><div class="cvk"><b class="pw">${(e.mw||0).toLocaleString()} MW</b> now</div><div class="cvk">${e.pmw>e.mw*1.05?`→ <b class="pw">${e.pmw.toLocaleString()} MW</b> at full capacity`:'already at full capacity'}</div>${e.mw?`<div class="cvk">${Math.round(e.h/e.mw).toLocaleString()} H100e per MW</div>`:''}</div>
+   <div><h5>Chips · ${tot?tot.toLocaleString()+' units':'n/d'}</h5>${chips}</div>
+   <div><h5>Money & users</h5>${e.cap?`<div class="cvk"><b>~$${e.cap.toFixed(1)}B</b> est. cost so far</div>`:'<div class="cvdim">cost n/d</div>'}${e.users.size?`<div class="cvk">used by ${esc([...e.users].join(', '))}</div>`:''}${e.names.length>1?`<div class="cvk cvdim">combines ${e.names.length} sites: ${esc(e.names.join(' · '))}</div>`:''}
+     <button class="cvopen" data-st="${s.st}" data-key="${esc(s.n+'|'+s.c)}">Open on map →</button></div>
+  </div>`;
 }
 function setCompute(on){ const c=document.querySelector('#chips-dc .chip[data-k="compute"]'); if(c) c.dataset.on=String(on); }
 
