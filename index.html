@@ -148,6 +148,10 @@ padding:10px 17px;cursor:pointer;transition:.18s}
 .fjit.hot .fjh{color:#fca5a5;font-weight:600}.fjit.new{animation:fjnew 2.5s ease-out}@keyframes fjnew{from{background:rgba(251,191,36,.18)}to{background:transparent}}
 .fjit mark{background:rgba(251,191,36,.28);color:#fde68a;border-radius:3px;padding:0 1px}
 .fjempty{padding:22px 14px;color:var(--ink-faint);font-size:12.5px}
+.fjsrc{display:flex;gap:6px;padding:0 12px 8px;flex-wrap:wrap}.fjsrc span{cursor:pointer;font-size:11px;padding:3px 9px;border-radius:8px;border:1px solid var(--card-edge);color:var(--ink-dim)}.fjsrc span i{font-style:normal;color:var(--ink-faint);margin-left:4px;font-family:var(--mono);font-size:10px}.fjsrc span.on{color:var(--ink);border-color:#7dd3fc;background:rgba(125,211,252,.08)}
+.fjb{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;padding:0 5px;border-radius:4px;margin-right:6px;vertical-align:1px}.fjb.FJ{background:rgba(251,146,60,.16);color:#fdba74}.fjb.IL{background:rgba(96,165,250,.16);color:#93c5fd}.fjb.CNBC{background:rgba(52,211,153,.14);color:#6ee7b7}
+.fjit .fjs{font-size:11.5px;color:var(--ink-faint);margin-top:2px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fjday{position:sticky;top:0;z-index:1;background:#0c1322;padding:5px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line)}
 </style>
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -384,21 +388,22 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 <div class="wipmain">
 <p class="sub" style="margin:0 0 14px">A sandbox for new modules before they graduate to their own tab. Live market headlines run in the right pane and update on their own, with no refresh needed.</p>
 <div class="srcard wipcard"><div class="wiph">🛠 In the works</div>
-<div class="wipitem"><b>Live news feed</b><span class="wiptag on">live</span><div>FinancialJuice free headlines (right pane): macro, central banks, earnings and market-moving news. Refreshes every 30 seconds; search filters the feed as you type (supports several words and "exact phrases"), and the quick chips jump to common topics. Search covers the latest 100 headlines plus everything that arrived while the page is open.</div></div>
+<div class="wipitem"><b>Live news feed</b><span class="wiptag on">live</span><div>Three free sources merged into one feed (right pane): <b>FinancialJuice</b> quick headlines, <b>investingLive</b> (formerly ForexLive) macro, central-bank, stocks, commodities, FX and crypto coverage, and <b>CNBC</b> top news, markets, economy, finance, tech and earnings. Every new story is saved as it comes in, so the feed holds the last 48 hours rather than just each source's latest 25–100. It checks for new stories every 30 seconds while open and keeps collecting every 5 minutes in the background. Search covers all 48 hours (several words, "exact phrases", headlines and summaries); the source chips filter by outlet.</div></div>
 <div class="wipitem dim"><b>Next module</b><span class="wiptag">open slot</span><div>Tell me what to build next and it lands here first.</div></div>
 </div>
 </div>
 <aside class="wipside">
 <div class="wipnews">
-<div class="wipnh"><span class="wipdot"></span>Live market news<span id="fjstat" class="fjstat"></span><a href="https://www.financialjuice.com/home" target="_blank" rel="noopener">FinancialJuice ↗</a></div>
-<div class="fjsearch"><input id="fjq" type="search" placeholder="Search headlines… e.g. nvidia, fed, crude oil" autocomplete="off"><span id="fjqn"></span></div>
+<div class="wipnh"><span class="wipdot"></span>Live market news<span id="fjstat" class="fjstat"></span></div>
+<div class="fjsearch"><input id="fjq" type="search" placeholder="Search 48h of news… e.g. nvidia, fed, &quot;crude oil&quot;" autocomplete="off"><span id="fjqn"></span></div>
+<div class="fjsrc" id="fjsrc"></div>
 <div class="fjquick" id="fjquick"></div>
 <div id="fjlist" class="fjlist"><div class="wipload">Loading live headlines…</div></div>
 <div id="financialjuice-news-widget-container"></div>
 </div>
 </aside>
 </div>
-<footer><div>News headlines: <a href="https://www.financialjuice.com/home" target="_blank" rel="noopener" style="color:inherit">FinancialJuice</a> free widget (third-party content, shown as published). Not financial advice, investment advice, or legal advice.</div></footer>
+<footer><div>News: <a href="https://www.financialjuice.com/home" target="_blank" rel="noopener" style="color:inherit">FinancialJuice</a>, <a href="https://investinglive.com" target="_blank" rel="noopener" style="color:inherit">investingLive</a> and <a href="https://www.cnbc.com" target="_blank" rel="noopener" style="color:inherit">CNBC</a> public RSS feeds (third-party headlines shown as published, each linking to the original). Not financial advice, investment advice, or legal advice.</div></footer>
 </div>
 
 <div id="view-stocks" class="webview" style="display:none">
@@ -3356,41 +3361,63 @@ watch(); setInterval(watch,1500);
 (function(){ const h=(location.hash||'').slice(1); if(h&&window.__showView&&document.getElementById('view-'+h)) window.__showView(h); })();
 </script>
 <script>
-/* ===== Work in Progress tab: searchable live FinancialJuice headlines (free public RSS, CORS-enabled) with the official widget as fallback ===== */
+/* ===== Work in Progress tab: merged live news (FinancialJuice + investingLive + CNBC) served by /api/news,
+   which stores every headline in Supabase so the pane holds 48h. Fallbacks: direct FinancialJuice RSS, then the official FJ widget. ===== */
 (function(){
-const FEED='https://www.financialjuice.com/feed.ashx?xy=rss', POLL=30000, KEEP=600;
+const API='/api/news', FJRSS='https://www.financialjuice.com/feed.ashx?xy=rss', POLL=30000, WINDOW=48*3600e3, KEEP=5000;
+const SRC={FJ:'FinancialJuice',IL:'investingLive',CNBC:'CNBC'};
 const QUICK=['Fed','CPI','Jobs','Oil','Nvidia','OpenAI','Tariff','China','Earnings','Bitcoin'];
-let started=false, items=[], seen=new Set(), q='', timer=null, lastOk=0, fails=0;
+let started=false, byId=new Map(), items=[], q='', src='', since=0, mode='api', timer=null, lastOk=0;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function terms(s){ const out=[]; s.replace(/"([^"]+)"|(\S+)/g,(m,a,b)=>{ out.push((a||b).toLowerCase()); }); return out.filter(Boolean); }
 function ago(d){ const s=(Date.now()-d)/1000; if(s<60) return 'just now'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
-function hhmm(d){ return new Date(d).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }
+const hhmm=d=>new Date(d).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+const dayLbl=d=>{ const x=new Date(d), n=new Date(); const y=new Date(n); y.setDate(n.getDate()-1); return x.toDateString()===n.toDateString()?'Today':x.toDateString()===y.toDateString()?'Yesterday':x.toLocaleDateString([], {weekday:'short',month:'short',day:'numeric'}); };
+function add(list, markFresh){
+  const fresh=new Set();
+  list.forEach(it=>{ if(!it||!it.title||byId.has(it.id)) return; it.lc=(it.title+' '+(it.snip||'')).toLowerCase(); byId.set(it.id,it); items.push(it); if(markFresh) fresh.add(it.id); });
+  const cut=Date.now()-WINDOW; items=items.filter(it=>it.t>=cut).sort((a,b)=>b.t-a.t); if(items.length>KEEP) items.length=KEEP;
+  byId=new Map(items.map(it=>[it.id,it])); return fresh;
+}
 function render(fresh){
   const list=$('fjlist'); if(!list) return;
-  const tq=terms(q); const shown=tq.length?items.filter(it=>tq.every(w=>it.lc.includes(w))):items;
+  const tq=terms(q); const pool=src?items.filter(it=>it.src===src):items;
+  const shown=tq.length?pool.filter(it=>tq.every(w=>it.lc.includes(w))):pool;
   const re=tq.length?new RegExp('('+tq.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi'):null;
-  $('fjqn').textContent=tq.length?shown.length+' of '+items.length:'';
-  list.innerHTML=shown.length?shown.slice(0,250).map(it=>{ const h=esc(it.title); return `<a class="fjit${it.hot?' hot':''}${fresh&&fresh.has(it.id)?' new':''}" href="${esc(it.link)}" target="_blank" rel="noopener"><div class="fjt">${hhmm(it.d)} · ${ago(it.d)}</div><div class="fjh">${re?h.replace(re,'<mark>$1</mark>'):h}</div></a>`; }).join('')
-    :`<div class="fjempty">${items.length?'No headlines match “'+esc(q)+'” in the latest '+items.length+'. New ones keep arriving every 30s.':'No headlines yet.'}</div>`;
+  const hl=s=>re?esc(s).replace(re,'<mark>$1</mark>'):esc(s);
+  $('fjqn').textContent=(tq.length||src)?shown.length.toLocaleString()+' of '+items.length.toLocaleString():'';
+  const cnt={}; items.forEach(it=>cnt[it.src]=(cnt[it.src]||0)+1);
+  const sc=$('fjsrc'); if(sc) sc.innerHTML=`<span data-s="" class="${src?'':'on'}">All<i>${items.length.toLocaleString()}</i></span>`+Object.keys(SRC).filter(k=>cnt[k]).map(k=>`<span data-s="${k}" class="${src===k?'on':''}">${SRC[k]}<i>${cnt[k].toLocaleString()}</i></span>`).join('');
+  if(sc) sc.querySelectorAll('span').forEach(b=>b.onclick=()=>{ src=b.dataset.s; render(); });
+  let day='', html='';
+  shown.slice(0,1500).forEach(it=>{ const dl=dayLbl(it.t); if(dl!==day){ day=dl; html+=`<div class="fjday">${dl}</div>`; }
+    const sn=tq.length&&it.snip&&re&&new RegExp(re.source,'i').test(it.snip)?`<div class="fjs">${hl(it.snip)}</div>`:'';
+    html+=`<a class="fjit${it.hot?' hot':''}${fresh&&fresh.has(it.id)?' new':''}" href="${esc(it.link||'#')}" target="_blank" rel="noopener"><div class="fjt"><span class="fjb ${it.src}">${it.src==='IL'?'iLIVE':it.src}</span>${hhmm(it.t)} · ${ago(it.t)}</div><div class="fjh">${hl(it.title)}</div>${sn}</a>`; });
+  list.innerHTML=html||`<div class="fjempty">${items.length?'No stories match “'+esc(q)+'” in the last 48 hours. New ones keep arriving.':'No headlines yet.'}</div>`;
   document.querySelectorAll('#fjquick span').forEach(b=>b.classList.toggle('on',q.toLowerCase()===b.dataset.q.toLowerCase()));
+  const st=$('fjstat'); if(st) st.textContent=lastOk?'· '+(mode==='api'?'48h · ':'')+'updated '+hhmm(lastOk):'';
 }
-function stat(){ const s=$('fjstat'); if(s) s.textContent=lastOk?'· updated '+hhmm(lastOk):''; }
-async function poll(){
-  try{
-    const r=await fetch(FEED+'&_='+Date.now(),{credentials:'omit',cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-    const doc=new DOMParser().parseFromString(await r.text(),'text/xml'); const its=[...doc.querySelectorAll('item')]; if(!its.length) throw new Error('empty');
-    const fresh=new Set();
-    its.forEach(n=>{ const g=x=>(n.querySelector(x)||{}).textContent||''; let title=g('title').replace(/^FinancialJuice:\s*/i,'').trim(); const id=g('guid')||g('link')||title;
-      if(!title||seen.has(id)) return; seen.add(id); if(lastOk) fresh.add(id);
-      const d=Date.parse(g('pubDate'))||Date.now(); items.push({id,title,link:g('link')||'https://www.financialjuice.com/home',d,lc:title.toLowerCase(),hot:/^(breaking|urgent)\b|\bbreaking:/i.test(title)}); });
-    items.sort((a,b)=>b.d-a.d); if(items.length>KEEP) items.length=KEEP;
-    lastOk=Date.now(); fails=0; render(fresh); stat();
-  }catch(e){ fails++; if(!items.length) fallback(); }
+async function pollApi(){
+  const r=await fetch(API+(since?'?since='+since:''),{cache:'no-store'}); const j=await r.json();
+  if(!j||!j.ok||!Array.isArray(j.items)) throw new Error('api');
+  if(!since&&!j.items.length&&!j.stored) throw new Error('empty');
+  const fresh=add(j.items, !!lastOk); since=j.stored?(j.now||Date.now()):0; lastOk=Date.now();
+  const list=$('fjlist'), st=list?list.scrollTop:0; render(fresh); if(list&&st) list.scrollTop=st;
+}
+async function pollRss(){
+  const r=await fetch(FJRSS+'&_='+Date.now(),{credentials:'omit',cache:'no-store'}); if(!r.ok) throw new Error(r.status);
+  const doc=new DOMParser().parseFromString(await r.text(),'text/xml'); const its=[...doc.querySelectorAll('item')]; if(!its.length) throw new Error('empty');
+  const list=its.map(n=>{ const g=x=>(n.querySelector(x)||{}).textContent||''; const title=g('title').replace(/^FinancialJuice:\s*/i,'').trim(); return {id:'FJ:'+(g('guid')||title),src:'FJ',title,link:g('link'),t:Date.parse(g('pubDate'))||Date.now(),hot:/^(breaking|urgent)\b|\bbreaking:/i.test(title),snip:''}; });
+  const fresh=add(list, !!lastOk); lastOk=Date.now(); render(fresh);
+}
+async function tick(){
+  if(mode==='api'){ try{ await pollApi(); return; }catch(e){ if(items.length) return; mode='rss'; } }
+  if(mode==='rss'){ try{ await pollRss(); return; }catch(e){ if(!items.length) fallback(); } }
 }
 function fallback(){
-  if(timer){ clearInterval(timer); timer=null; }
-  ['fjlist','fjquick'].forEach(id=>{ const el=$(id); if(el) el.style.display='none'; }); const sb=document.querySelector('.fjsearch'); if(sb) sb.style.display='none';
+  mode='widget'; if(timer){ clearInterval(timer); timer=null; }
+  ['fjlist','fjquick','fjsrc'].forEach(id=>{ const el=$(id); if(el) el.style.display='none'; }); const sb=document.querySelector('.fjsearch'); if(sb) sb.style.display='none';
   const box=$('financialjuice-news-widget-container'); if(!box) return; box.innerHTML='<div class="wipload">Loading live headlines…</div>';
   const w=Math.max(300,Math.min(box.clientWidth||460,700)), h=Math.max(520,Math.min(innerHeight-200,1000));
   const s=document.createElement('script'); s.id='FJ-Widgets'; s.src='https://feed.financialjuice.com/widgets/widgets.js?r='+Math.floor(Math.random()*10000);
@@ -3402,8 +3429,8 @@ function start(){
   if(started) return; started=true;
   const qk=$('fjquick'); if(qk){ qk.innerHTML=QUICK.map(k=>`<span data-q="${k}">${k}</span>`).join(''); qk.querySelectorAll('span').forEach(b=>b.addEventListener('click',()=>{ q=(q.toLowerCase()===b.dataset.q.toLowerCase())?'':b.dataset.q; $('fjq').value=q; render(); })); }
   const qi=$('fjq'); if(qi) qi.addEventListener('input',()=>{ q=qi.value; render(); });
-  poll(); timer=setInterval(()=>{ if(!document.hidden) poll(); },POLL);
-  setInterval(()=>{ if(items.length&&!document.hidden&&$('view-wip').style.display!=='none') { const st=$('fjlist').scrollTop; render(); $('fjlist').scrollTop=st; } },60000);
+  tick(); timer=setInterval(()=>{ if(!document.hidden) tick(); },POLL);
+  setInterval(()=>{ if(items.length&&!document.hidden&&$('view-wip').style.display!=='none'){ const l=$('fjlist'), st=l.scrollTop; render(); l.scrollTop=st; } },60000);
 }
 const prev=window.__showWeb;
 window.__showWeb=function(v){ if(v==='wip'){ requestAnimationFrame(start); return; } if(prev) prev(v); };
