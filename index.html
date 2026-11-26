@@ -236,6 +236,7 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 </header>
 <div class="rule"></div>
 <div class="tabs" id="maintabs">
+<button class="tab" data-view="news">📰 News Central</button>
 <button class="tab active" data-group="ai">◆ AI / Mag 7 Webs</button>
 <button class="tab" data-view="energy">⚡ Energy Map</button>
 <button class="tab" data-view="datacenter">▣ Data Center Map</button>
@@ -394,18 +395,14 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 <footer><div><b>Curated snapshot, Nov 21, 2026</b> — <span id="dccount"></span>. Compute figures: Epoch AI (CC-BY 4.0). Not a census of every US data center: it tracks the campuses that matter for the AI build-out plus each listed operator's flagship hubs. Locations are city / county level. <b>⚡ Power tags:</b> ✓ confirmed = checked against a utility-commission, county or permit filing (or equivalent record) · per announcements = from company / utility press releases · territory only = assigned from the utility service territory the campus sits in, not yet confirmed. <b>Status:</b> operating = running (incl. partially live) · under construction · approved / permitted = zoning, permits or utility approval in hand but no vertical build · announced = deal or plan signed, no permits or construction yet. <b>⚡ Power</b> = publicly traded utilities, generators, gas suppliers and turbine / fuel-cell / storage makers tied to a campus — the local grid utility where the service territory is clear, plus disclosed supply deals (non-listed public power like TVA, co-ops and municipal utilities is left out; "not disclosed" where no public company is confirmed). <b>Public</b> = the owner / operator is listed (SoftBank-led sites count as public via SoftBank Group, Tokyo: 9984; JV sites count with their listed sponsor). Revenue = latest TTM on stockanalysis.com (mostly through Jun 30, 2026); backlog = company-reported RPO / contracted lease value (— where none is reported). <b>Overseas</b> = countries outside the US where the company has data centers, from company disclosures (hyperscalers don't publish per-country building counts, so they show the number of countries outside the US where they run a cloud region; L = leased / colocation). <b>Leased / US</b> = counts of tracked US campuses only (not every site a company uses); leased $ = total disclosed lease or capacity-contract value where public (* = compute contracts that include GPUs, not pure building leases). Sources: company releases &amp; filings, Epoch AI, llmpulse &amp; ElectricChoice trackers, DCD, CoStar, state economic-development offices. Not financial advice, investment advice, or legal advice.</div></footer>
 </div>
 
-<div id="view-wip" class="webview" style="display:none">
-<p class="sub" style="margin:0 0 12px">Home dashboard preview: live markets, what the news is talking about, today's economic and earnings calendars, and a searchable 7-day news feed, all in one place.</p>
+<div id="view-news" class="webview" style="display:none">
+<p class="sub" style="margin:0 0 12px">News Central: live markets, what the news is talking about, today's economic and earnings calendars, and a searchable 7-day news feed, all in one place.</p>
 <div class="hmstrip"><div class="hmlab">Markets</div><div id="tvtape" class="hmtape"></div></div>
 <div class="hmstrip hmtrend"><div class="hmlab">🔥 Trending in the news <i id="trendwin"></i></div><div id="trend" class="trendrow"><span class="trendempty">Reading the news…</span></div></div>
 <div class="wipgrid">
 <div class="wipmain">
 <div class="hmcard"><div class="hmh"><span>📅 Economic calendar</span><i>US, EU, UK, Japan, China · high &amp; medium impact</i></div><div id="tvecon" class="hmecon"></div></div>
 <div class="hmcard"><div class="hmh"><span>💼 Earnings calendar</span><a href="https://earnings-calendar-2026.vercel.app/" target="_blank" rel="noopener">Open full site ↗</a></div><div id="earnbox" class="hmearn"></div></div>
-<div class="srcard wipcard"><div class="wiph">🛠 In the works</div>
-<div class="wipitem"><b>Live news feed</b><span class="wiptag on">live</span><div>Five free sources merged into one feed (right pane): <b>FinancialJuice</b> quick headlines, <b>investingLive</b> (formerly ForexLive) macro, central-bank, stocks, commodities, FX and crypto coverage, <b>CNBC</b> top news, markets, economy, finance, tech and earnings, plus press-release wires <b>PR Newswire</b> and <b>Business Wire</b> (English only) for earnings, deals and company announcements straight from the source. Every new story is saved as it comes in and kept for 7 days. The pane shows the last 48 hours live, checks for new stories every 30 seconds while open and keeps collecting every 5 minutes in the background. Search covers the full 7 days (several words, "exact phrases", headlines and summaries); the source chips filter by outlet. <b>All</b> leaves out FinancialJuice's rapid-fire trader headlines; tap the FinancialJuice chip to see them.</div></div>
-<div class="wipitem dim"><b>Next module</b><span class="wiptag">open slot</span><div>Tell me what to build next and it lands here first.</div></div>
-</div>
 </div>
 <aside class="wipside">
 <div class="wipnews">
@@ -419,6 +416,17 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 </aside>
 </div>
 <footer><div>News: <a href="https://www.financialjuice.com/home" target="_blank" rel="noopener" style="color:inherit">FinancialJuice</a>, <a href="https://investinglive.com" target="_blank" rel="noopener" style="color:inherit">investingLive</a> and <a href="https://www.cnbc.com" target="_blank" rel="noopener" style="color:inherit">CNBC</a>, PR Newswire and Business Wire public RSS feeds (third-party headlines shown as published, each linking to the original). Not financial advice, investment advice, or legal advice.</div></footer>
+</div>
+
+<div id="view-wip" class="webview" style="display:none">
+<p class="sub" style="margin:0 0 14px">A sandbox for new modules before they graduate to their own tab.</p>
+<div style="max-width:900px">
+<div class="srcard wipcard"><div class="wiph">🛠 In the works</div>
+<div class="wipitem"><b>Live news feed</b><span class="wiptag on">graduated → News Central</span><div>Five free sources merged into one searchable feed on News Central: <b>FinancialJuice</b> quick headlines, <b>investingLive</b> (formerly ForexLive) macro, central-bank, stocks, commodities, FX and crypto coverage, <b>CNBC</b> top news, markets, economy, finance, tech and earnings, plus press-release wires <b>PR Newswire</b> and <b>Business Wire</b> (English only) for earnings, deals and company announcements straight from the source. Every new story is saved as it comes in and kept for 7 days. The pane shows the last 48 hours live, checks for new stories every 30 seconds while open and keeps collecting every 5 minutes in the background. Search covers the full 7 days (several words, "exact phrases", headlines and summaries); the source chips filter by outlet. <b>All</b> leaves out FinancialJuice's rapid-fire trader headlines; tap the FinancialJuice chip to see them.</div></div>
+<div class="wipitem dim"><b>Next module</b><span class="wiptag">open slot</span><div>Tell me what to build next and it lands here first.</div></div>
+</div>
+</div>
+<footer><div>Not financial advice, investment advice, or legal advice.</div></footer>
 </div>
 
 <div id="view-stocks" class="webview" style="display:none">
@@ -3500,11 +3508,11 @@ function start(){
   const qk=$('fjquick'); if(qk){ qk.innerHTML=QUICK.map(k=>`<span data-q="${k}">${k}</span>`).join(''); qk.querySelectorAll('span').forEach(b=>b.addEventListener('click',()=>{ q=(q.toLowerCase()===b.dataset.q.toLowerCase())?'':b.dataset.q; $('fjq').value=q; render(); searchOlder(); })); }
   const qi=$('fjq'); if(qi) qi.addEventListener('input',()=>{ q=qi.value; render(); searchOlder(); });
   tick(); timer=setInterval(()=>{ if(!document.hidden) tick(); },POLL);
-  setInterval(()=>{ if(items.length&&!document.hidden&&$('view-wip').style.display!=='none'){ const l=$('fjlist'), st=l.scrollTop; render(); l.scrollTop=st; } },60000);
+  setInterval(()=>{ if(items.length&&!document.hidden&&$('view-news').style.display!=='none'){ const l=$('fjlist'), st=l.scrollTop; render(); l.scrollTop=st; } },60000);
 }
 const prev=window.__showWeb;
-window.__showWeb=function(v){ if(v==='wip'){ requestAnimationFrame(start); return; } if(prev) prev(v); };
-if(location.hash==='#wip') requestAnimationFrame(start);
+window.__showWeb=function(v){ if(v==='news'){ requestAnimationFrame(start); return; } if(v==='wip') return; if(prev) prev(v); };
+if(location.hash==='#news') requestAnimationFrame(start);
 })();
 </script>
 </body>
