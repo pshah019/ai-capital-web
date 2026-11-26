@@ -91,6 +91,7 @@ export default async function handler(req, res) {
 
   // No database configured: serve whatever the feeds have right now.
   if (!storageReady()) {
+    res.setHeader('Cache-Control', 'public, s-maxage=45, stale-while-revalidate=120');
     const { items, status } = await pullAll();
     items.sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at));
     return res.status(200).json({ ok: true, stored: false, now, items: items.map(toClient), status });
@@ -127,6 +128,7 @@ export default async function handler(req, res) {
   } catch (e) {
     // Database problem: fall back to a live pull so the pane still shows news.
     try {
+      res.setHeader('Cache-Control', 'public, s-maxage=45, stale-while-revalidate=120');
       const { items, status } = await pullAll();
       items.sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at));
       return res.status(200).json({ ok: true, stored: false, now, items: items.map(toClient), status, dbError: String(e.message || e).slice(0, 200) });
