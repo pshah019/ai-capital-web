@@ -1,9 +1,10 @@
 -- Live news feed (Work in Progress tab) — run once in the Supabase SQL editor.
+-- Stories are kept 7 days (pruned by /api/news).
 -- Same pattern as schema_stocks.sql: the Vercel function /api/news uses the anon key server side.
 
 create table if not exists public.news_items (
   id            text primary key,              -- source + hash of the feed guid
-  src           text not null,                 -- FJ | IL | CNBC
+  src           text not null,                 -- FJ | IL | CNBC | PRN | GNW | BW
   title         text not null,
   link          text not null default '',
   published_at  timestamptz not null,
