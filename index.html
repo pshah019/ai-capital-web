@@ -3472,7 +3472,7 @@ function tvWidget(boxId,file,cfg){
   box.firstChild.appendChild(s);
 }
 function loadHome(){
-  tvWidget('tvtape','embed-widget-ticker-tape.js',{symbols:[{proName:'FOREXCOM:SPXUSD',title:'S&P 500'},{proName:'FOREXCOM:NSXUSD',title:'Nasdaq 100'},{proName:'FOREXCOM:DJI',title:'Dow'},{proName:'TVC:VIX',title:'VIX'},{proName:'TVC:US10Y',title:'US 10Y'},{proName:'TVC:USOIL',title:'WTI oil'},{proName:'TVC:GOLD',title:'Gold'},{proName:'TVC:DXY',title:'Dollar'},{proName:'BITSTAMP:BTCUSD',title:'Bitcoin'},{proName:'NASDAQ:NVDA',title:'NVDA'}],showSymbolLogo:true,isTransparent:true,displayMode:'adaptive',colorTheme:'dark',locale:'en'});
+  tvWidget('tvtape','embed-widget-ticker-tape.js',{symbols:[{proName:'FOREXCOM:SPXUSD',title:'S&P 500'},{proName:'FOREXCOM:NSXUSD',title:'Nasdaq 100'},{proName:'FOREXCOM:DJI',title:'Dow'},{proName:'CAPITALCOM:VIX',title:'VIX'},{proName:'OANDA:USB10YUSD',title:'10Y T-Note'},{proName:'TVC:USOIL',title:'WTI oil'},{proName:'TVC:GOLD',title:'Gold'},{proName:'CAPITALCOM:DXY',title:'Dollar (DXY)'},{proName:'BITSTAMP:BTCUSD',title:'Bitcoin'},{proName:'NASDAQ:NVDA',title:'NVDA'}],showSymbolLogo:true,isTransparent:true,displayMode:'adaptive',colorTheme:'dark',locale:'en'});
   tvWidget('tvecon','embed-widget-events.js',{colorTheme:'dark',isTransparent:true,width:'100%',height:'100%',locale:'en',importanceFilter:'0,1',countryFilter:'us,eu,gb,jp,cn'});
   const eb=$('earnbox'); if(eb&&!eb.dataset.done){ eb.dataset.done='1'; eb.innerHTML='<iframe src="https://earnings-calendar-2026.vercel.app/" title="Earnings calendar" loading="lazy"></iframe>'; }
 }
