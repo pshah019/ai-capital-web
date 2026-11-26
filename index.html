@@ -3386,7 +3386,7 @@ async function poll(){
       const d=Date.parse(g('pubDate'))||Date.now(); items.push({id,title,link:g('link')||'https://www.financialjuice.com/home',d,lc:title.toLowerCase(),hot:/^(breaking|urgent)\b|\bbreaking:/i.test(title)}); });
     items.sort((a,b)=>b.d-a.d); if(items.length>KEEP) items.length=KEEP;
     lastOk=Date.now(); fails=0; render(fresh); stat();
-  }catch(e){ fails++; if(!items.length && fails>=2) fallback(); }
+  }catch(e){ fails++; if(!items.length) fallback(); }
 }
 function fallback(){
   if(timer){ clearInterval(timer); timer=null; }
