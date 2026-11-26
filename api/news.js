@@ -15,10 +15,11 @@
 import { storageReady, sb } from './_sb.js';
 
 const MIN_GAP_MS = 45_000;
+const SLOW_GAP_MS = 4 * 60_000; // slow feeds (FinancialJuice) at most every 4 minutes, whatever triggers the pull
 const UA = 'Mozilla/5.0 (compatible; AIInsightsNews/1.0; +https://ai-capital-web.vercel.app)';
 const FEEDS = [
-  // FinancialJuice rate-limits frequent polling (HTTP 429); its feed holds ~100 headlines, so pull it
-  // only on the 5-minute background refresh (pg_cron), not on visitor-triggered pulls.
+  // FinancialJuice rate-limits frequent polling (HTTP 429); its feed holds ~100 headlines, so it is pulled
+  // at most every SLOW_GAP_MS (tracked in news_meta 'fj_pull'), on whichever pull comes due first.
   { src: 'FJ',   url: 'https://www.financialjuice.com/feed.ashx?xy=rss', slow: true },
   { src: 'IL',   url: 'https://investinglive.com/feed' },
   { src: 'IL',   url: 'https://investinglive.com/feed/news' },
@@ -131,12 +132,15 @@ export default async function handler(req, res) {
   try {
     // 1) Pull sources if the last pull is older than MIN_GAP_MS.
     let pulled = null;
-    const meta = await sb('news_meta?select=k,at&k=eq.last_pull');
-    const last = meta && meta[0] ? Date.parse(meta[0].at) : 0;
+    const meta = await sb('news_meta?select=k,at&k=in.(last_pull,fj_pull)');
+    const mt = k => { const r = (meta || []).find(x => x.k === k); return r ? Date.parse(r.at) : 0; };
+    const last = mt('last_pull');
+    const slowDue = now - mt('fj_pull') > SLOW_GAP_MS;  // FinancialJuice keeps its own clock
     if (now - last > MIN_GAP_MS || (q.refresh && now - last > 20_000)) {
       // claim the slot first so parallel requests don't all pull
       await sb('news_meta?on_conflict=k', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ k: 'last_pull', at: new Date(now).toISOString() }) });
-      const { items, status } = await pullAll(!!q.refresh);
+      if (slowDue) await sb('news_meta?on_conflict=k', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ k: 'fj_pull', at: new Date(now).toISOString() }) });
+      const { items, status } = await pullAll(slowDue);
       if (items.length) {
         for (let i = 0; i < items.length; i += 400) {
           await sb('news_items?on_conflict=id', { method: 'POST', headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' }, body: JSON.stringify(items.slice(i, i + 400)) });
