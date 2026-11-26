@@ -125,6 +125,29 @@ padding:10px 17px;cursor:pointer;transition:.18s}
 .key span.sec-on{background:rgba(255,255,255,.06)}
 .key.has-sel span:not(.sec-on){opacity:.34}
 .cvsearch{position:relative;margin-top:10px;max-width:440px}.cvsearch input{width:100%;box-sizing:border-box;background:#0b1220;border:1px solid #243049;border-radius:10px;color:var(--ink);font:inherit;font-size:13px;padding:7px 70px 7px 12px;outline:none}.cvsearch input:focus{border-color:#7dd3fc}.cvsearch span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#7c8aa5}
+.wipgrid{display:grid;grid-template-columns:minmax(0,1fr) 480px;gap:18px;align-items:start}
+@media(max-width:1100px){.wipgrid{grid-template-columns:1fr}}
+.wiph{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.wipitem{padding:10px 0;border-top:1px solid var(--line);color:var(--ink-dim)}.wipitem b{color:var(--ink);font-size:13.5px}.wipitem div{margin-top:4px}.wipitem.dim{opacity:.6}
+.wiptag{margin-left:8px;font-family:var(--mono);font-size:10px;padding:1px 7px;border-radius:99px;border:1px solid var(--card-edge);color:var(--ink-faint)}.wiptag.on{color:#34d399;border-color:#1f6f52}
+.wipside{position:sticky;top:12px}
+.wipnews{border:1px solid var(--card-edge);border-radius:14px;background:var(--card);overflow:hidden}
+.wipnh{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.wipnh a{margin-left:auto;color:var(--ink-faint);text-decoration:none;text-transform:none;letter-spacing:0}.wipnh a:hover{color:var(--ink)}
+.wipdot{width:7px;height:7px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 0 rgba(239,68,68,.6);animation:wippulse 1.6s infinite}
+@keyframes wippulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 7px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+#financialjuice-news-widget-container{min-height:400px}#financialjuice-news-widget-container iframe{display:block;max-width:100%}
+.wipload{padding:24px 14px;color:var(--ink-faint);font-family:var(--mono);font-size:12px}
+.fjstat{font-size:10px;color:var(--ink-faint);text-transform:none;letter-spacing:0}
+.fjsearch{position:relative;padding:10px 12px 6px}.fjsearch input{width:100%;box-sizing:border-box;background:#0b1220;border:1px solid #243049;border-radius:10px;color:var(--ink);font:inherit;font-size:13px;padding:8px 74px 8px 12px;outline:none}.fjsearch input:focus{border-color:#7dd3fc}
+.fjsearch span{position:absolute;right:24px;top:50%;transform:translateY(-35%);font-size:11px;color:#7c8aa5;font-family:var(--mono)}
+.fjquick{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px;border-bottom:1px solid var(--line)}.fjquick span{cursor:pointer;font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:99px;border:1px solid var(--card-edge);color:var(--ink-dim)}.fjquick span:hover,.fjquick span.on{color:var(--ink);border-color:#7dd3fc;background:rgba(125,211,252,.08)}
+.fjlist{max-height:calc(100vh - 290px);min-height:420px;overflow:auto}
+.fjit{display:block;padding:9px 14px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}.fjit:hover{background:rgba(125,211,252,.05)}
+.fjit .fjt{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-bottom:2px}.fjit .fjh{font-size:13px;line-height:1.4}
+.fjit.hot .fjh{color:#fca5a5;font-weight:600}.fjit.new{animation:fjnew 2.5s ease-out}@keyframes fjnew{from{background:rgba(251,191,36,.18)}to{background:transparent}}
+.fjit mark{background:rgba(251,191,36,.28);color:#fde68a;border-radius:3px;padding:0 1px}
+.fjempty{padding:22px 14px;color:var(--ink-faint);font-size:12.5px}
 </style>
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -202,6 +225,7 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 <button class="tab" data-view="energy">⚡ Energy Map</button>
 <button class="tab" data-view="datacenter">▣ Data Center Map</button>
 <button class="tab" data-view="stocks">▤ Stock Research Data</button>
+<button class="tab" data-view="wip">🛠 Work in Progress</button>
 </div>
 <div class="tabs subtabs" id="aitabs">
 <button class="tab active" data-view="capital">◆ AI Macro Web</button>
@@ -353,6 +377,28 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 </div>
 <div id="dcpanel" class="panel"><button class="pclose" id="dcpclose">×</button><div class="ph" id="dcph"></div><div class="pdeals" id="dcpdeals"></div></div>
 <footer><div><b>Curated snapshot, Nov 21, 2026</b> — <span id="dccount"></span>. Compute figures: Epoch AI (CC-BY 4.0). Not a census of every US data center: it tracks the campuses that matter for the AI build-out plus each listed operator's flagship hubs. Locations are city / county level. <b>⚡ Power tags:</b> ✓ confirmed = checked against a utility-commission, county or permit filing (or equivalent record) · per announcements = from company / utility press releases · territory only = assigned from the utility service territory the campus sits in, not yet confirmed. <b>Status:</b> operating = running (incl. partially live) · under construction · approved / permitted = zoning, permits or utility approval in hand but no vertical build · announced = deal or plan signed, no permits or construction yet. <b>⚡ Power</b> = publicly traded utilities, generators, gas suppliers and turbine / fuel-cell / storage makers tied to a campus — the local grid utility where the service territory is clear, plus disclosed supply deals (non-listed public power like TVA, co-ops and municipal utilities is left out; "not disclosed" where no public company is confirmed). <b>Public</b> = the owner / operator is listed (SoftBank-led sites count as public via SoftBank Group, Tokyo: 9984; JV sites count with their listed sponsor). Revenue = latest TTM on stockanalysis.com (mostly through Jun 30, 2026); backlog = company-reported RPO / contracted lease value (— where none is reported). <b>Overseas</b> = countries outside the US where the company has data centers, from company disclosures (hyperscalers don't publish per-country building counts, so they show the number of countries outside the US where they run a cloud region; L = leased / colocation). <b>Leased / US</b> = counts of tracked US campuses only (not every site a company uses); leased $ = total disclosed lease or capacity-contract value where public (* = compute contracts that include GPUs, not pure building leases). Sources: company releases &amp; filings, Epoch AI, llmpulse &amp; ElectricChoice trackers, DCD, CoStar, state economic-development offices. Not financial advice, investment advice, or legal advice.</div></footer>
+</div>
+
+<div id="view-wip" class="webview" style="display:none">
+<div class="wipgrid">
+<div class="wipmain">
+<p class="sub" style="margin:0 0 14px">A sandbox for new modules before they graduate to their own tab. Live market headlines run in the right pane and update on their own, with no refresh needed.</p>
+<div class="srcard wipcard"><div class="wiph">🛠 In the works</div>
+<div class="wipitem"><b>Live news feed</b><span class="wiptag on">live</span><div>FinancialJuice free headlines (right pane): macro, central banks, earnings and market-moving news. Refreshes every 30 seconds; search filters the feed as you type (supports several words and "exact phrases"), and the quick chips jump to common topics. Search covers the latest 100 headlines plus everything that arrived while the page is open.</div></div>
+<div class="wipitem dim"><b>Next module</b><span class="wiptag">open slot</span><div>Tell me what to build next and it lands here first.</div></div>
+</div>
+</div>
+<aside class="wipside">
+<div class="wipnews">
+<div class="wipnh"><span class="wipdot"></span>Live market news<span id="fjstat" class="fjstat"></span><a href="https://www.financialjuice.com/home" target="_blank" rel="noopener">FinancialJuice ↗</a></div>
+<div class="fjsearch"><input id="fjq" type="search" placeholder="Search headlines… e.g. nvidia, fed, crude oil" autocomplete="off"><span id="fjqn"></span></div>
+<div class="fjquick" id="fjquick"></div>
+<div id="fjlist" class="fjlist"><div class="wipload">Loading live headlines…</div></div>
+<div id="financialjuice-news-widget-container"></div>
+</div>
+</aside>
+</div>
+<footer><div>News headlines: <a href="https://www.financialjuice.com/home" target="_blank" rel="noopener" style="color:inherit">FinancialJuice</a> free widget (third-party content, shown as published). Not financial advice, investment advice, or legal advice.</div></footer>
 </div>
 
 <div id="view-stocks" class="webview" style="display:none">
@@ -3308,6 +3354,61 @@ watch(); setInterval(watch,1500);
 
 /* deep link: #energy, #datacenter, #stocks … */
 (function(){ const h=(location.hash||'').slice(1); if(h&&window.__showView&&document.getElementById('view-'+h)) window.__showView(h); })();
+</script>
+<script>
+/* ===== Work in Progress tab: searchable live FinancialJuice headlines (free public RSS, CORS-enabled) with the official widget as fallback ===== */
+(function(){
+const FEED='https://www.financialjuice.com/feed.ashx?xy=rss', POLL=30000, KEEP=600;
+const QUICK=['Fed','CPI','Jobs','Oil','Nvidia','OpenAI','Tariff','China','Earnings','Bitcoin'];
+let started=false, items=[], seen=new Set(), q='', timer=null, lastOk=0, fails=0;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function terms(s){ const out=[]; s.replace(/"([^"]+)"|(\S+)/g,(m,a,b)=>{ out.push((a||b).toLowerCase()); }); return out.filter(Boolean); }
+function ago(d){ const s=(Date.now()-d)/1000; if(s<60) return 'just now'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+function hhmm(d){ return new Date(d).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }
+function render(fresh){
+  const list=$('fjlist'); if(!list) return;
+  const tq=terms(q); const shown=tq.length?items.filter(it=>tq.every(w=>it.lc.includes(w))):items;
+  const re=tq.length?new RegExp('('+tq.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi'):null;
+  $('fjqn').textContent=tq.length?shown.length+' of '+items.length:'';
+  list.innerHTML=shown.length?shown.slice(0,250).map(it=>{ const h=esc(it.title); return `<a class="fjit${it.hot?' hot':''}${fresh&&fresh.has(it.id)?' new':''}" href="${esc(it.link)}" target="_blank" rel="noopener"><div class="fjt">${hhmm(it.d)} · ${ago(it.d)}</div><div class="fjh">${re?h.replace(re,'<mark>$1</mark>'):h}</div></a>`; }).join('')
+    :`<div class="fjempty">${items.length?'No headlines match “'+esc(q)+'” in the latest '+items.length+'. New ones keep arriving every 30s.':'No headlines yet.'}</div>`;
+  document.querySelectorAll('#fjquick span').forEach(b=>b.classList.toggle('on',q.toLowerCase()===b.dataset.q.toLowerCase()));
+}
+function stat(){ const s=$('fjstat'); if(s) s.textContent=lastOk?'· updated '+hhmm(lastOk):''; }
+async function poll(){
+  try{
+    const r=await fetch(FEED+'&_='+Date.now(),{credentials:'omit',cache:'no-store'}); if(!r.ok) throw new Error(r.status);
+    const doc=new DOMParser().parseFromString(await r.text(),'text/xml'); const its=[...doc.querySelectorAll('item')]; if(!its.length) throw new Error('empty');
+    const fresh=new Set();
+    its.forEach(n=>{ const g=x=>(n.querySelector(x)||{}).textContent||''; let title=g('title').replace(/^FinancialJuice:\s*/i,'').trim(); const id=g('guid')||g('link')||title;
+      if(!title||seen.has(id)) return; seen.add(id); if(lastOk) fresh.add(id);
+      const d=Date.parse(g('pubDate'))||Date.now(); items.push({id,title,link:g('link')||'https://www.financialjuice.com/home',d,lc:title.toLowerCase(),hot:/^(breaking|urgent)\b|\bbreaking:/i.test(title)}); });
+    items.sort((a,b)=>b.d-a.d); if(items.length>KEEP) items.length=KEEP;
+    lastOk=Date.now(); fails=0; render(fresh); stat();
+  }catch(e){ fails++; if(!items.length && fails>=2) fallback(); }
+}
+function fallback(){
+  if(timer){ clearInterval(timer); timer=null; }
+  ['fjlist','fjquick'].forEach(id=>{ const el=$(id); if(el) el.style.display='none'; }); const sb=document.querySelector('.fjsearch'); if(sb) sb.style.display='none';
+  const box=$('financialjuice-news-widget-container'); if(!box) return; box.innerHTML='<div class="wipload">Loading live headlines…</div>';
+  const w=Math.max(300,Math.min(box.clientWidth||460,700)), h=Math.max(520,Math.min(innerHeight-200,1000));
+  const s=document.createElement('script'); s.id='FJ-Widgets'; s.src='https://feed.financialjuice.com/widgets/widgets.js?r='+Math.floor(Math.random()*10000);
+  s.onload=()=>{ try{ box.innerHTML=''; new window.FJWidgets.createWidget({container:'financialjuice-news-widget-container',mode:'Dark',width:w+'px',height:h+'px',backColor:'0f1626',fontColor:'b2b5be',widgetType:'NEWS'}); }catch(e){ box.innerHTML='<div class="wipload">Headlines failed to load. <a href="https://www.financialjuice.com/home" target="_blank" rel="noopener" style="color:#7dd3fc">Open FinancialJuice ↗</a></div>'; } };
+  s.onerror=()=>{ box.innerHTML='<div class="wipload">Headlines blocked (ad blocker?). <a href="https://www.financialjuice.com/home" target="_blank" rel="noopener" style="color:#7dd3fc">Open FinancialJuice ↗</a></div>'; };
+  document.head.appendChild(s);
+}
+function start(){
+  if(started) return; started=true;
+  const qk=$('fjquick'); if(qk){ qk.innerHTML=QUICK.map(k=>`<span data-q="${k}">${k}</span>`).join(''); qk.querySelectorAll('span').forEach(b=>b.addEventListener('click',()=>{ q=(q.toLowerCase()===b.dataset.q.toLowerCase())?'':b.dataset.q; $('fjq').value=q; render(); })); }
+  const qi=$('fjq'); if(qi) qi.addEventListener('input',()=>{ q=qi.value; render(); });
+  poll(); timer=setInterval(()=>{ if(!document.hidden) poll(); },POLL);
+  setInterval(()=>{ if(items.length&&!document.hidden&&$('view-wip').style.display!=='none') { const st=$('fjlist').scrollTop; render(); $('fjlist').scrollTop=st; } },60000);
+}
+const prev=window.__showWeb;
+window.__showWeb=function(v){ if(v==='wip'){ requestAnimationFrame(start); return; } if(prev) prev(v); };
+if(location.hash==='#wip') requestAnimationFrame(start);
+})();
 </script>
 </body>
 </html>
