@@ -388,7 +388,7 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 <div class="wipmain">
 <p class="sub" style="margin:0 0 14px">A sandbox for new modules before they graduate to their own tab. Live market headlines run in the right pane and update on their own, with no refresh needed.</p>
 <div class="srcard wipcard"><div class="wiph">🛠 In the works</div>
-<div class="wipitem"><b>Live news feed</b><span class="wiptag on">live</span><div>Five free sources merged into one feed (right pane): <b>FinancialJuice</b> quick headlines, <b>investingLive</b> (formerly ForexLive) macro, central-bank, stocks, commodities, FX and crypto coverage, <b>CNBC</b> top news, markets, economy, finance, tech and earnings, plus press-release wires <b>PR Newswire</b> and <b>Business Wire</b> (English only) for earnings, deals and company announcements straight from the source. Every new story is saved as it comes in and kept for 7 days. The pane shows the last 48 hours live, checks for new stories every 30 seconds while open and keeps collecting every 5 minutes in the background. Search covers the full 7 days (several words, "exact phrases", headlines and summaries); the source chips filter by outlet.</div></div>
+<div class="wipitem"><b>Live news feed</b><span class="wiptag on">live</span><div>Five free sources merged into one feed (right pane): <b>FinancialJuice</b> quick headlines, <b>investingLive</b> (formerly ForexLive) macro, central-bank, stocks, commodities, FX and crypto coverage, <b>CNBC</b> top news, markets, economy, finance, tech and earnings, plus press-release wires <b>PR Newswire</b> and <b>Business Wire</b> (English only) for earnings, deals and company announcements straight from the source. Every new story is saved as it comes in and kept for 7 days. The pane shows the last 48 hours live, checks for new stories every 30 seconds while open and keeps collecting every 5 minutes in the background. Search covers the full 7 days (several words, "exact phrases", headlines and summaries); the source chips filter by outlet. <b>All</b> leaves out FinancialJuice's rapid-fire trader headlines; tap the FinancialJuice chip to see them.</div></div>
 <div class="wipitem dim"><b>Next module</b><span class="wiptag">open slot</span><div>Tell me what to build next and it lands here first.</div></div>
 </div>
 </div>
@@ -3366,6 +3366,7 @@ watch(); setInterval(watch,1500);
 (function(){
 const API='/api/news', FJRSS='https://www.financialjuice.com/feed.ashx?xy=rss', POLL=30000, WINDOW=48*3600e3, KEEP=5000;
 const SRC={FJ:'FinancialJuice',IL:'investingLive',CNBC:'CNBC',PRN:'PR Newswire',GNW:'GlobeNewswire',BW:'Business Wire'};
+const ALL_SKIP=new Set(['FJ']);
 const BADGE={FJ:'FJ',IL:'iLIVE',CNBC:'CNBC',PRN:'PRN',GNW:'GNW',BW:'BW'};
 const QUICK=['Fed','CPI','Jobs','Oil','Nvidia','OpenAI','Tariff','China','Earnings','Bitcoin'];
 let started=false, byId=new Map(), items=[], q='', src='', since=0, mode='api', timer=null, lastOk=0, older=[], olderQ='', sTimer=null, searching=false;
@@ -3386,13 +3387,14 @@ function render(fresh){
   const tq=terms(q); const ids=new Set(items.map(it=>it.id));
   const extra=(tq.length&&olderQ===q.trim())?older.filter(it=>!ids.has(it.id)):[];
   const base=extra.length?items.concat(extra).sort((a,b)=>b.t-a.t):items;
-  const pool=src?base.filter(it=>it.src===src):base;
+  const pool=src?base.filter(it=>it.src===src):base.filter(it=>!ALL_SKIP.has(it.src)); // FinancialJuice only shows under its own chip
   const shown=tq.length?pool.filter(it=>tq.every(w=>it.lc.includes(w))):pool;
   const re=tq.length?new RegExp('('+tq.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi'):null;
   const hl=s=>re?esc(s).replace(re,'<mark>$1</mark>'):esc(s);
+  const allN=items.filter(it=>!ALL_SKIP.has(it.src)).length;
   $('fjqn').textContent=tq.length?(searching?'searching 7d…':shown.length.toLocaleString()+' in 7d'):src?shown.length.toLocaleString()+' of '+items.length.toLocaleString():'';
   const cnt={}; items.forEach(it=>cnt[it.src]=(cnt[it.src]||0)+1);
-  const sc=$('fjsrc'); if(sc) sc.innerHTML=`<span data-s="" class="${src?'':'on'}">All<i>${items.length.toLocaleString()}</i></span>`+Object.keys(SRC).filter(k=>cnt[k]).map(k=>`<span data-s="${k}" class="${src===k?'on':''}">${SRC[k]}<i>${cnt[k].toLocaleString()}</i></span>`).join('');
+  const sc=$('fjsrc'); if(sc) sc.innerHTML=`<span data-s="" class="${src?'':'on'}" title="Everything except FinancialJuice (tap its chip for those quick-fire headlines)">All<i>${allN.toLocaleString()}</i></span>`+Object.keys(SRC).filter(k=>cnt[k]).map(k=>`<span data-s="${k}" class="${src===k?'on':''}">${SRC[k]}<i>${cnt[k].toLocaleString()}</i></span>`).join('');
   if(sc) sc.querySelectorAll('span').forEach(b=>b.onclick=()=>{ src=b.dataset.s; render(); });
   let day='', html='';
   shown.slice(0,1500).forEach(it=>{ const dl=dayLbl(it.t); if(dl!==day){ day=dl; html+=`<div class="fjday">${dl}</div>`; }
