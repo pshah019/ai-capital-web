@@ -17,7 +17,9 @@ import { storageReady, sb } from './_sb.js';
 const MIN_GAP_MS = 45_000;
 const UA = 'Mozilla/5.0 (compatible; AIInsightsNews/1.0; +https://ai-capital-web.vercel.app)';
 const FEEDS = [
-  { src: 'FJ',   url: 'https://www.financialjuice.com/feed.ashx?xy=rss' },
+  // FinancialJuice rate-limits frequent polling (HTTP 429); its feed holds ~100 headlines, so pull it
+  // only on the 5-minute background refresh (pg_cron), not on visitor-triggered pulls.
+  { src: 'FJ',   url: 'https://www.financialjuice.com/feed.ashx?xy=rss', slow: true },
   { src: 'IL',   url: 'https://investinglive.com/feed' },
   { src: 'IL',   url: 'https://investinglive.com/feed/news' },
   { src: 'IL',   url: 'https://investinglive.com/feed/centralbank' },
@@ -37,9 +39,7 @@ const FEEDS = [
   { src: 'PRN',  url: 'https://www.prnewswire.com/rss/business-technology-latest-news/business-technology-latest-news-list.rss' },
   { src: 'PRN',  url: 'https://www.prnewswire.com/rss/energy-latest-news/energy-latest-news-list.rss' },
   { src: 'PRN',  url: 'https://www.prnewswire.com/rss/general-business-latest-news/general-business-latest-news-list.rss' },
-  { src: 'GNW',  url: 'https://www.globenewswire.com/RssFeed/orgclass/1/feedTitle/GlobeNewswire%20-%20News%20about%20Public%20Companies' },
-  { src: 'GNW',  url: 'https://www.globenewswire.com/RssFeed/subjectcode/13-Earnings%20Releases%20And%20Operating%20Results/feedTitle/GlobeNewswire%20-%20Earnings%20Releases%20And%20Operating%20Results' },
-  { src: 'GNW',  url: 'https://www.globenewswire.com/RssFeed/subjectcode/27-Mergers%20And%20Acquisitions/feedTitle/GlobeNewswire%20-%20Mergers%20And%20Acquisitions' },
+  // GlobeNewswire's RSS answers HTTP 403 to Vercel's servers (works in a browser), so it is not pulled.
   ...[
     'G1QFDERJXkJeGFNTXA==', // banking
     'G1QFDERJXkJaF1tXVA==', // asset management
@@ -105,8 +105,8 @@ async function getFeed(f) {
   finally { clearTimeout(to); }
 }
 
-async function pullAll() {
-  const res = await Promise.all(FEEDS.map(getFeed));
+async function pullAll(includeSlow = true) {
+  const res = await Promise.all(FEEDS.filter(f => includeSlow || !f.slow).map(getFeed));
   const seen = new Set(), items = [];
   for (const r of res) for (const it of r.items) if (!seen.has(it.id)) { seen.add(it.id); items.push(it); }
   return { items, status: res.map(r => ({ src: r.src, n: r.items.length, err: r.err })) };
@@ -136,7 +136,7 @@ export default async function handler(req, res) {
     if (now - last > MIN_GAP_MS || (q.refresh && now - last > 20_000)) {
       // claim the slot first so parallel requests don't all pull
       await sb('news_meta?on_conflict=k', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ k: 'last_pull', at: new Date(now).toISOString() }) });
-      const { items, status } = await pullAll();
+      const { items, status } = await pullAll(!!q.refresh);
       if (items.length) {
         for (let i = 0; i < items.length; i += 400) {
           await sb('news_items?on_conflict=id', { method: 'POST', headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' }, body: JSON.stringify(items.slice(i, i + 400)) });
