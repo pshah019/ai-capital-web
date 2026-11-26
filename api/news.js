@@ -4,7 +4,8 @@
 // history even though each RSS feed only shows its latest 25-100 items, and serves the
 // stored window to the page.
 //
-// GET /api/news                -> last 48h (max 72h via ?hours=)
+// GET /api/news                -> last 48h (max 7 days via ?hours=)
+// GET /api/news?q=fed%20cut     -> search everything stored (7 days)
 // GET /api/news?since=<ms>     -> only items stored after that time (for polling)
 // GET /api/news?refresh=1      -> force a source pull (still rate limited); used by the
 //                                 Supabase pg_cron job every 5 minutes so the archive keeps
@@ -30,7 +31,32 @@ const FEEDS = [
   { src: 'CNBC', url: 'https://www.cnbc.com/id/10000664/device/rss/rss.html' },  // finance
   { src: 'CNBC', url: 'https://www.cnbc.com/id/19854910/device/rss/rss.html' },  // technology
   { src: 'CNBC', url: 'https://www.cnbc.com/id/15839135/device/rss/rss.html' },  // earnings
+  // Press-release wires (English only; each feed shows its latest ~20 releases)
+  { src: 'PRN',  url: 'https://www.prnewswire.com/rss/news-releases-list.rss' },
+  { src: 'PRN',  url: 'https://www.prnewswire.com/rss/financial-services-latest-news/financial-services-latest-news-list.rss' },
+  { src: 'PRN',  url: 'https://www.prnewswire.com/rss/business-technology-latest-news/business-technology-latest-news-list.rss' },
+  { src: 'PRN',  url: 'https://www.prnewswire.com/rss/energy-latest-news/energy-latest-news-list.rss' },
+  { src: 'PRN',  url: 'https://www.prnewswire.com/rss/general-business-latest-news/general-business-latest-news-list.rss' },
+  { src: 'GNW',  url: 'https://www.globenewswire.com/RssFeed/orgclass/1/feedTitle/GlobeNewswire%20-%20News%20about%20Public%20Companies' },
+  { src: 'GNW',  url: 'https://www.globenewswire.com/RssFeed/subjectcode/13-Earnings%20Releases%20And%20Operating%20Results/feedTitle/GlobeNewswire%20-%20Earnings%20Releases%20And%20Operating%20Results' },
+  { src: 'GNW',  url: 'https://www.globenewswire.com/RssFeed/subjectcode/27-Mergers%20And%20Acquisitions/feedTitle/GlobeNewswire%20-%20Mergers%20And%20Acquisitions' },
+  ...[
+    'G1QFDERJXkJeGFNTXA==', // banking
+    'G1QFDERJXkJaF1tXVA==', // asset management
+    'G1QFDERJXkJaF1tQVQ==', // business
+    'G1QFDERJXkJeGVpSVQ==', // data management
+    'G1QFDERJXkJeGVpSVA==', // hardware
+    'G1QFDERJXkJeGVpVXQ==', // internet
+    'G1QFDERJXkJeGVpSWw==', // consumer electronics
+    'G1QFDERJXkJeGFNSVQ==', // oil/gas
+    'G1QFDERJXkJeGFNVXQ==', // utilities
+    'G1QFDERJXkJeGFNSXQ==', // alternative energy
+    'G1QFDERJXkJeGFNSWg==', // nuclear
+    'G1QFDERJXkJeEFpTXA==', // manufacturing
+    'G1QFDERJXkJeGFNYXQ==', // mining/minerals
+  ].map(c => ({ src: 'BW', url: 'https://feed.businesswire.com/rss/home/?rss=' + c })),
 ];
+const KEEP_DAYS = 7;
 
 const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
 function decode(s) {
@@ -54,9 +80,14 @@ function parse(xml, src) {
     let title = decode(tag(it, 'title')).replace(/^FinancialJuice:\s*/i, '');
     if (!title) continue;
     const link = decode(tag(it, 'link')) || '';
+    // English only (wires publish translations too)
+    const lang = decode(tag(it, 'dc:language')).toLowerCase();
+    if (lang && !lang.startsWith('en')) continue;
+    const bwLang = src === 'BW' && link.match(/\/news\/home\/\d+\/([a-zA-Z-]+)\//);
+    if (bwLang && bwLang[1].toLowerCase() !== 'en') continue;
     const guid = decode(tag(it, 'guid')) || link || title;
     const t = Date.parse(decode(tag(it, 'pubDate'))) || Date.now();
-    const snip = src === 'FJ' ? '' : decode(tag(it, 'description')).slice(0, 220);
+    const snip = src === 'FJ' ? '' : decode(tag(it, 'description')).replace(/^.{0,140}?(\/PRNewswire\/|\(GLOBE NEWSWIRE\)|--\(BUSINESS WIRE\)--)\s*-*\s*/i, '').slice(0, 220);
     const hot = /^(breaking|urgent|alert)\b|\bbreaking\b:/i.test(title);
     out.push({ id: src + ':' + hash(guid), src, title: title.slice(0, 400), link: link.slice(0, 600), published_at: new Date(Math.min(t, Date.now() + 60_000)).toISOString(), snip, hot });
   }
@@ -87,7 +118,7 @@ export default async function handler(req, res) {
   const q = req.query || {};
   res.setHeader('Cache-Control', 'no-store');
   const now = Date.now();
-  const hours = Math.min(72, Math.max(1, +q.hours || 48));
+  const hours = Math.min(KEEP_DAYS * 24, Math.max(1, +q.hours || 48));
 
   // No database configured: serve whatever the feeds have right now.
   if (!storageReady()) {
@@ -112,13 +143,23 @@ export default async function handler(req, res) {
         }
       }
       pulled = status;
-      // prune anything older than 4 days (about 1 pull in 30)
-      if (Math.random() < 0.035) await sb(`news_items?published_at=lt.${new Date(now - 4 * 86400_000).toISOString()}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+      // prune anything older than KEEP_DAYS (about 1 pull in 30)
+      if (Math.random() < 0.035) await sb(`news_items?published_at=lt.${new Date(now - KEEP_DAYS * 86400_000).toISOString()}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
     }
 
     if (q.refresh && q.limit === '1') return res.status(200).json({ ok: true, pulled });
 
-    // 2) Read the stored window.
+    // 2a) Search the whole stored week: ?q=words (all words must match title or summary)
+    if (q.q) {
+      const words = [];
+      String(q.q).replace(/"([^"]+)"|(\S+)/g, (m, a, b) => { const w = (a || b).replace(/[,()"*\\%]/g, ' ').trim(); if (w.length >= 2) words.push(w); });
+      if (!words.length) return res.status(200).json({ ok: true, stored: true, now, items: [] });
+      const cond = words.slice(0, 6).map(w => `or(title.ilike."*${w}*",snip.ilike."*${w}*")`).join(',');
+      const rows = await sb(`news_items?select=id,src,title,link,published_at,fetched_at,hot,snip&published_at=gt.${new Date(now - KEEP_DAYS * 86400_000).toISOString()}&and=(${encodeURIComponent(cond)})&order=published_at.desc&limit=500`);
+      return res.status(200).json({ ok: true, stored: true, now, search: true, items: (rows || []).map(toClient) });
+    }
+
+    // 2b) Read the stored window.
     const since = +q.since || 0;
     const filt = since
       ? `fetched_at=gt.${new Date(since - 2000).toISOString()}`
