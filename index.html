@@ -3381,7 +3381,7 @@ watch(); setInterval(watch,1500);
 })();
 
 /* deep link: #energy, #datacenter, #stocks … */
-(function(){ const h=(location.hash||'').slice(1); if(h&&window.__showView&&document.getElementById('view-'+h)) window.__showView(h); })();
+(function(){ const h=(location.hash||'').slice(1); if(!window.__showView) return; if(h&&document.getElementById('view-'+h)) window.__showView(h); else window.__showView('news'); /* News Central is the landing page */ })();
 </script>
 <script>
 /* ===== Work in Progress tab: merged live news (FinancialJuice + investingLive + CNBC) served by /api/news,
