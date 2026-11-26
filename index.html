@@ -152,6 +152,17 @@ padding:10px 17px;cursor:pointer;transition:.18s}
 .fjb{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;padding:0 5px;border-radius:4px;margin-right:6px;vertical-align:1px}.fjb.FJ{background:rgba(251,146,60,.16);color:#fdba74}.fjb.IL{background:rgba(96,165,250,.16);color:#93c5fd}.fjb.CNBC{background:rgba(52,211,153,.14);color:#6ee7b7}.fjb.PRN{background:rgba(244,114,182,.15);color:#f9a8d4}.fjb.GNW{background:rgba(167,139,250,.16);color:#c4b5fd}.fjb.BW{background:rgba(250,204,21,.14);color:#fde047}
 .fjit .fjs{font-size:11.5px;color:var(--ink-faint);margin-top:2px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .fjday{position:sticky;top:0;z-index:1;background:#0c1322;padding:5px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line)}
+.hmstrip{display:flex;align-items:center;gap:10px;border:1px solid var(--card-edge);border-radius:12px;background:var(--card);margin-bottom:10px;overflow:hidden;min-height:46px}
+.hmlab{flex:0 0 auto;padding:0 12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border-right:1px solid var(--line);align-self:stretch;display:flex;align-items:center;gap:6px;white-space:nowrap}.hmlab i{font-style:normal;color:var(--ink-faint);text-transform:none;letter-spacing:0}
+.hmtape{flex:1;min-width:0;height:46px}.hmtape .tradingview-widget-copyright{display:none}
+.trendrow{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;padding:7px 10px 7px 0;scrollbar-width:thin}
+.trendrow .tk{flex:0 0 auto;cursor:pointer;display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--card-edge);background:#0b1220;font-family:var(--mono);font-size:12px;color:var(--ink)}
+.trendrow .tk i{font-style:normal;font-size:10.5px;color:var(--ink-faint)}.trendrow .tk.hot{border-color:#7f3b1d}.trendrow .tk.hot i{color:#fb923c}.trendrow .tk:hover,.trendrow .tk.on{border-color:#7dd3fc;background:rgba(125,211,252,.1)}
+.trendempty{color:var(--ink-faint);font-size:12px;padding:0 4px}
+.hmcard{border:1px solid var(--card-edge);border-radius:14px;background:var(--card);overflow:hidden;margin-bottom:14px}
+.hmh{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}.hmh i{font-style:normal;margin-left:auto;color:var(--ink-faint);text-transform:none;letter-spacing:0;font-size:10.5px}.hmh a{margin-left:auto;color:var(--ink-faint);text-decoration:none;text-transform:none;letter-spacing:0}.hmh a:hover{color:var(--ink)}
+.hmecon{height:520px}.hmearn{height:760px}.hmearn iframe{width:100%;height:100%;border:0;display:block;background:#0b0f19}
+.fjtk{display:inline-block;margin-left:6px;padding:0 5px;border-radius:4px;border:1px solid var(--card-edge);font-size:9.5px;color:#93c5fd;cursor:pointer}.fjtk:hover{border-color:#7dd3fc;color:var(--ink)}
 </style>
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -384,9 +395,13 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 </div>
 
 <div id="view-wip" class="webview" style="display:none">
+<p class="sub" style="margin:0 0 12px">Home dashboard preview: live markets, what the news is talking about, today's economic and earnings calendars, and a searchable 7-day news feed, all in one place.</p>
+<div class="hmstrip"><div class="hmlab">Markets</div><div id="tvtape" class="hmtape"></div></div>
+<div class="hmstrip hmtrend"><div class="hmlab">🔥 Trending in the news <i id="trendwin"></i></div><div id="trend" class="trendrow"><span class="trendempty">Reading the news…</span></div></div>
 <div class="wipgrid">
 <div class="wipmain">
-<p class="sub" style="margin:0 0 14px">A sandbox for new modules before they graduate to their own tab. Live market headlines run in the right pane and update on their own, with no refresh needed.</p>
+<div class="hmcard"><div class="hmh"><span>📅 Economic calendar</span><i>US, EU, UK, Japan, China · high &amp; medium impact</i></div><div id="tvecon" class="hmecon"></div></div>
+<div class="hmcard"><div class="hmh"><span>💼 Earnings calendar</span><a href="https://earnings-calendar-2026.vercel.app/" target="_blank" rel="noopener">Open full site ↗</a></div><div id="earnbox" class="hmearn"></div></div>
 <div class="srcard wipcard"><div class="wiph">🛠 In the works</div>
 <div class="wipitem"><b>Live news feed</b><span class="wiptag on">live</span><div>Five free sources merged into one feed (right pane): <b>FinancialJuice</b> quick headlines, <b>investingLive</b> (formerly ForexLive) macro, central-bank, stocks, commodities, FX and crypto coverage, <b>CNBC</b> top news, markets, economy, finance, tech and earnings, plus press-release wires <b>PR Newswire</b> and <b>Business Wire</b> (English only) for earnings, deals and company announcements straight from the source. Every new story is saved as it comes in and kept for 7 days. The pane shows the last 48 hours live, checks for new stories every 30 seconds while open and keeps collecting every 5 minutes in the background. Search covers the full 7 days (several words, "exact phrases", headlines and summaries); the source chips filter by outlet. <b>All</b> leaves out FinancialJuice's rapid-fire trader headlines; tap the FinancialJuice chip to see them.</div></div>
 <div class="wipitem dim"><b>Next module</b><span class="wiptag">open slot</span><div>Tell me what to build next and it lands here first.</div></div>
@@ -3368,8 +3383,19 @@ const API='/api/news', FJRSS='https://www.financialjuice.com/feed.ashx?xy=rss', 
 const SRC={FJ:'FinancialJuice',IL:'investingLive',CNBC:'CNBC',PRN:'PR Newswire',GNW:'GlobeNewswire',BW:'Business Wire'};
 const ALL_SKIP=new Set(['FJ']);
 const BADGE={FJ:'FJ',IL:'iLIVE',CNBC:'CNBC',PRN:'PRN',GNW:'GNW',BW:'BW'};
+/* ---- ticker detection: exchange tags "(NASDAQ: NVDA)", cashtags "$NVDA", and well-known company names ---- */
+const NAMES=[['Nvidia','NVDA'],['NVIDIA','NVDA'],['Apple','AAPL'],['Microsoft','MSFT'],['Tesla','TSLA'],['Amazon','AMZN'],['Alphabet','GOOGL'],['Google','GOOGL'],['Meta Platforms','META'],['Meta','META'],['Oracle','ORCL'],['AMD','AMD'],['Advanced Micro Devices','AMD'],['Broadcom','AVGO'],['Intel','INTC'],['Micron','MU'],['TSMC','TSM'],['Taiwan Semiconductor','TSM'],['Netflix','NFLX'],['Palantir','PLTR'],['CoreWeave','CRWV'],['Nebius','NBIS'],['Super Micro','SMCI'],['Supermicro','SMCI'],['Dell','DELL'],['Boeing','BA'],['JPMorgan','JPM'],['Goldman Sachs','GS'],['Morgan Stanley','MS'],['Bank of America','BAC'],['Wells Fargo','WFC'],['Citigroup','C'],['Walmart','WMT'],['Costco','COST'],['Disney','DIS'],['Berkshire','BRK.B'],['Exxon','XOM'],['ExxonMobil','XOM'],['Chevron','CVX'],['Salesforce','CRM'],['Adobe','ADBE'],['Qualcomm','QCOM'],['Arm Holdings','ARM'],['Coinbase','COIN'],['Snowflake','SNOW'],['Uber','UBER'],['Nike','NKE'],['Pfizer','PFE'],['Eli Lilly','LLY'],['Novo Nordisk','NVO'],['UnitedHealth','UNH'],['Vistra','VST'],['Constellation Energy','CEG'],['Oklo','OKLO'],['GE Vernova','GEV'],['Marvell','MRVL'],['Cisco','CSCO'],['IBM','IBM'],['Ford','F'],['General Motors','GM'],['Starbucks','SBUX'],['Alibaba','BABA'],['Baidu','BIDU'],['Strategy Inc','MSTR'],['MicroStrategy','MSTR'],['Robinhood','HOOD'],['Visa','V'],['Mastercard','MA'],['PayPal','PYPL'],['Shopify','SHOP'],['Applied Digital','APLD'],['IREN','IREN'],['Cipher Mining','CIFR'],['TeraWulf','WULF'],['Core Scientific','CORZ'],['Bloom Energy','BE'],['Vertiv','VRT'],['Caterpillar','CAT'],['Lockheed Martin','LMT'],['Home Depot','HD'],['McDonald\'s','MCD'],['Coca-Cola','KO'],['PepsiCo','PEP'],['Procter & Gamble','PG'],['Johnson & Johnson','JNJ'],['Merck','MRK'],['AbbVie','ABBV'],['Moderna','MRNA'],['Rivian','RIVN'],['Lucid','LCID'],['Spotify','SPOT'],['Airbnb','ABNB'],['DoorDash','DASH'],['AppLovin','APP'],['ServiceNow','NOW'],['CrowdStrike','CRWD'],['Palo Alto Networks','PANW'],['Lam Research','LRCX'],['Applied Materials','AMAT'],['ASML','ASML'],['KLA','KLAC']];
+const NAME_RE=new RegExp('\\b('+NAMES.map(n=>n[0].replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).sort((a,b)=>b.length-a.length).join('|')+')(?![\\w-])','g');
+const NAME_MAP=Object.fromEntries(NAMES);
+const EXCH_RE=/\b(?:NYSE(?:\s+American|\s+Arca)?|NASDAQ|Nasdaq|Cboe(?:\s+BZX)?|AMEX)\s*:\s*([A-Z]{1,5}(?:\.[A-Z])?)\b/g;
+const CASH_RE=/(?:^|[\s(])\$([A-Z]{1,5})\b/g;
+function tickersOf(s){ const out=new Set(); let m; s=String(s||'');
+  EXCH_RE.lastIndex=0; while((m=EXCH_RE.exec(s))) out.add(m[1]);
+  CASH_RE.lastIndex=0; while((m=CASH_RE.exec(s))) out.add(m[1]);
+  NAME_RE.lastIndex=0; while((m=NAME_RE.exec(s))) out.add(NAME_MAP[m[1]]);
+  return [...out].slice(0,6); }
 const QUICK=['Fed','CPI','Jobs','Oil','Nvidia','OpenAI','Tariff','China','Earnings','Bitcoin'];
-let started=false, byId=new Map(), items=[], q='', src='', since=0, mode='api', timer=null, lastOk=0, older=[], olderQ='', sTimer=null, searching=false;
+let started=false, byId=new Map(), items=[], q='', src='', tk='', since=0, mode='api', timer=null, lastOk=0, older=[], olderQ='', sTimer=null, searching=false;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function terms(s){ const out=[]; s.replace(/"([^"]+)"|(\S+)/g,(m,a,b)=>{ out.push((a||b).toLowerCase()); }); return out.filter(Boolean); }
@@ -3378,7 +3404,7 @@ const hhmm=d=>new Date(d).toLocaleTimeString([], {hour:'numeric',minute:'2-digit
 const dayLbl=d=>{ const x=new Date(d), n=new Date(); const y=new Date(n); y.setDate(n.getDate()-1); return x.toDateString()===n.toDateString()?'Today':x.toDateString()===y.toDateString()?'Yesterday':x.toLocaleDateString([], {weekday:'short',month:'short',day:'numeric'}); };
 function add(list, markFresh){
   const fresh=new Set();
-  list.forEach(it=>{ if(!it||!it.title||byId.has(it.id)) return; it.lc=(it.title+' '+(it.snip||'')).toLowerCase(); byId.set(it.id,it); items.push(it); if(markFresh) fresh.add(it.id); });
+  list.forEach(it=>{ if(!it||!it.title||byId.has(it.id)) return; it.lc=(it.title+' '+(it.snip||'')).toLowerCase(); it.tks=tickersOf(it.title+' '+(it.snip||'')); byId.set(it.id,it); items.push(it); if(markFresh) fresh.add(it.id); });
   const cut=Date.now()-WINDOW; items=items.filter(it=>it.t>=cut).sort((a,b)=>b.t-a.t); if(items.length>KEEP) items.length=KEEP;
   byId=new Map(items.map(it=>[it.id,it])); return fresh;
 }
@@ -3387,21 +3413,24 @@ function render(fresh){
   const tq=terms(q); const ids=new Set(items.map(it=>it.id));
   const extra=(tq.length&&olderQ===q.trim())?older.filter(it=>!ids.has(it.id)):[];
   const base=extra.length?items.concat(extra).sort((a,b)=>b.t-a.t):items;
-  const pool=src?base.filter(it=>it.src===src):base.filter(it=>!ALL_SKIP.has(it.src)); // FinancialJuice only shows under its own chip
+  const pool0=src?base.filter(it=>it.src===src):base.filter(it=>!ALL_SKIP.has(it.src)); // FinancialJuice only shows under its own chip
+  const pool=tk?pool0.filter(it=>(it.tks||[]).includes(tk)):pool0;
   const shown=tq.length?pool.filter(it=>tq.every(w=>it.lc.includes(w))):pool;
   const re=tq.length?new RegExp('('+tq.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi'):null;
   const hl=s=>re?esc(s).replace(re,'<mark>$1</mark>'):esc(s);
   const allN=items.filter(it=>!ALL_SKIP.has(it.src)).length;
-  $('fjqn').textContent=tq.length?(searching?'searching 7d…':shown.length.toLocaleString()+' in 7d'):src?shown.length.toLocaleString()+' of '+items.length.toLocaleString():'';
+  $('fjqn').textContent=tq.length?(searching?'searching 7d…':shown.length.toLocaleString()+' in 7d'):tk?tk+' · '+shown.length:src?shown.length.toLocaleString()+' of '+items.length.toLocaleString():'';
   const cnt={}; items.forEach(it=>cnt[it.src]=(cnt[it.src]||0)+1);
   const sc=$('fjsrc'); if(sc) sc.innerHTML=`<span data-s="" class="${src?'':'on'}" title="Everything except FinancialJuice (tap its chip for those quick-fire headlines)">All<i>${allN.toLocaleString()}</i></span>`+Object.keys(SRC).filter(k=>cnt[k]).map(k=>`<span data-s="${k}" class="${src===k?'on':''}">${SRC[k]}<i>${cnt[k].toLocaleString()}</i></span>`).join('');
   if(sc) sc.querySelectorAll('span').forEach(b=>b.onclick=()=>{ src=b.dataset.s; render(); });
   let day='', html='';
   shown.slice(0,1500).forEach(it=>{ const dl=dayLbl(it.t); if(dl!==day){ day=dl; html+=`<div class="fjday">${dl}</div>`; }
     const sn=tq.length&&it.snip&&re&&new RegExp(re.source,'i').test(it.snip)?`<div class="fjs">${hl(it.snip)}</div>`:'';
-    html+=`<a class="fjit${it.hot?' hot':''}${fresh&&fresh.has(it.id)?' new':''}" href="${esc(it.link||'#')}" target="_blank" rel="noopener"><div class="fjt"><span class="fjb ${it.src}">${BADGE[it.src]||it.src}</span>${hhmm(it.t)} · ${ago(it.t)}</div><div class="fjh">${hl(it.title)}</div>${sn}</a>`; });
+    html+=`<a class="fjit${it.hot?' hot':''}${fresh&&fresh.has(it.id)?' new':''}" href="${esc(it.link||'#')}" target="_blank" rel="noopener"><div class="fjt"><span class="fjb ${it.src}">${BADGE[it.src]||it.src}</span>${hhmm(it.t)} · ${ago(it.t)}${(it.tks||[]).map(x=>`<span class="fjtk" data-tk="${x}">${x}</span>`).join('')}</div><div class="fjh">${hl(it.title)}</div>${sn}</a>`; });
   list.innerHTML=html||`<div class="fjempty">${items.length?(searching?'Searching the last 7 days…':'No stories match “'+esc(q)+'” in the last 7 days. New ones keep arriving.'):'No headlines yet.'}</div>`;
+  list.querySelectorAll('.fjtk').forEach(x=>x.addEventListener('click',ev=>{ ev.preventDefault(); ev.stopPropagation(); setTk(x.dataset.tk); }));
   document.querySelectorAll('#fjquick span').forEach(b=>b.classList.toggle('on',q.toLowerCase()===b.dataset.q.toLowerCase()));
+  renderTrend();
   const st=$('fjstat'); if(st) st.textContent=lastOk?'· '+(mode==='api'?'48h live · search 7d · ':'')+'updated '+hhmm(lastOk):'';
 }
 async function pollApi(){
@@ -3421,12 +3450,38 @@ async function tick(){
   if(mode==='api'){ try{ await pollApi(); return; }catch(e){ if(items.length) return; mode='rss'; } }
   if(mode==='rss'){ try{ await pollRss(); return; }catch(e){ if(!items.length) fallback(); } }
 }
+function setTk(x){ tk=(tk===x)?'':x; const l=$('fjlist'); render(); if(l) l.scrollTop=0; }
+let trendSig='';
+function renderTrend(){
+  const box=$('trend'); if(!box) return;
+  const now=Date.now(); let win=6;
+  const tally=w=>{ const r={}, b={}; items.forEach(it=>{ if(ALL_SKIP.has(it.src)) return; const age=(now-it.t)/3600e3; (it.tks||[]).forEach(x=>{ if(age<=w) r[x]=(r[x]||0)+1; else if(age<=48) b[x]=(b[x]||0)+1; }); }); return [r,b]; };
+  let [r,b]=tally(6); if(Object.values(r).filter(n=>n>=2).length<5){ win=24; [r,b]=tally(24); }
+  const rows=Object.keys(r).map(x=>{ const base=(b[x]||0)/Math.max(1,48-win), rate=r[x]/win; return {x,n:r[x],spike:rate/(base+0.05)}; })
+    .filter(o=>o.n>=2).sort((a,c)=>(c.n-a.n)||(c.spike-a.spike)).slice(0,18);
+  const sig=win+'|'+tk+'|'+rows.map(o=>o.x+o.n).join(','); if(sig===trendSig) return; trendSig=sig;
+  const w=$('trendwin'); if(w) w.textContent='last '+win+'h';
+  box.innerHTML=rows.length?rows.map(o=>`<span class="tk${o.spike>=3&&o.n>=3?' hot':''}${tk===o.x?' on':''}" data-tk="${o.x}" title="${o.n} stories in the last ${win}h${o.spike>=3?' · '+(o.spike>=10?Math.round(o.spike):o.spike.toFixed(1))+'× its usual pace':''} — tap to filter the news">${o.x}<i>${o.n}${o.spike>=3&&o.n>=3?' 🔥':''}</i></span>`).join('')
+    :'<span class="trendempty">No ticker is getting repeat coverage yet.</span>';
+  box.querySelectorAll('.tk').forEach(el=>el.addEventListener('click',()=>setTk(el.dataset.tk)));
+}
+function tvWidget(boxId,file,cfg){
+  const box=$(boxId); if(!box||box.dataset.done) return; box.dataset.done='1';
+  box.innerHTML='<div class="tradingview-widget-container" style="height:100%;width:100%"><div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div></div>';
+  const s=document.createElement('script'); s.type='text/javascript'; s.async=true; s.src='https://s3.tradingview.com/external-embedding/'+file; s.text=JSON.stringify(cfg);
+  box.firstChild.appendChild(s);
+}
+function loadHome(){
+  tvWidget('tvtape','embed-widget-ticker-tape.js',{symbols:[{proName:'FOREXCOM:SPXUSD',title:'S&P 500'},{proName:'FOREXCOM:NSXUSD',title:'Nasdaq 100'},{proName:'FOREXCOM:DJI',title:'Dow'},{proName:'TVC:VIX',title:'VIX'},{proName:'TVC:US10Y',title:'US 10Y'},{proName:'TVC:USOIL',title:'WTI oil'},{proName:'TVC:GOLD',title:'Gold'},{proName:'TVC:DXY',title:'Dollar'},{proName:'BITSTAMP:BTCUSD',title:'Bitcoin'},{proName:'NASDAQ:NVDA',title:'NVDA'}],showSymbolLogo:true,isTransparent:true,displayMode:'adaptive',colorTheme:'dark',locale:'en'});
+  tvWidget('tvecon','embed-widget-events.js',{colorTheme:'dark',isTransparent:true,width:'100%',height:'100%',locale:'en',importanceFilter:'0,1',countryFilter:'us,eu,gb,jp,cn'});
+  const eb=$('earnbox'); if(eb&&!eb.dataset.done){ eb.dataset.done='1'; eb.innerHTML='<iframe src="https://earnings-calendar-2026.vercel.app/" title="Earnings calendar" loading="lazy"></iframe>'; }
+}
 function searchOlder(){
   clearTimeout(sTimer); const qq=q.trim();
   if(mode!=='api'||qq.length<2){ searching=false; older=[]; olderQ=''; return; }
   searching=true; render();
   sTimer=setTimeout(async()=>{ try{ const r=await fetch(API+'?q='+encodeURIComponent(qq),{cache:'no-store'}); const j=await r.json();
-      if(q.trim()!==qq) return; older=(j&&j.ok&&Array.isArray(j.items)?j.items:[]).map(it=>Object.assign(it,{lc:(it.title+' '+(it.snip||'')).toLowerCase()})); olderQ=qq; }
+      if(q.trim()!==qq) return; older=(j&&j.ok&&Array.isArray(j.items)?j.items:[]).map(it=>Object.assign(it,{lc:(it.title+' '+(it.snip||'')).toLowerCase(),tks:tickersOf(it.title+' '+(it.snip||''))})); olderQ=qq; }
     catch(e){ older=[]; olderQ=qq; } searching=false; const l=$('fjlist'), st=l?l.scrollTop:0; render(); if(l) l.scrollTop=st; },350);
 }
 function fallback(){
@@ -3440,6 +3495,7 @@ function fallback(){
   document.head.appendChild(s);
 }
 function start(){
+  loadHome();
   if(started) return; started=true;
   const qk=$('fjquick'); if(qk){ qk.innerHTML=QUICK.map(k=>`<span data-q="${k}">${k}</span>`).join(''); qk.querySelectorAll('span').forEach(b=>b.addEventListener('click',()=>{ q=(q.toLowerCase()===b.dataset.q.toLowerCase())?'':b.dataset.q; $('fjq').value=q; render(); searchOlder(); })); }
   const qi=$('fjq'); if(qi) qi.addEventListener('input',()=>{ q=qi.value; render(); searchOlder(); });
