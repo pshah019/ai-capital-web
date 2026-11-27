@@ -115,8 +115,29 @@ async function pullAll(includeSlow = true) {
 
 const toClient = r => ({ id: r.id, src: r.src, title: r.title, link: r.link, t: Date.parse(r.published_at), f: Date.parse(r.fetched_at || r.published_at), hot: !!r.hot, snip: r.snip || '' });
 
+// Economic-calendar schedule for the cheat sheet: Forex Factory's free public weekly export
+// (current week only; rolls over on Sunday). Cached in memory + at Vercel's edge for an hour.
+let CAL = { t: 0, data: null };
+async function calendar(res) {
+  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200');
+  if (CAL.data && Date.now() - CAL.t < 3600_000) return res.status(200).json({ ok: true, events: CAL.data, cached: true });
+  try {
+    const r = await fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json', { headers: { 'User-Agent': UA } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const raw = await r.json();
+    const keep = new Set(['USD', 'EUR', 'GBP', 'JPY', 'CNY']);
+    CAL = { t: Date.now(), data: raw.filter(e => keep.has(e.country) && e.title)
+      .map(e => ({ title: e.title, c: e.country, t: Date.parse(e.date), imp: e.impact, f: e.forecast || '', p: e.previous || '' })) };
+    return res.status(200).json({ ok: true, events: CAL.data });
+  } catch (e) {
+    if (CAL.data) return res.status(200).json({ ok: true, events: CAL.data, stale: true });
+    return res.status(200).json({ ok: false, error: String(e.message || e) });
+  }
+}
+
 export default async function handler(req, res) {
   const q = req.query || {};
+  if (q.cal) return calendar(res);
   res.setHeader('Cache-Control', 'no-store');
   const now = Date.now();
   const hours = Math.min(KEEP_DAYS * 24, Math.max(1, +q.hours || 48));
