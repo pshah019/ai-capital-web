@@ -177,6 +177,13 @@ body.wideview .wrap{max-width:1680px}
 .chi mark{background:rgba(251,191,36,.28);color:#fde68a;border-radius:3px}
 .cheatempty{color:var(--ink-faint);font-size:12px;padding:12px 2px}
 .cshint{font-weight:400;margin-left:8px;color:var(--ink-faint);text-transform:none;letter-spacing:0;font-size:10.5px}
+.cuday{font-family:var(--mono);font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;padding:8px 2px 3px}
+.cu{padding:7px 2px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer}.cu.past{opacity:.5}
+.cut{font-size:12.3px;color:var(--ink);line-height:1.35}.cut b{font-weight:600}.cutm{font-family:var(--mono);font-size:10.5px;color:#93c5fd;margin-right:6px}
+.imp{display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:6px;vertical-align:1px;background:#64748b}.imp.high{background:#ef4444}.imp.medium{background:#f59e0b}.imp.holiday{background:#a78bfa}
+.cuf{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-top:2px}.cud{font-size:11.6px;color:var(--ink-dim);margin-top:3px;line-height:1.35}
+.cuw{display:none;font-size:11.3px;color:#93c5fd;margin-top:3px;line-height:1.35}.cu.open .cuw{display:block}
+.chgall{margin-top:6px}
 </style>
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -414,7 +421,7 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 <div class="hmstrip hmtrend"><div class="hmlab">🔥 Trending in the news <i id="trendwin"></i></div><div id="trend" class="trendrow"><span class="trendempty">Reading the news…</span></div></div>
 <div class="wipgrid">
 <div class="wipmain">
-<div class="hmcard"><div class="hmh"><span>📅 Economic calendar</span><b class="cshint">📖 cheat sheet on the left</b><i>US, EU, UK, Japan, China · high &amp; medium impact</i></div><div class="econwrap"><div class="cheat"><div class="cheatq"><input id="cheatq" type="search" placeholder="What is… e.g. PMI, JOLTS, CPI" autocomplete="off"></div><div id="cheatlist" class="cheatlist"></div></div><div id="tvecon" class="hmecon"></div></div></div>
+<div class="hmcard"><div class="hmh"><span>📅 Economic calendar</span><b class="cshint">📖 cheat sheet on the left</b><i>US, EU, UK, Japan, China · high &amp; medium impact</i></div><div class="econwrap"><div class="cheat"><div class="cheatq"><input id="cheatq" type="search" placeholder="What is… e.g. PMI, JOLTS, CPI" autocomplete="off"></div><div id="cheatlist" class="cheatlist"><div id="cheatup"></div><div id="cheatall"></div></div></div><div id="tvecon" class="hmecon"></div></div></div>
 <div class="hmcard"><div class="hmh"><span>💼 Earnings calendar</span><a href="https://earnings-calendar-2026.vercel.app/" target="_blank" rel="noopener">Open full site ↗</a></div><div id="earnbox" class="hmearn"></div></div>
 </div>
 <aside class="wipside">
@@ -3560,6 +3567,8 @@ const CHEAT=[
 ['Industrial Production','Output from factories, mines and utilities.','Shows whether the industrial side of the economy is expanding.','industrial production output'],
 ['Trade Balance','Exports minus imports.','A bigger deficit subtracts from GDP; also moves with tariffs and the dollar.','trade balance advance goods'],
 ['Wholesale / Retail Inventories','How much stock businesses are holding.','Inventory swings feed into GDP and hint at future production.','inventories wholesale retail'],
+['Personal Income & Spending','How much Americans earned and spent last month (released with PCE).','Spending is the engine of the US economy; income shows whether it can keep going.','personal income spending'],
+['Money Supply & Lending (M3)','How much money is circulating and how much banks are lending.','Faster lending growth supports the economy; central banks watch it for inflation risk.','m3 money supply private loans lending'],
 ]],
 ['Surveys & PMIs',[
 ['ISM Manufacturing PMI','Monthly survey of factory purchasing managers.','Above 50 = manufacturing growing, below 50 = shrinking; one of the first reads on each month.','ism manufacturing pmi'],
@@ -3569,6 +3578,7 @@ const CHEAT=[
 ['Regional Fed Surveys','Empire State, Philly Fed, Chicago PMI, Dallas, Richmond, Kansas City factory surveys.','Early previews of the national ISM numbers.','empire philly philadelphia chicago pmi dallas fed richmond kansas'],
 ['Consumer Confidence','Conference Board survey of how upbeat consumers feel.','Confident consumers spend more, which supports growth.','consumer confidence conference board confid'],
 ['UMich Consumer Sentiment','University of Michigan survey of consumer mood.','Same idea as confidence; it also produces the inflation-expectations numbers.','michigan sentiment umich'],
+['German Business & Consumer Surveys','ifo business climate, ZEW sentiment and GfK consumer climate.','Germany is Europe\'s biggest economy, so these are early reads on the eurozone.','ifo zew gfk sentix german business climate'],
 ['China PMIs (NBS / Caixin)','Factory and services surveys for China.','China\'s demand drives commodities and global growth expectations.','china nbs caixin pmi chinese'],
 ]],
 ['Housing',[
@@ -3585,6 +3595,7 @@ const CHEAT=[
 ['Fed / ECB / BoE speakers','Speeches by central-bank officials.','Markets parse them for clues about the next rate decision.','speaks speech testifies'],
 ['Treasury Auctions','The US government selling bills, notes and bonds.','Weak demand (low bid-to-cover) pushes yields up, which can hit stocks.','auction bill bond note bid-to-cover high yield'],
 ['Beige Book','The Fed\'s anecdotal report on conditions in each region.','Color on the economy ahead of Fed meetings.','beige book'],
+['Financial Stability Reports','Central-bank checkups on risks in banks and markets.','Flags where officials see stress building, e.g. in credit or housing.','financial stability fpc'],
 ['ECB / BoE / BoJ Decisions','Rate decisions in Europe, the UK and Japan.','Move the euro, pound, yen and global bond yields.','ecb boe boj bank of england japan rate decision'],
 ]],
 ['Energy & markets',[
@@ -3596,22 +3607,75 @@ const CHEAT=[
 ['Early Market Close / Holiday','US markets close early or are shut.','Thin trading can mean unusual price moves.','early close holiday'],
 ]],
 ];
-const box=document.getElementById('cheatlist'), qi=document.getElementById('cheatq'); if(!box) return;
+const box=document.getElementById('cheatall'), up=document.getElementById('cheatup'), list=document.getElementById('cheatlist'), qi=document.getElementById('cheatq'); if(!box) return;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const BY={}; CHEAT.forEach(([g,l])=>l.forEach(r=>BY[r[0]]=r));
+/* map a scheduled event title (Forex Factory wording) to a glossary entry */
+const MAP=[
+[/non-?farm employment|non-?farm payrolls/i,'Nonfarm Payrolls (NFP)'],[/unemployment claims|jobless claims/i,'Initial Jobless Claims'],[/continuing claims/i,'Continuing Claims'],
+[/\bADP\b/i,'ADP Employment Change'],[/JOLTS/i,'JOLTS Job Openings'],[/challenger/i,'Challenger Layoffs'],[/average hourly earnings/i,'Average Hourly Earnings'],
+[/unemployment (rate|change)/i,'Unemployment Rate'],[/participation/i,'Labor Force Participation'],
+[/core pce/i,'PCE / Core PCE'],[/\bPCE\b/i,'PCE / Core PCE'],[/core cpi/i,'Core CPI'],[/\bCPI\b|HICP/i,null],[/\bPPI\b|producer price/i,'PPI (Producer Price Index)'],
+[/inflation expectations/i,'Inflation Expectations (UMich)'],[/import prices/i,'Import Prices'],
+[/GDP/i,'GDP'],[/retail sales/i,'Retail Sales'],[/durable goods/i,'Durable Goods Orders'],[/factory orders/i,'Factory Orders'],[/industrial production/i,'Industrial Production'],
+[/trade balance|current account/i,'Trade Balance'],[/inventories/i,null],[/personal (income|spending)/i,'Personal Income & Spending'],[/M3 money|private loans/i,'Money Supply & Lending (M3)'],
+[/ISM manufacturing prices|ISM.*prices/i,'ISM Prices Paid'],[/ISM manufacturing/i,'ISM Manufacturing PMI'],[/ISM services|ISM non-?manufacturing/i,'ISM Services PMI'],
+[/empire state|philly fed|philadelphia|richmond|chicago pmi|dallas|kansas city/i,'Regional Fed Surveys'],
+[/consumer confidence|CB consumer/i,'Consumer Confidence'],[/UoM|michigan|consumer sentiment/i,'UMich Consumer Sentiment'],
+[/ifo|ZEW|GfK|sentix/i,'German Business & Consumer Surveys'],[/PMI/i,null],
+[/housing starts|building permits/i,'Housing Starts / Building Permits'],[/pending home/i,'Pending Home Sales'],[/home sales/i,'Existing / New Home Sales'],[/HPI|case-?shiller/i,'Case-Shiller Home Prices'],[/MBA|mortgage/i,'MBA Mortgage Applications'],
+[/FOMC (statement|economic projections)|federal funds rate/i,'FOMC Rate Decision'],[/FOMC press/i,'FOMC Press Conference'],[/FOMC.*minutes/i,'FOMC Minutes'],
+[/main refinancing|ECB press|official bank rate|BOJ policy rate|monetary policy statement|MPC official|policy rate/i,'ECB / BoE / BoJ Decisions'],
+[/speaks|testifies|hearings|speech/i,'Fed / ECB / BoE speakers'],[/bond auction|bill auction|note auction/i,'Treasury Auctions'],[/beige book/i,'Beige Book'],
+[/financial stability|FPC/i,'Financial Stability Reports'],[/meeting accounts|minutes/i,'FOMC Minutes'],
+[/crude oil inventories/i,'EIA Crude Oil Inventories'],[/API weekly|API crude/i,'API Crude Stock Change'],[/natural gas storage/i,'EIA Natural Gas Storage'],[/OPEC|IEA/i,'OPEC / IEA Oil Reports'],
+[/bank holiday|early close/i,'Early Market Close / Holiday'],
+];
+function entryFor(ev){
+  const title=ev.title;
+  for(const [re,name] of MAP){ if(!re.test(title)) continue;
+    if(name) return BY[name];
+    if(/core cpi/i.test(title)) return BY['Core CPI'];
+    if(/CPI|HICP/i.test(title)) return (ev.c==='EUR'&&!/german|french|spanish|italian/i.test(title))?BY['HICP (Eurozone / EU CPI)']:BY['CPI (Consumer Price Index)'];
+    if(/inventories/i.test(title)) return BY['Wholesale / Retail Inventories'];
+    if(/PMI/i.test(title)) return ev.c==='CNY'?BY['China PMIs (NBS / Caixin)']:BY['S&P Global PMIs (Flash / Final)'];
+  }
+  return null;
+}
+const FLAG={USD:'🇺🇸',EUR:'🇪🇺',GBP:'🇬🇧',JPY:'🇯🇵',CNY:'🇨🇳'};
+let EVENTS=null;
+function renderUp(){
+  if(!up) return;
+  if(!EVENTS){ up.innerHTML='<div class="chg">Coming up</div><div class="cheatempty">Loading this week\'s schedule…</div>'; return; }
+  const now=Date.now();
+  const ev=EVENTS.filter(e=>(e.imp==='High'||e.imp==='Medium'||(e.imp==='Holiday'&&e.c==='USD'))&&e.t>=now-90*60e3).sort((a,b)=>a.t-b.t);
+  if(!ev.length){ up.innerHTML='<div class="chg">Coming up</div><div class="cheatempty">That\'s it for this week\'s scheduled releases. Next week\'s schedule appears here on Sunday; the glossary is below.</div>'; return; }
+  let day='', html='<div class="chg">Coming up · in calendar order</div>';
+  ev.forEach(e=>{ const d=new Date(e.t), dl=d.toLocaleDateString([], {weekday:'short',month:'short',day:'numeric'});
+    if(dl!==day){ day=dl; html+=`<div class="cuday">${dl}</div>`; }
+    const g=entryFor(e), past=e.t<now;
+    html+=`<div class="cu${past?' past':''}"><div class="cut"><span class="cutm">${d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}</span>${FLAG[e.c]||''} <b>${esc(e.title)}</b><i class="imp ${String(e.imp).toLowerCase()}" title="${esc(e.imp)} impact"></i></div>${(e.f||e.p)?`<div class="cuf">${e.f?'Forecast '+esc(e.f):''}${e.f&&e.p?' · ':''}${e.p?'Prior '+esc(e.p):''}</div>`:''}${g?`<div class="cud">${esc(g[1])}</div><div class="cuw">Why it matters: ${esc(g[2])}</div>`:''}</div>`; });
+  up.innerHTML=html;
+  up.querySelectorAll('.cu').forEach(el=>el.addEventListener('click',()=>el.classList.toggle('open')));
+}
 function render(q){
   q=(q||'').trim().toLowerCase(); const words=q.split(/\s+/).filter(Boolean);
   const re=words.length?new RegExp('('+words.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi'):null;
   const hl=s=>re?esc(s).replace(re,'<mark>$1</mark>'):esc(s);
-  let html='';
-  CHEAT.forEach(([g,list])=>{
-    const rows=list.filter(r=>!words.length||words.every(w=>(r[0]+' '+r[1]+' '+r[2]+' '+r[3]+' '+g).toLowerCase().includes(w)));
+  if(up) up.style.display=words.length?'none':'';
+  let html=words.length?'':'<div class="chg chgall">Glossary · A–Z by topic</div>';
+  CHEAT.forEach(([g,l])=>{
+    const rows=l.filter(r=>!words.length||words.every(w=>(r[0]+' '+r[1]+' '+r[2]+' '+r[3]+' '+g).toLowerCase().includes(w)));
     if(!rows.length) return;
     html+=`<div class="chg">${esc(g)}</div>`+rows.map(r=>`<div class="chi"><b>${hl(r[0])}</b><span>${hl(r[1])}</span><i>Why it matters: ${hl(r[2])}</i></div>`).join('');
   });
   box.innerHTML=html||'<div class="cheatempty">Not in the cheat sheet yet. Try a shorter word like "pmi", "cpi" or "claims".</div>';
-  box.scrollTop=0;
+  if(list) list.scrollTop=0;
 }
 render('');
+renderUp();
+fetch('/api/news?cal=1').then(r=>r.json()).then(j=>{ EVENTS=(j&&j.ok&&Array.isArray(j.events))?j.events:[]; renderUp(); }).catch(()=>{ EVENTS=[]; renderUp(); });
+setInterval(renderUp,5*60e3);
 if(qi) qi.addEventListener('input',()=>render(qi.value));
 })();
 </script>
