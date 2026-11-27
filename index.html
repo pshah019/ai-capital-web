@@ -163,6 +163,20 @@ padding:10px 17px;cursor:pointer;transition:.18s}
 .hmh{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}.hmh i{font-style:normal;margin-left:auto;color:var(--ink-faint);text-transform:none;letter-spacing:0;font-size:10.5px}.hmh a{margin-left:auto;color:var(--ink-faint);text-decoration:none;text-transform:none;letter-spacing:0}.hmh a:hover{color:var(--ink)}
 .hmecon{height:520px}.hmearn{height:760px}.hmearn iframe{width:100%;height:100%;border:0;display:block;background:#0b0f19}
 .fjtk{display:inline-block;margin-left:6px;padding:0 5px;border-radius:4px;border:1px solid var(--card-edge);font-size:9.5px;color:#93c5fd;cursor:pointer}.fjtk:hover{border-color:#7dd3fc;color:var(--ink)}
+body.wideview .wrap{max-width:1680px}
+#view-news .wipgrid{grid-template-columns:minmax(0,1fr) 500px}
+@media(max-width:1100px){#view-news .wipgrid{grid-template-columns:1fr}}
+.econwrap{display:grid;grid-template-columns:310px minmax(0,1fr);height:560px}
+@media(max-width:820px){.econwrap{grid-template-columns:1fr;height:auto}.econwrap .cheat{height:320px}.econwrap .hmecon{height:520px}}
+.econwrap .hmecon{height:100%}
+.cheat{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:rgba(11,18,32,.55)}
+.cheatq{padding:10px}.cheatq input{width:100%;box-sizing:border-box;background:#0b1220;border:1px solid #243049;border-radius:9px;color:var(--ink);font:inherit;font-size:12.5px;padding:7px 10px;outline:none}.cheatq input:focus{border-color:#7dd3fc}
+.cheatlist{flex:1;overflow:auto;padding:0 10px 12px;scrollbar-width:thin}
+.chg{position:sticky;top:0;background:#0d1424;padding:7px 2px 5px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line);z-index:1}
+.chi{padding:8px 2px;border-bottom:1px solid rgba(255,255,255,.04)}.chi b{display:block;color:var(--ink);font-size:12.5px}.chi span{display:block;color:var(--ink-dim);font-size:11.8px;line-height:1.4;margin-top:2px}.chi i{display:block;font-style:normal;color:#93c5fd;font-size:11.3px;line-height:1.4;margin-top:3px}
+.chi mark{background:rgba(251,191,36,.28);color:#fde68a;border-radius:3px}
+.cheatempty{color:var(--ink-faint);font-size:12px;padding:12px 2px}
+.cshint{font-weight:400;margin-left:8px;color:var(--ink-faint);text-transform:none;letter-spacing:0;font-size:10.5px}
 </style>
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -400,7 +414,7 @@ function mixText(arr,max){ const m=new Map(); arr.forEach(t=>m.set(t,(m.get(t)||
 <div class="hmstrip hmtrend"><div class="hmlab">🔥 Trending in the news <i id="trendwin"></i></div><div id="trend" class="trendrow"><span class="trendempty">Reading the news…</span></div></div>
 <div class="wipgrid">
 <div class="wipmain">
-<div class="hmcard"><div class="hmh"><span>📅 Economic calendar</span><i>US, EU, UK, Japan, China · high &amp; medium impact</i></div><div id="tvecon" class="hmecon"></div></div>
+<div class="hmcard"><div class="hmh"><span>📅 Economic calendar</span><b class="cshint">📖 cheat sheet on the left</b><i>US, EU, UK, Japan, China · high &amp; medium impact</i></div><div class="econwrap"><div class="cheat"><div class="cheatq"><input id="cheatq" type="search" placeholder="What is… e.g. PMI, JOLTS, CPI" autocomplete="off"></div><div id="cheatlist" class="cheatlist"></div></div><div id="tvecon" class="hmecon"></div></div></div>
 <div class="hmcard"><div class="hmh"><span>💼 Earnings calendar</span><a href="https://earnings-calendar-2026.vercel.app/" target="_blank" rel="noopener">Open full site ↗</a></div><div id="earnbox" class="hmearn"></div></div>
 </div>
 <aside class="wipside">
@@ -883,7 +897,7 @@ sim.force("x",d3.forceX(W/2).strength(.045)).force("y",d3.forceY(H/2).strength(.
 (function(){
 const AI=['capital','nvidia','apple','microsoft','alphabet','amazon','meta','tesla'];
 let lastAi='capital';
-function showView(v){
+function showView(v){ document.body.classList.toggle('wideview', v==='news');
   if(!document.getElementById('view-'+v)) v='capital';
   if(AI.includes(v)) lastAi=v;
   document.querySelectorAll('#aitabs .tab').forEach(x=>x.classList.toggle('active', x.dataset.view===v));
@@ -3512,6 +3526,93 @@ function start(){
 const prev=window.__showWeb;
 window.__showWeb=function(v){ if(v==='news'){ requestAnimationFrame(start); return; } if(v==='wip') return; if(prev) prev(v); };
 if(location.hash==='#news') requestAnimationFrame(start);
+})();
+</script>
+<script>
+/* ===== News Central: economic-calendar cheat sheet (static, plain-English one-liners) ===== */
+(function(){
+const CHEAT=[
+['Jobs',[
+['Nonfarm Payrolls (NFP)','Jobs added across the US economy last month (excluding farms).','The biggest monthly market mover: strong hiring = hot economy, which can delay Fed rate cuts.','nfp payrolls employment change jobs report'],
+['Unemployment Rate','Share of people who want a job but don\'t have one.','Rising unemployment signals a slowdown and pushes the Fed toward cutting rates.','unemployment jobless rate'],
+['Average Hourly Earnings','How fast wages are growing.','Hot wage growth can keep inflation sticky, a worry for the Fed.','wages earnings ahe'],
+['Initial Jobless Claims','New unemployment filings in the past week.','The fastest weekly read on layoffs; a steady rise warns the job market is cracking.','initial claims jobless clm'],
+['Continuing Claims','People still collecting unemployment benefits.','Rising = laid-off workers are taking longer to find new jobs.','continued continuing claims'],
+['ADP Employment Change','Payroll firm ADP\'s estimate of private-sector hiring, out 2 days before NFP.','A preview of the jobs report, though it often misses the official number.','adp private payrolls'],
+['JOLTS Job Openings','How many jobs employers have open.','Lots of openings = tight labor market, which can push wages and inflation up and keep rates higher.','jolts openings job openings'],
+['Challenger Layoffs','Job cuts announced by US employers.','An early read on whether companies are starting to downsize.','challenger layoffs job cuts'],
+['Labor Force Participation','Share of adults working or looking for work.','Helps explain whether unemployment is moving because of hiring or people leaving the workforce.','participation rate labor force'],
+]],
+['Inflation',[
+['CPI (Consumer Price Index)','Change in prices consumers pay for a basket of goods and services.','The headline inflation number; a hot CPI usually lifts bond yields and pressures stocks.','cpi consumer price index inflation'],
+['Core CPI','CPI without food and energy, which swing a lot.','What the Fed watches for the underlying inflation trend.','core cpi'],
+['PCE / Core PCE','Inflation measured from what people actually spend on.','The Fed\'s preferred inflation gauge; its 2% target is based on PCE.','pce core pce personal consumption'],
+['PPI (Producer Price Index)','Prices businesses get for what they sell (wholesale inflation).','Often leads consumer inflation; rising costs can squeeze margins or get passed on.','ppi producer price'],
+['Inflation Expectations (UMich)','What consumers think inflation will be in 1 and 5 years.','The Fed watches it closely because expectations can become self-fulfilling.','inflation expectations michigan 1 yr 5 yr'],
+['HICP (Eurozone / EU CPI)','The EU\'s harmonized consumer inflation measure.','What the ECB targets; drives euro rates and EUR/USD.','hicp eurozone cpi flash'],
+['Import Prices','Change in prices of goods brought into the US.','Feeds into consumer inflation; moves with the dollar and tariffs.','import prices'],
+]],
+['Growth & spending',[
+['GDP','Total value of everything the economy produced (advance, second and final estimates).','The broadest growth measure; two negative quarters in a row is the classic recession signal.','gdp gross domestic product growth'],
+['Retail Sales','Monthly spending at stores, restaurants and online.','Consumers drive roughly two-thirds of the US economy, so this is a key health check.','retail sales redbook'],
+['Durable Goods Orders','Orders for long-lasting goods like machinery, planes and appliances.','"Core" (ex-transportation) orders are a read on business investment.','durable goods core durable'],
+['Factory Orders','Total new orders for US manufactured goods.','Confirms the manufacturing trend shown earlier by durable goods.','factory orders'],
+['Industrial Production','Output from factories, mines and utilities.','Shows whether the industrial side of the economy is expanding.','industrial production output'],
+['Trade Balance','Exports minus imports.','A bigger deficit subtracts from GDP; also moves with tariffs and the dollar.','trade balance advance goods'],
+['Wholesale / Retail Inventories','How much stock businesses are holding.','Inventory swings feed into GDP and hint at future production.','inventories wholesale retail'],
+]],
+['Surveys & PMIs',[
+['ISM Manufacturing PMI','Monthly survey of factory purchasing managers.','Above 50 = manufacturing growing, below 50 = shrinking; one of the first reads on each month.','ism manufacturing pmi'],
+['ISM Services PMI','Same survey for service businesses.','Services are most of the US economy, so this often matters more than manufacturing.','ism services pmi non-manufacturing'],
+['S&P Global PMIs (Flash / Final)','Business surveys for manufacturing, services and composite.','"Flash" comes out mid-month, giving the earliest read on activity.','s&p global pmi flash final composite markit'],
+['ISM Prices Paid','The price component of the ISM survey.','A forward look at input-cost inflation.','prices paid ism mfg prices'],
+['Regional Fed Surveys','Empire State, Philly Fed, Chicago PMI, Dallas, Richmond, Kansas City factory surveys.','Early previews of the national ISM numbers.','empire philly philadelphia chicago pmi dallas fed richmond kansas'],
+['Consumer Confidence','Conference Board survey of how upbeat consumers feel.','Confident consumers spend more, which supports growth.','consumer confidence conference board confid'],
+['UMich Consumer Sentiment','University of Michigan survey of consumer mood.','Same idea as confidence; it also produces the inflation-expectations numbers.','michigan sentiment umich'],
+['China PMIs (NBS / Caixin)','Factory and services surveys for China.','China\'s demand drives commodities and global growth expectations.','china nbs caixin pmi chinese'],
+]],
+['Housing',[
+['Housing Starts / Building Permits','New homes started and permits approved.','Very sensitive to mortgage rates; an early signal for construction and the economy.','housing starts building permits'],
+['Existing / New Home Sales','Homes sold in the month.','Shows how high rates are hitting housing demand.','existing home sales new home sales'],
+['Pending Home Sales','Contracts signed but not yet closed.','Leads existing home sales by 1–2 months.','pending home sales'],
+['Case-Shiller Home Prices','Index of US home prices.','Home prices feed household wealth and housing inflation.','case shiller home price hpi'],
+['MBA Mortgage Applications','Weekly mortgage application volume and average rates.','A quick read on how rates are affecting buyers and refinancing.','mba mortgage applications 30-yr'],
+]],
+['Fed, rates & policy',[
+['FOMC Rate Decision','The Federal Reserve sets its benchmark interest rate (8 meetings a year).','The biggest scheduled event for every market; "SEP" meetings add the dot-plot projections.','fomc rate statement fed funds sep dot plot'],
+['FOMC Press Conference','Fed Chair explains the decision.','Tone ("hawkish" vs "dovish") can move markets more than the decision itself.','press conference powell fed chair'],
+['FOMC Minutes','Detailed notes from the meeting 3 weeks earlier.','Reveals how divided the Fed is and hints at the next move.','fomc minutes'],
+['Fed / ECB / BoE speakers','Speeches by central-bank officials.','Markets parse them for clues about the next rate decision.','speaks speech testifies'],
+['Treasury Auctions','The US government selling bills, notes and bonds.','Weak demand (low bid-to-cover) pushes yields up, which can hit stocks.','auction bill bond note bid-to-cover high yield'],
+['Beige Book','The Fed\'s anecdotal report on conditions in each region.','Color on the economy ahead of Fed meetings.','beige book'],
+['ECB / BoE / BoJ Decisions','Rate decisions in Europe, the UK and Japan.','Move the euro, pound, yen and global bond yields.','ecb boe boj bank of england japan rate decision'],
+]],
+['Energy & markets',[
+['EIA Crude Oil Inventories','Weekly change in US oil stockpiles (Wednesdays).','A surprise build usually pushes oil down, a draw pushes it up.','eia crude oil inventories cushing gasoline distillate'],
+['API Crude Stock Change','Industry estimate of oil inventories, out the day before EIA.','An early hint at the official EIA number.','api crude stock'],
+['EIA Natural Gas Storage','Weekly change in US natural gas in storage.','Drives natural gas prices, especially in winter.','natural gas storage bcf'],
+['OPEC / IEA Oil Reports','Monthly supply-and-demand outlooks.','Shift oil price expectations.','opec iea oil report steo'],
+['Options Expiry (OPEX / Triple Witching)','Monthly or quarterly expiry of stock options and futures.','Can cause big trading volume and price swings that day.','opex triple witch expiry options'],
+['Early Market Close / Holiday','US markets close early or are shut.','Thin trading can mean unusual price moves.','early close holiday'],
+]],
+];
+const box=document.getElementById('cheatlist'), qi=document.getElementById('cheatq'); if(!box) return;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function render(q){
+  q=(q||'').trim().toLowerCase(); const words=q.split(/\s+/).filter(Boolean);
+  const re=words.length?new RegExp('('+words.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi'):null;
+  const hl=s=>re?esc(s).replace(re,'<mark>$1</mark>'):esc(s);
+  let html='';
+  CHEAT.forEach(([g,list])=>{
+    const rows=list.filter(r=>!words.length||words.every(w=>(r[0]+' '+r[1]+' '+r[2]+' '+r[3]+' '+g).toLowerCase().includes(w)));
+    if(!rows.length) return;
+    html+=`<div class="chg">${esc(g)}</div>`+rows.map(r=>`<div class="chi"><b>${hl(r[0])}</b><span>${hl(r[1])}</span><i>Why it matters: ${hl(r[2])}</i></div>`).join('');
+  });
+  box.innerHTML=html||'<div class="cheatempty">Not in the cheat sheet yet. Try a shorter word like "pmi", "cpi" or "claims".</div>';
+  box.scrollTop=0;
+}
+render('');
+if(qi) qi.addEventListener('input',()=>render(qi.value));
 })();
 </script>
 </body>
