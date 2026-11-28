@@ -1056,6 +1056,13 @@ const MILESTONES=[
   ["Late 2027","2027-11-30",["anthropic","nscale"],"Nscale's ~460MW <b>Monarch (WV)</b> campus starts Vera Rubin capacity for Anthropic ($44.6B, 6 yrs)."],
   ["Q4 2027","2027-12-15",["meta","cleanspark"],"CleanSpark's <b>Sandersville, GA</b> data center comes online for Meta ($6.6B, 20-yr lease)."],
   ["By Jun 2028","2028-06-30",["anthropic","riot"],"Riot's 191MW <b>Rockdale, TX</b> build for Anthropic fully complete (extensions to $16.1B)."],
+  ["1H 2027","2027-06-30",["nvidia","huggingface","microsoft"],"Nvidia's $12.9B <b>Hugging Face</b> acquisition expected to close (pending regulators)."],
+  ["2027","2027-07-01",["nvidia","skorea"],"First phase of SK Telecom's 2GW <b>Vera Rubin AI factory</b> under the Nvidia–SK pact."],
+  ["By 2027","2027-12-31",["nvidia","australia"],"Australia's eight-partner sovereign-AI program targets <b>up to 2GW</b> of Nvidia capacity."],
+  ["By 2027","2027-12-31",["google","blackstone"],"Blackstone's $5B Google-backed <b>AI-infrastructure venture</b> targets ~500MW online."],
+  ["From 2027","2027-07-01",["anthropic","amd"],"Anthropic starts running up to <b>2GW of AMD MI450s</b>."],
+  ["From 2028","2028-06-30",["nvidia","sbenergy"],"First phases of SB Energy's <b>PORTS-Pike, Ohio</b> campus come online (Nvidia exclusive compute)."],
+  ["2028","2028-06-30",["meta","blackrock"],"Meta becomes sole occupant of the 1GW <b>El Paso</b> campus (BlackRock-funded JV)."],
 ].map(([when,d,ids,text])=>({when,d,ids,text}));
 let EARN=[], catFilter=null;
 const todayStr=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);};
@@ -1185,7 +1192,7 @@ const _focus=focusNode; focusNode=function(d){_focus(d);catFilter=active;renderC
 const _clear=clearFocus; clearFocus=function(){_clear();if(catFilter){catFilter=null;renderCats();}};
 
 renderLead(); renderCats(); loadEarnings();
-window.__macroX={onHook,exposureOf,FLOWS};
+window.__macroX={onHook,exposureOf,FLOWS,MILESTONES};
 })();
 
 /* ---------- reset / resize ---------- */
@@ -1198,6 +1205,202 @@ addEventListener("resize",()=>{
 W=svg.node().clientWidth;H=svg.node().clientHeight;svg.attr("viewBox",[0,0,W,H]);
 sim.force("x",d3.forceX(W/2).strength(.045)).force("y",d3.forceY(H/2).strength(.06)).alpha(.3).restart();
 });
+</script>
+<script>
+/* ===== Actionable layer for the company webs (Nvidia + Mag 7): exposure from stated deal $, catalysts, price colors ===== */
+(function(){
+/* node id → Yahoo symbol, shared by every company web (keep in step with the Macro Web's TICK) */
+const TICK_ALL={nvidia:"NVDA",google:"GOOGL",microsoft:"MSFT",amazon:"AMZN",meta:"META",apple:"AAPL",tesla:"TSLA",spacex:"SPCX",
+  broadcom:"AVGO",berkshire:"BRK-B",oracle:"ORCL",anthropic:"ANT",amd:"AMD",intel:"INTC",softbank:"9984.T",coreweave:"CRWV",nebius:"NBIS",
+  terawulf:"WULF",riot:"RIOT",cleanspark:"CLSK",applieddigital:"APLD",blackstone:"BX",catl:"300750.SZ",chevron:"CVX",coherent:"COHR",
+  constellation:"CEG",corning:"GLW",elililly:"LLY",foxconn:"2317.TW",hyundai:"005380.KS",lg:"373220.KS",lumentum:"LITE",marvell:"MRVL",
+  mercedes:"MBG.DE",micron:"MU",nokia:"NOK",palantir:"PLTR",panasonic:"6752.T",qualcomm:"QCOM",recursion:"RXRX",samsung:"005930.KS",
+  skhynix:"000660.KS",smci:"SMCI",sony:"SONY",synopsys:"SNPS",toyota:"TM",tsmc:"TSM",uber:"UBER",weride:"WRD",iren:"IREN",oklo:"OKLO",
+  amkor:"AMKR",mediatek:"2454.TW"};
+window.TICK_ALL=TICK_ALL;
+/* links whose first dollar figure is not the deal's own size (it describes something else) — treated as "not disclosed" */
+const AXFIX=new Set(["nvidia>lambda","smci>nvidia","markets>microsoft","microsoft>huggingface","openai>google"]);
+const SHOW=s=>s==="BRK-B"?"BRK.B":s;
+const isPublic=n=>!!n&&/mkt cap/i.test(n.val||"");
+const sid=e=>e&&e.id||e;
+const pctTxt=x=>x==null?"–":(x>0?"+":"")+x.toFixed(Math.abs(x)>=10?0:1)+"%";
+const fmtPct=(x,who)=>{const w=who?who+"'s value":"its value";return x>=100?(x/100).toFixed(x>=1000?0:1).replace(/\.0$/,"")+"× "+w:(x>=10?Math.round(x):x.toFixed(1).replace(/\.0$/,""))+"% of "+w;};
+const todayStr=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);};
+const fmtDay=s=>new Date(s+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+
+/* First dollar figure written in a deal's text. Per-period figures ($/yr, $/month) are kept as stated and never divided into market value. */
+function money(body){
+  const m=String(body||"").match(/(up to |~|>|over |about |nearly |roughly )?\$\s?(\d+(?:\.\d+)?)\s?(trillion|billion|million|bn|T|B|M)\b(\s?(?:\/|per |a )\s?(yr|year|month|mo|quarter|qtr)\b)?/i);
+  if(!m)return null;
+  const u=m[3].toLowerCase(), mult=u[0]==="t"?1000:u[0]==="b"?1:0.001;
+  const per=m[5]?(/^mo/i.test(m[5])?"mo":/^q/i.test(m[5])?"q":"yr"):null;
+  const b=+m[2]*mult;
+  return {b, per, rank:per==="mo"?b*12:per==="q"?b*4:b, txt:m[0].replace(/\s+/g," ").trim()};
+}
+
+/* shared data: earnings calendar text + quotes cache */
+let EARN_P=null;
+function earnings(){
+  if(!EARN_P)EARN_P=fetch("https://raw.githubusercontent.com/pshah019/earnings-calendar-2026/main/index.html",{cache:"no-cache"}).then(r=>r.text()).then(t=>{
+    const out=[], seen=new Set(), re=/\{d:"(\d{4}-\d\d-\d\d)",name:"[^"]*",ticker:"([A-Z.\-]+)",time:"(\w*)",status:"(\w+)"/g; let m;
+    while((m=re.exec(t))){const k=m[2]+m[1]; if(seen.has(k))continue; seen.add(k); out.push({d:m[1],tk:m[2],time:m[3],status:m[4]});}
+    return out;
+  }).catch(()=>[]);
+  return EARN_P;
+}
+const QC={}; // sym -> {t,v}
+async function quotes(syms,force){
+  const need=syms.filter(s=>force||!QC[s]||Date.now()-QC[s].t>4*60e3);
+  for(let i=0;i<need.length;i+=40){
+    try{const j=await (await fetch("/api/quotes?s="+encodeURIComponent(need.slice(i,i+40).join(",")))).json();
+      Object.entries((j&&j.q)||{}).forEach(([s,v])=>QC[s]={t:Date.now(),v});}catch(e){}
+  }
+  const o={}; syms.forEach(s=>{if(QC[s])o[s]=QC[s].v;}); return o;
+}
+const MS=()=>((window.__macroX&&window.__macroX.MILESTONES)||[]);
+
+/* one-time CSS for the company-web controls */
+const css=document.createElement("style");
+css.textContent=".axperf .chip{padding:5px 12px}.axperf .chip[data-on=\"false\"]{opacity:.7;text-decoration:none;filter:none}.axperf .chip[data-on=\"true\"]{border-color:var(--gold);color:var(--gold);background:rgba(231,178,74,.08)}"+
+ ".xrow .xv.nd{color:var(--ink-faint)}.xsec{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin:10px 0 2px}.xsec:first-child{margin-top:0}";
+document.head.appendChild(css);
+
+window.attachActionable=function(o){
+  const NODE=new Map(o.NODES.map(n=>[n.id,n])), center=NODE.get(o.centerId), view=document.getElementById(o.viewId);
+  const FLIP=new Set(o.flip||[]);
+  const TICK={}; o.NODES.forEach(n=>{if(TICK_ALL[n.id])TICK[n.id]=TICK_ALL[n.id];});
+  /* money flows: payer → payee for hw/svc/cap (cap from a lender = credit), investor → investee for inv; partnerships (vc) carry no money math */
+  const FLOWS=[];
+  o.LINKS.forEach(l=>{
+    const s=sid(l.source),t=sid(l.target),mny=AXFIX.has(s+">"+t)?null:money(l.body); if(l.cat==="vc")return;
+    if(l.cat==="inv")FLOWS.push({kind:"eq",holder:s,issuer:t,m:mny,body:l.body});
+    else{const sn=NODE.get(s);
+      if(l.cat==="cap"&&sn&&(sn.role==="market"||sn.role==="fin"))FLOWS.push({kind:"cred",holder:s,issuer:t,m:mny,body:l.body});
+      else{const f=FLIP.has(l.cat);FLOWS.push({kind:"rev",payer:f?t:s,payee:f?s:t,m:mny,body:l.body});}}
+  });
+  function agg(pick){
+    const m=new Map();
+    FLOWS.forEach(f=>{const c=pick(f); if(!c)return;
+      const r=m.get(c)||{id:c,kinds:new Set(),items:[]}; r.kinds.add(f.kind); r.items.push(f.m); m.set(c,r);});
+    return [...m.values()].map(r=>{
+      const ms=r.items.filter(Boolean);
+      r.rank=ms.reduce((a,x)=>a+x.rank,0);
+      r.total=ms.filter(x=>!x.per).reduce((a,x)=>a+x.b,0);
+      r.txt=ms.map(x=>x.txt).join(" + ");
+      r.nd=ms.length<r.items.length; return r;});
+  }
+  const onHook=x=>agg(f=>f.kind==="rev"?(f.payer===x?f.payee:null):(f.issuer===x?f.holder:null));   // who loses if x stumbles
+  const betsOf=x=>agg(f=>f.kind==="rev"?(f.payee===x?f.payer:null):(f.holder===x?f.issuer:null));   // what x is betting on
+  const withPct=(rows,denomOf,who)=>rows.map(r=>{const n=denomOf(r);r.pct=(n&&isPublic(n)&&r.total>0)?r.total/n.v*100:null;r.who=who||null;return r;})
+    .sort((a,b)=>(b.pct??-1)-(a.pct??-1)||b.rank-a.rank||(a.nd-b.nd));
+  const TAGS={rev:'<span class="xtag rev">revenue</span>',eq:'<span class="xtag eq">equity</span>',cred:'<span class="xtag cred">credit</span>'};
+  function row(id,label,r){
+    const val=r.txt?(r.txt+(r.nd?" + undisclosed":"")+(r.pct!=null?" · "+fmtPct(r.pct,r.who):"")):"size not disclosed";
+    const bar=r.pct!=null?`<div class="xbar"><i class="${r.pct>100?"over":""}" style="width:${Math.min(100,Math.max(2,r.pct))}%"></i></div>`:"";
+    return `<div class="xrow" data-axgo="${o.key}|${id}"><div class="xn">${label}${[...r.kinds].map(k=>TAGS[k]).join("")}</div><div class="xv${r.txt?"":" nd"}">${val}</div>${bar}</div>`;
+  }
+  view.addEventListener("click",e=>{const r=e.target.closest&&e.target.closest("[data-axgo]"); if(!r)return; const [k,id]=r.dataset.axgo.split("|"); if(k!==o.key)return; e.stopPropagation(); o.go(id);});
+  document.getElementById("panel").addEventListener("click",e=>{const r=e.target.closest&&e.target.closest("[data-axgo]"); if(!r)return; const [k,id]=r.dataset.axgo.split("|"); if(k!==o.key||view.style.display==="none")return; e.stopPropagation(); o.go(id);},true);
+
+  /* ----- controls + cards (injected so the HTML of each web stays untouched) ----- */
+  const ctl=view.querySelector(".controls"), stage=view.querySelector(".stage");
+  const pb=document.createElement("div"); pb.className="legend-block";
+  pb.innerHTML=`<div class="ltitle">Circle color — tap for price moves</div><div class="chips axperf"></div><div class="perfnote"></div>`;
+  if(ctl)ctl.appendChild(pb);
+  const grid=document.createElement("div"); grid.className="xgrid";
+  grid.innerHTML=`<div class="xcard"><div class="xhd"><b>💥 Who's most tied to ${center.label}</b><span>stated deal $ · ÷ partner's market value when it's a one-off total</span></div><div class="xbody axlead"></div>
+<div class="xfoot">Only dollar figures written in the mapped deal terms are counted (line thickness on this web is illustrative, not dollars). Per-year / per-month figures are shown as stated and never divided into market value; partnerships without money terms are left out. Over 100% means the contract is bigger than the partner company today — a concentration flag, not a loss estimate. Tap a row to open it.</div></div>
+<div class="xcard"><div class="xhd"><b>⏱ Catalyst timeline</b><span class="axhint">earnings dates + dated deal milestones for this web</span><span class="xclr axclr" style="display:none">show all ×</span></div><div class="xbody axcats"></div>
+<div class="xfoot">Earnings dates come live from the <a href="https://earnings-calendar-2026.vercel.app/" target="_blank" rel="noopener" style="color:#93c5fd">earnings calendar</a> (✓ confirmed / ~ estimated) for the listed companies on this web; milestones are the companies' or reporters' targets and can slip. Tap a circle to filter.</div></div>`;
+  if(stage)stage.after(grid);
+  const $=s=>grid.querySelector(s);
+
+  function renderLead(){
+    const ride=withPct(onHook(o.centerId),r=>NODE.get(r.id)), lean=withPct(betsOf(o.centerId),()=>center,center.label);
+    const sec=(title,rows,labelOf)=>rows.length?`<div class="xsec">${title}</div>`+rows.slice(0,8).map(r=>row(r.id,labelOf(r),r)).join(""):"";
+    $(".axlead").innerHTML=(sec(`Rides on ${center.label} — loses if it stumbles`,ride,r=>NODE.get(r.id).label)+
+      sec(`${center.label} leans on`,lean,r=>NODE.get(r.id).label))||'<div class="xempty">No money terms mapped.</div>';
+  }
+
+  /* ----- catalysts ----- */
+  let EARN=[], catFilter=null;
+  const symFor=id=>TICK[id]?SHOW(TICK[id]):null;
+  function items(){
+    const today=todayStr(), past30=(()=>{const d=new Date(today+"T12:00:00");d.setDate(d.getDate()-30);return d.toISOString().slice(0,10);})();
+    const bySym=new Map(); o.NODES.forEach(n=>{const s=symFor(n.id); if(s)bySym.set(s,n.id);});
+    const e=EARN.filter(x=>x.d>=today&&bySym.has(x.tk)).map(x=>({d:x.d,ids:[bySym.get(x.tk)],earn:true,tk:x.tk,time:x.time,status:x.status}));
+    const m=MS().filter(x=>x.d>=past30&&x.ids.some(id=>NODE.has(id)));
+    return [...e,...m];
+  }
+  function catRow(i,today){
+    if(i.earn){const n=NODE.get(i.ids[0]);
+      return `<div class="catr"><div class="cw">${fmtDay(i.d)}<small>${i.time||""}</small></div><div class="ct"><b>${n.label}</b> (${i.tk}) earnings<span class="xtag ${i.status==="confirmed"?"conf":"est"}">${i.status==="confirmed"?"✓ confirmed":"~ estimated"}</span><span class="cco"><span data-axgo="${o.key}|${n.id}">${n.label} →</span></span></div></div>`;}
+    const due=i.d<today;
+    return `<div class="catr${due?" due":""}"><div class="cw">${i.when}${due?"<small>due — check status</small>":""}</div><div class="ct">${i.text}<span class="cco">${i.ids.filter(x=>NODE.has(x)).map(x=>`<span data-axgo="${o.key}|${x}">${NODE.get(x).label} →</span>`).join("")}</span></div></div>`;
+  }
+  function renderCats(){
+    const today=todayStr(), plus=n=>{const d=new Date(today+"T12:00:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);};
+    const d30=plus(30), d90=plus(90);
+    let it=items(); if(catFilter)it=it.filter(i=>i.ids.includes(catFilter));
+    it.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:(b.earn?1:0)-(a.earn?1:0));
+    let html="";
+    [["Next 30 days",i=>i.d<=d30],["Next 90 days",i=>i.d>d30&&i.d<=d90],["Later",i=>i.d>d90]].forEach(([g,f])=>{const l=it.filter(f); if(l.length)html+=`<div class="catg">${g}</div>`+l.map(i=>catRow(i,today)).join("");});
+    $(".axcats").innerHTML=html||`<div class="xempty">${catFilter?"No dated catalysts mapped for "+NODE.get(catFilter).label+" yet.":"No upcoming catalysts mapped."}</div>`;
+    $(".axhint").textContent=catFilter?"filtered to "+NODE.get(catFilter).label:"earnings dates + dated deal milestones for this web";
+    $(".axclr").style.display=catFilter?"":"none";
+  }
+  $(".axclr").addEventListener("click",e=>{e.stopPropagation();catFilter=null;renderCats();});
+
+  /* ----- price colors ----- */
+  let PERF=null, perfT=0, mode="role", timer=null;
+  const SPAN={d1:4,w1:8,m1:15,ytd:40}, PER=[["role","Role"],["d1","1D"],["w1","1W"],["m1","1M"],["ytd","YTD"]];
+  const syms=[...new Set(Object.values(TICK))];
+  async function loadPerf(force){ if(!force&&PERF&&Date.now()-perfT<4*60e3)return; PERF=await quotes(syms,force); perfT=Date.now(); }
+  const perfOf=id=>TICK[id]&&PERF?PERF[TICK[id]]:null;
+  const colorFor=x=>{if(x==null)return null;const k=Math.max(-1,Math.min(1,x/(SPAN[mode]||10)));return k>=0?d3.interpolateRgb("#1b2433","#16a34a")(k):d3.interpolateRgb("#1b2433","#dc2626")(-k);};
+  const note=pb.querySelector(".perfnote");
+  function applyPerf(){
+    const circles=o.nodeSel.select("circle.core"), vals=o.nodeSel.select("text.val");
+    if(mode==="role"){circles.style("fill",null);vals.text(d=>d.val).style("fill",null);note.innerHTML="";return;}
+    if(!PERF){note.textContent="Loading prices…";return;}
+    circles.style("fill",d=>{const p=perfOf(d.id);return (p&&colorFor(p[mode]))||null;});
+    vals.text(d=>{const p=perfOf(d.id);if(p&&p[mode]!=null)return SHOW(TICK[d.id])+" "+pctTxt(p[mode]);return TICK[d.id]?SHOW(TICK[d.id])+" · n/a":"private";})
+      .style("fill",d=>{const p=perfOf(d.id);return p&&p[mode]!=null?(p[mode]>=0?"#6ee7b7":"#fca5a5"):"#5e6b85";});
+    const L=SPAN[mode];
+    note.innerHTML=`<span class="perfleg">−${L}% <i></i> +${L}%</span> · ${PER.find(p=>p[0]===mode)[1]} · ${Object.keys(PERF).length} listed names · updated ${new Date(perfT).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`;
+  }
+  const pc=pb.querySelector(".axperf");
+  PER.forEach(([k,lab])=>{const el=document.createElement("div"); el.className="chip"; el.dataset.on=String(k==="role"); el.dataset.k=k; el.textContent=lab;
+    el.addEventListener("click",async e=>{e.stopPropagation(); mode=k; pc.querySelectorAll(".chip").forEach(c=>c.dataset.on=String(c.dataset.k===k)); clearInterval(timer);
+      if(k!=="role"){applyPerf();await loadPerf();applyPerf();timer=setInterval(async()=>{if(view.style.display==="none")return;await loadPerf(true);applyPerf();},5*60e3);}
+      else applyPerf();});
+    pc.appendChild(el);});
+
+  /* ----- panel extras ----- */
+  function panel(d){
+    const box=document.getElementById("p-deals"), n=NODE.get(d.id); let top="";
+    const hook=withPct(onHook(d.id),r=>NODE.get(r.id)), bets=withPct(betsOf(d.id),()=>n,n.label);
+    if(hook.length)top+=`<h3>Who's on the hook if ${n.label} stumbles</h3>`+hook.slice(0,8).map(r=>row(r.id,NODE.get(r.id).label,r)).join("");
+    if(bets.length)top+=`<h3>What ${n.label} is betting on</h3>`+bets.slice(0,8).map(r=>row(r.id,NODE.get(r.id).label,r)).join("");
+    const today=todayStr(), up=items().filter(i=>i.ids.includes(d.id)&&i.d>=today).sort((a,b)=>a.d<b.d?-1:1).slice(0,4);
+    if(up.length)top+=`<h3>Coming up</h3>`+up.map(i=>i.earn
+      ?`<div class="catr"><div class="cw">${fmtDay(i.d)}<small>${i.time||""}</small></div><div class="ct">Earnings<span class="xtag ${i.status==="confirmed"?"conf":"est"}">${i.status==="confirmed"?"✓ confirmed":"~ estimated"}</span></div></div>`
+      :`<div class="catr"><div class="cw">${i.when}</div><div class="ct">${i.text}</div></div>`).join("");
+    if(top)box.innerHTML=top+`<h3 style="margin-top:20px">All mapped links</h3>`+box.innerHTML;
+    const old=document.getElementById("p-perf"); if(old)old.remove();
+    if(TICK[d.id]){
+      const div=document.createElement("div"); div.className="pperf"; div.id="p-perf"; document.getElementById("p-val").after(div);
+      const fill=()=>{const p=perfOf(d.id);
+        div.innerHTML=p?`<b>${SHOW(TICK[d.id])} ${p.cur&&p.cur!=="USD"?p.cur+" ":"$"}${p.p}</b>`+[["1D","d1"],["1W","w1"],["1M","m1"],["YTD","ytd"]].map(([l,k])=>`<span>${l} <span class="${p[k]>=0?"up":"dn"}">${pctTxt(p[k])}</span></span>`).join(""):`<span>${SHOW(TICK[d.id])} · price unavailable</span>`;};
+      if(PERF)fill(); else {div.textContent=SHOW(TICK[d.id])+" · loading price…"; loadPerf().then(()=>{if(document.getElementById("p-perf")===div)fill();});}
+    }
+  }
+  function focus(id){ if(catFilter===id)return; catFilter=id; renderCats(); }
+
+  renderLead(); renderCats(); earnings().then(e=>{EARN=e;renderCats();});
+  return {panel:d=>{try{panel(d);}catch(e){console.warn("panel extras",e);}}, focus};
+};
+})();
 </script>
 <script>
 /* ===== Tab switching: main row (AI / Mag 7 group, Energy, Data Center, Stocks) + AI sub-row ===== */
@@ -1501,6 +1704,7 @@ svg.transition().duration(450).call((svg.node().__zb||d3.zoom()).transform,d3.zo
 sim.alpha(.6).restart();
 });
 attachWebSearch(svg.node(),nodeSel,linkSel,{clear:()=>{clearFocus();},pick:d=>{clearFocus();focusNode(d);openPanel(d);}});
+if(window.attachActionable){const __ax=attachActionable({key:"nvidia",viewId:"view-nvidia",centerId:"nvidia",NODES,LINKS,nodeSel,flip:["cap","svc"],go:id=>{const n=NODES.find(x=>x.id===id);if(n){clearFocus();focusNode(n);openPanel(n);}}}); const _o=openPanel,_f=focusNode,_c=clearFocus; openPanel=function(d){_o(d);__ax.panel(d);}; focusNode=function(d){_f(d);__ax.focus(active);}; clearFocus=function(){_c();__ax.focus(null);};}
 window.nvResize=function(){
 W=svg.node().clientWidth||W; H=svg.node().clientHeight||H; svg.attr("viewBox",[0,0,W,H]);
 sim.force("x",d3.forceX(W/2).strength(.05)).force("y",d3.forceY(H/2).strength(.07)).alpha(.3).restart();
@@ -1655,6 +1859,7 @@ tk.appendChild(s);
 });
 document.getElementById(cfg.resetId).addEventListener("click",()=>{ clearFocus();closePanel(); svg.transition().duration(450).call((svg.node().__zb||d3.zoom()).transform,d3.zoomIdentity); sim.alpha(.6).restart(); });
 attachWebSearch(svg.node(),nodeSel,linkSel,{clear:()=>{clearFocus();},pick:d=>{clearFocus();focusNode(d);openPanel(d);}});
+if(window.attachActionable){const __ax=attachActionable({key:cfg.viewId.replace("view-",""),viewId:cfg.viewId,centerId:cfg.centerId,NODES,LINKS,nodeSel,flip:[],go:id=>{const n=NODES.find(x=>x.id===id);if(n){clearFocus();focusNode(n);openPanel(n);}}}); const _o=openPanel,_f=focusNode,_c=clearFocus; openPanel=function(d){_o(d);__ax.panel(d);}; focusNode=function(d){_f(d);__ax.focus(active);}; clearFocus=function(){_c();__ax.focus(null);};}
 function doResize(){ W=svg.node().clientWidth||W; H=svg.node().clientHeight||H; svg.attr("viewBox",[0,0,W,H]); sim.force("x",d3.forceX(W/2).strength(.05)).force("y",d3.forceY(H/2).strength(.07)).alpha(.3).restart(); }
 addEventListener("resize",()=>{ const vw=document.getElementById(cfg.viewId); if(vw && vw.style.display!=='none') doResize(); });
 return {resize:doResize};
